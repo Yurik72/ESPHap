@@ -3,8 +3,8 @@
 #include <FS.h>
 #include <SPIFFS.h>
 
-const char* ssid     = "Phoenix";
-const char* password = "Welcome Marka";
+const char* ssid     = "your ssid";
+const char* password = "pwd to ssid";
 
 const int identity_led=2;
 const int led_gpio = 4;
