@@ -41,6 +41,7 @@ This example used as well implemenation for pairing storage. it will be stored i
 In the ino file change your wifi name and password. After connecting to wifi device should be accesible for pairing from Apple home.
 At this moment QR is not generated, so please use manual pairing by enetering password  11111111
 
+More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 ## For more information
 
