@@ -17,8 +17,8 @@ this project uses this as well.
 ## build instruction
 
 This library should be located under standart Arduino libraries folder. 
-Library is depends from [wolfssl][https://github.com/wolfSSL]  , but it requires some preparation before usage
-full instruction how to do that can be found (there) [https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html]
+Library is depends from [wolfssl](https://github.com/wolfSSL)  , but it requires some preparation before usage
+full instruction how to do that can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
 
 if you are doing this manually you should specifically configure this before usage
 For simplify process you can use wolfssl.rar archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
