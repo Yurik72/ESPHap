@@ -145,8 +145,9 @@ void hap_init_homekit_server() {
 					 NEW_HOMEKIT_ACCESSORY(
 					 				.category=(homekit_accessory_category_t)base_acctype,//  homekit_accessory_category_lightbulb,
 					 				.services=hap_services);
-					// homekit_accessory_clone(hap_accessories[base_accessory_index]);
-			 //to do delete old;
+					
+			 //TO DO  memory leak
+			 //Need release  homekit_accessory_t * old  
 		 }
 
 
