@@ -13,7 +13,7 @@ typedef unsigned char byte;
 #else
 
 #define DEBUG(message, ...)
-sdcde
+
 #endif
 
 #define INFO(message, ...) printf(">>> HomeKit: " message "\n", ##__VA_ARGS__)
