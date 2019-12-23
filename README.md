@@ -24,7 +24,7 @@ if you are doing this manually you should specifically configure this before usa
 For simplify process you can use [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
 
 If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from attached archive or
- [this locvation](https://github.com/Yurik72/ESPHap/tree/master/wolfssl)
+ [this location](https://github.com/Yurik72/ESPHap/tree/master/wolfssl)
 
 ## Getting help
 
