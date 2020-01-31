@@ -40,7 +40,9 @@ static int mdns_port = 80;
 void homekit_mdns_init() {
     mdns_init();
 }
+void homekit_mdns_add_txt_ex(const char *key, const char *val) {
 
+}
 void homekit_mdns_configure_init(const char *instance_name, int port) {
     strncpy(mdns_instance_name, instance_name, sizeof(mdns_instance_name));
     mdns_txt_rec[0] = 0;
@@ -105,7 +107,9 @@ void homekit_overclock_end() {
 void homekit_mdns_init() {
     mdns_init();
 }
+void homekit_mdns_add_txt_ex(const char *key, const char *val) {
 
+}
 void homekit_mdns_configure_init(const char *instance_name, int port) {
     mdns_hostname_set(instance_name);
     mdns_instance_name_set(instance_name);
@@ -168,7 +172,9 @@ void homekit_overclock_end() {
 void homekit_mdns_init() {
 	mdns_init();
 }
+void homekit_mdns_add_txt_ex(const char *key, const char *val) {
 
+}
 void homekit_mdns_configure_init(const char *instance_name, int port) {
 	mdns_hostname_set(instance_name);
 	mdns_instance_name_set(instance_name);
@@ -195,5 +201,96 @@ void homekit_mdns_configure_finalize() {
 		   name->value.string_value, txt_rec, PORT, 0);
 	*/
 }
+#endif
+#if defined(ARDUINO) && defined(ESP8266)
+
+#include <string.h>
+//#include <esp/hwrand.h>
+//#include <espressif/esp_common.h>
+//#include <esplibs/libmain.h>
+
+
+#include "types.h"
+#include "Arduino.h"
+
+#include "mdnsA8266.h"
+
+#ifndef MDNS_TTL
+#define MDNS_TTL 4500
+#endif
+
+uint32_t ICACHE_FLASH_ATTR homekit_random() {
+	//return hwrand();
+	return 0;// hwrand_fill'
+}
+
+void ICACHE_FLASH_ATTR homekit_random_fill(uint8_t *data, size_t size) {
+	//hwrand_fill(data, size);
+}
+
+void ICACHE_FLASH_ATTR homekit_system_restart() {
+	//sdk_system_restart();
+}
+
+void ICACHE_FLASH_ATTR homekit_overclock_start() {
+	//sdk_system_overclock();
+	system_update_cpu_freq(160);
+	ets_intr_lock();
+}
+
+void homekit_overclock_end() {
+	//sdk_system_restoreclock();
+	system_update_cpu_freq(80);
+	ets_intr_unlock();
+}
+
+//static char mdns_instance_name[65] = { 0 };
+//static char mdns_txt_rec[128] = { 0 };
+static int mdns_port = 80;
+const char * mdns_base_service = "hap";
+const char * mdns_base_service_proto = "tcp";
+void homekit_mdns_init() {
+	mdns_init();
+}
+
+void ICACHE_FLASH_ATTR homekit_mdns_configure_init(const char *instance_name, int port) {
+	//strncpy(mdns_instance_name, instance_name, sizeof(mdns_instance_name));
+	//mdns_txt_rec[0] = 0;
+	mdns_port = port;
+	mdns_init8266(instance_name, mdns_base_service, mdns_base_service_proto, port, MDNS_TTL);
+}
+void ICACHE_FLASH_ATTR homekit_mdns_add_txt_ex(const char *key, const char *val) {
+	//mdns_TXT_append_ex(key, val);
+}
+void ICACHE_FLASH_ATTR homekit_mdns_add_txt(const char *key, const char *format, ...) {
+	
+	va_list arg_ptr;
+	va_start(arg_ptr, format);
+
+	char value[128];
+	int value_len = vsnprintf(value, sizeof(value), format, arg_ptr);
+
+	va_end(arg_ptr);
+	
+	if (value_len && value_len < sizeof(value) - 1) {
+		mdns_TXT_append_ex(mdns_base_service, mdns_base_service_proto, key, value );
+		//char buffer[128];
+		//int buffer_len = snprintf(buffer, sizeof(buffer), "%s=%s", key, value);
+
+		//if (buffer_len < sizeof(buffer) - 1)
+		//	mdns_TXT_append(mdns_base_service, mdns_base_service_proto, key, buffer, );
+	}
+	
+}
+
+void ICACHE_FLASH_ATTR homekit_mdns_configure_finalize() {
+	//mdns_clear();
+	//mdns_add_facility(mdns_instance_name, mdns_base_service, mdns_txt_rec, mdns_TCP, mdns_port, MDNS_TTL);
+
+	//printf("mDNS announcement: Name=%s %s Port=%d TTL=%d\n",
+	//	mdns_instance_name, mdns_txt_rec, mdns_port, MDNS_TTL);
+}
 
 #endif
+
+

@@ -1,5 +1,9 @@
 #include "port_x.h"
-#if !defined(ARDUINO8266_SERVER)
+#ifdef ARDUINO8266_SERVER
+
+#include <Arduino.h>
+#include "os_settings.h"
+extern "C" {
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,20 +15,7 @@
 
 #include <unistd.h>
 
-#if defined(ESP_IDF)
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/queue.h>
-#elif defined(ESP_OPEN_RTOS)
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#elif defined(ARDUINO)
-#include <Arduino.h>
-#include "os_settings.h"
-#else
-#error "Unknown target platform"
-#endif
+
 
 #include "http_parser.h"
 #include "cJSON.h"
@@ -45,6 +36,12 @@
 #include "tlv.h""
 
 
+}
+
+
+
+extern "C"
+{
 #define PORT 5556
 
 #ifndef HOMEKIT_MAX_CLIENTS
@@ -141,25 +138,25 @@ struct _client_context_t {
     int count_reads;
     int count_writes;
 
-    QueueHandle_t event_queue;
+   // QueueHandle_t event_queue;
     pair_verify_context_t *verify_context;
 
     struct _client_context_t *next;
 };
 
-//#if !defined(ARDUINO) && !defined(ESP8266)
+#if !defined(ARDUINO) && !defined(ESP8266)
 typedef struct {
     homekit_characteristic_t *characteristic;
     homekit_value_t value;
 } characteristic_event_t;
-//#endif
+#endif
 
 void client_context_free(client_context_t *c);
 void pairing_context_free(pairing_context_t *context);
 
 
 homekit_server_t *server_new() {
-    homekit_server_t *server = malloc(sizeof(homekit_server_t));
+    homekit_server_t *server =(homekit_server_t *) malloc(sizeof(homekit_server_t));
     FD_ZERO(&server->fds);
     server->max_fd = 0;
     server->nfds = 0;
@@ -293,7 +290,7 @@ typedef enum {
 
 
 pair_verify_context_t *pair_verify_context_new() {
-    pair_verify_context_t *context = malloc(sizeof(pair_verify_context_t));
+    pair_verify_context_t *context =(pair_verify_context_t *) malloc(sizeof(pair_verify_context_t));
 
     context->secret = NULL;
     context->secret_size = 0;
@@ -326,17 +323,17 @@ void pair_verify_context_free(pair_verify_context_t *context) {
 
 
 client_context_t *client_context_new() {
-    client_context_t *c = malloc(sizeof(client_context_t));
+    client_context_t *c = (client_context_t *)malloc(sizeof(client_context_t));
     c->server = NULL;
     c->endpoint_params = NULL;
 
     c->data_size = 1024 + 18;
     c->data_available = 0;
-    c->data = malloc(c->data_size);
+    c->data = (unsigned char*)malloc(c->data_size);
 
     c->body = NULL;
     c->body_length = 0;
-    c->parser = malloc(sizeof(*c->parser));
+    c->parser =(http_parser*) malloc(sizeof(*c->parser));
     http_parser_init(c->parser, HTTP_REQUEST);
     c->parser->data = c;
 
@@ -349,7 +346,7 @@ client_context_t *client_context_new() {
 
     c->disconnect = false;
 
-    c->event_queue = xQueueCreate(20, sizeof(characteristic_event_t*));
+   // c->event_queue = xQueueCreate(20, sizeof(characteristic_event_t*));
     c->verify_context = NULL;
 
     c->next = NULL;
@@ -368,8 +365,8 @@ void client_context_free(client_context_t *c) {
     if (c->verify_context)
         pair_verify_context_free(c->verify_context);
 
-    if (c->event_queue)
-        vQueueDelete(c->event_queue);
+  //  if (c->event_queue)
+  //      vQueueDelete(c->event_queue);
 
     if (c->endpoint_params)
         query_params_free(c->endpoint_params);
@@ -396,7 +393,7 @@ pairing_context_t *pairing_context_new() {
 	int i = sizeof(pairing_context_t);
 	//INFO("pc 2");
 	//INFO("size 0x%d", i);
-    pairing_context_t *context = malloc(sizeof(pairing_context_t));
+    pairing_context_t *context = (pairing_context_t *) malloc(sizeof(pairing_context_t));
 	//INFO("allocated 0x%d", (int)context);
 	//INFO("starting crypto");
     context->srp = crypto_srp_new();
@@ -579,11 +576,11 @@ void write_characteristic_json(json_stream *json, client_context_t *client, cons
                         if (tlv_size == 0) {
                             json_string(json, "");
                         } else {
-                            byte *tlv_data = malloc(tlv_size);
+                            byte *tlv_data = (unsigned char*)malloc(tlv_size);
                             tlv_format(v.tlv_values, tlv_data, &tlv_size);
 
                             size_t encoded_tlv_size = base64_encoded_size(tlv_data, tlv_size);
-                            byte *encoded_tlv_data = malloc(encoded_tlv_size + 1);
+                            byte *encoded_tlv_data =(unsigned char*) malloc(encoded_tlv_size + 1);
                             base64_encode(tlv_data, tlv_size, encoded_tlv_data);
                             encoded_tlv_data[encoded_tlv_size] = 0;
 
@@ -719,7 +716,7 @@ void homekit_setup_mdns(homekit_server_t *server);
 
 
 void client_notify_characteristic(homekit_characteristic_t *ch, homekit_value_t value, void *context) {
-    client_context_t *client = context;
+    client_context_t *client = (client_context_t*)context;
 
     if (client->current_characteristic == ch && client->current_value && homekit_value_equal(client->current_value, &value))
         // This value is set by this client, no need to send notification
@@ -727,18 +724,18 @@ void client_notify_characteristic(homekit_characteristic_t *ch, homekit_value_t 
 
     DEBUG("Got characteristic %d.%d change event", ch->service->accessory->id, ch->id);
 
-    if (!client->event_queue) {
-        ERROR("Client has no event queue. Skipping notification");
-        return;
-    }
+   // if (!client->event_queue) {
+  //      ERROR("Client has no event queue. Skipping notification");
+   //     return;
+   // }
 
-    characteristic_event_t *event = malloc(sizeof(characteristic_event_t));
+    characteristic_event_t *event = (characteristic_event_t*)malloc(sizeof(characteristic_event_t));
     event->characteristic = ch;
     homekit_value_copy(&event->value, &value);
 	
     DEBUG("Sending event to client %d", client->socket);
 
-    xQueueSendToBack(client->event_queue, &event, 10);
+    //xQueueSendToBack(client->event_queue, &event, 10);
 }
 
 
@@ -765,10 +762,10 @@ void client_send(client_context_t *context, byte *data, size_t data_size) {
 
 
 void client_send_chunk(byte *data, size_t size, void *arg) {
-    client_context_t *context = arg;
+    client_context_t *context =(client_context_t*)arg;
 
     size_t payload_size = size + 8;
-    byte *payload = malloc(payload_size);
+    byte *payload =(unsigned char*) malloc(payload_size);
 
     int offset = snprintf((char *)payload, payload_size, "%x\r\n", size);
     memcpy(payload + offset, data, size);
@@ -820,7 +817,7 @@ void send_client_events(client_context_t *context, client_event_t *events) {
     client_event_t *e = events;
     while (e) {
         json_object_start(json);
-        write_characteristic_json(json, context, e->characteristic, 0, &e->value);
+        write_characteristic_json(json, context, e->characteristic,(characteristic_format_t) 0, &e->value);
         json_object_end(json);
 
         e = e->next;
@@ -854,7 +851,7 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
     size_t payload_size = 0;
     tlv_format(values, NULL, &payload_size);
 
-    byte *payload = malloc(payload_size);
+    byte *payload =(unsigned char*)malloc(payload_size);
     int r = tlv_format(values, payload, &payload_size);
     if (r) {
         CLIENT_ERROR(context, "Failed to format TLV payload (code %d)", r);
@@ -871,7 +868,7 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
         "Connection: keep-alive\r\n\r\n";
 
     int response_size = strlen(http_headers) + payload_size + 32;
-    char *response = malloc(response_size);
+    char *response = (char*)malloc(response_size);
     int response_len = snprintf(response, response_size, http_headers, payload_size);
 
     if (response_size - response_len < payload_size + 1) {
@@ -929,7 +926,7 @@ void send_json_response(client_context_t *context, int status_code, byte *payloa
     }
 
     int response_size = strlen(http_headers) + payload_size + strlen(status_text) + 32;
-    char *response = malloc(response_size);
+    char *response =(char*) malloc(response_size);
     if (!response) {
         CLIENT_ERROR(context, "Failed to allocate response buffer of size %d", response_size);
         return;
@@ -1098,10 +1095,10 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
-			
+
             size_t salt_size = 0;
             crypto_srp_get_salt(context->server->pairing_context->srp, NULL, &salt_size);
-			
+
             byte *salt = malloc(salt_size);
             r = crypto_srp_get_salt(context->server->pairing_context->srp, salt, &salt_size);
             if (r) {
@@ -1114,16 +1111,15 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
-			
+
             tlv_values_t *response = tlv_new();
             tlv_add_value(response, TLVType_PublicKey, context->server->pairing_context->public_key, context->server->pairing_context->public_key_size);
             tlv_add_value(response, TLVType_Salt, salt, salt_size);
             tlv_add_integer_value(response, TLVType_State, 1, 2);
 
             free(salt);
-			CLIENT_INFO(context, "send_tlv_response");
+
             send_tlv_response(context, response);
-			CLIENT_INFO(context, "send_tlv_response done");
             break;
         }
         case 3: {
@@ -3097,10 +3093,10 @@ client_context_t *homekit_server_accept_client(homekit_server_t *server) {
     const int idle = 180; /* 180 sec idle before start sending probes */
     setsockopt(s, IPPROTO_TCP, TCP_KEEPIDLE, &idle, sizeof(idle));
 
-    const int interval = 20; /* 30 sec between probes */
+    const int interval = 30; /* 30 sec between probes */
     setsockopt(s, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
 
-    const int maxpkt = 5; /* Drop connection after 4 probes without response */
+    const int maxpkt = 4; /* Drop connection after 4 probes without response */
     setsockopt(s, IPPROTO_TCP, TCP_KEEPCNT, &maxpkt, sizeof(maxpkt));
 
     client_context_t *context = client_context_new();
@@ -3237,16 +3233,14 @@ static void homekit_run_server(homekit_server_t *server)
 
             client_context_t *context = server->clients;
             while (context && triggered_nfds) {
-				//INFO("triggered_nfds %d", triggered_nfds);
                 if (FD_ISSET(context->socket, &read_fds)) {
-					//INFO("homekit_client_process");
                     homekit_client_process(context);
                     triggered_nfds--;
                 }
 
                 context = context->next;
             }
-			//INFO("homekit_server_close_clients");
+
             homekit_server_close_clients(server);
         }
 
@@ -3559,5 +3553,6 @@ int homekit_get_setup_uri(const homekit_server_config_t *config, char *buffer, s
     buffer[0] = 0;
 
     return 0;
+}
 }
 #endif

@@ -13,10 +13,11 @@
 #include <wolfssl/wolfcrypt/srp.h>
 #include <wolfssl/wolfcrypt/error-crypt.h>
 
+#include "port_x.h"
 #include "port.h"
 #include "debug.h"
 
-
+#ifndef ARDUINO8266_SERVER_X
 // 3072-bit group N (per RFC5054, Appendix A)
 const byte N[] = {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc9, 0x0f, 0xda, 0xa2,
@@ -53,10 +54,25 @@ const byte N[] = {
   0xa9, 0x3a, 0xd2, 0xca, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
+
 // 3072-bit group generator (per RFC5054, Appendix A)
 const byte g[] = {0x05};
-
-
+#else
+//1024 - bit Group
+const byte N[] = {
+	0xEE, 0xAF, 0x0A, 0xB9, 0xAD, 0xB3, 0x8D, 0xD6, 0x9C, 0x33, 0xF8, 0x0A, 0xFA, 0x8F,
+		0xC5, 0xE8, 0x60, 0x72, 0x61, 0x87, 0x75, 0xFF, 0x3C, 0x0B, 0x9E, 0xA2, 0x31, 0x4C,
+		0x9C, 0x25, 0x65, 0x76, 0xD6, 0x74, 0xDF, 0x74, 0x96, 0xEA, 0x81, 0xD3, 0x38, 0x3B,
+		0x48, 0x13, 0xD6, 0x92, 0xC6, 0xE0, 0xE0, 0xD5, 0xD8, 0xE2, 0x50, 0xB9, 0x8B, 0xE4,
+		0x8E, 0x49, 0x5C, 0x1D, 0x60, 0x89, 0xDA, 0xD1, 0x5D, 0xC7, 0xD7, 0xB4, 0x61, 0x54,
+		0xD6, 0xB6, 0xCE, 0x8E, 0xF4, 0xAD, 0x69, 0xB1, 0x5D, 0x49, 0x82, 0x55, 0x9B, 0x29,
+		0x7B, 0xCF, 0x18, 0x85, 0xC5, 0x29, 0xF5, 0x66, 0x66, 0x0E, 0x57, 0xEC, 0x68, 0xED,
+		0xBC, 0x3C, 0x05, 0x72, 0x6C, 0xC0, 0x2F, 0xD4, 0xCB, 0xF4, 0x97, 0x6E, 0xAA, 0x9A,
+		0xFD, 0x51, 0x38, 0xFE, 0x83, 0x76, 0x43, 0x5B, 0x9F, 0xC6, 0x1D, 0x2F, 0xC0, 0xEB,
+		0x06, 0xE3 };
+// 1024-bit group generator (per RFC5054, Appendix A)
+const byte g[]={ 0x02 };
+#endif
 int wc_SrpSetKeyH(Srp *srp, byte *secret, word32 size) {
     SrpHash hash;
     int r = BAD_FUNC_ARG;
@@ -101,36 +117,41 @@ void crypto_srp_free(Srp *srp) {
 
 
 int crypto_srp_init(Srp *srp, const char *username, const char *password) {
-    DEBUG("Generating salt");
+   // INFO("Generating salt");
     byte salt[16];
     homekit_random_fill(salt, sizeof(salt));
 
     int r;
-    DEBUG("Setting SRP username");
+	//INFO("Setting SRP username");
     r = wc_SrpSetUsername(srp, (byte*)username, strlen(username));
     if (r) {
-        DEBUG("Failed to set SRP username (code %d)", r);
+		DEBUG("Failed to set SRP username (code %d)", r);
         return r;
     }
 
-    DEBUG("Setting SRP params");
+	//INFO("Setting SRP params");
     r = wc_SrpSetParams(srp, N, sizeof(N), g, sizeof(g), salt, sizeof(salt));
     if (r) {
         DEBUG("Failed to set SRP params (code %d)", r);
         return r;
     }
 
-    DEBUG("Setting SRP password");
+	//INFO("Setting SRP password");
     r = wc_SrpSetPassword(srp, (byte *)password, strlen(password));
     if (r) {
-        DEBUG("Failed to set SRP password (code %d)", r);
+		INFO("Failed to set SRP password (code %d)", r);
         return r;
     }
 
-    DEBUG("Getting SRP verifier");
+	//INFO("Getting SRP verifier");
     word32 verifierLen = 1024;
     byte *verifier = malloc(verifierLen);
+	//INFO("Getting SRP verifier allocated %d",(int)verifier);
+	INFO_HEAP();
+	
+	
     r = wc_SrpGetVerifier(srp, verifier, &verifierLen);
+	//INFO("Getting SRP verifier done");
     if (r) {
         DEBUG("Failed to get SRP verifier (code %d)", r);
         free(verifier);
@@ -138,10 +159,10 @@ int crypto_srp_init(Srp *srp, const char *username, const char *password) {
     }
 
     srp->side = SRP_SERVER_SIDE;
-    DEBUG("Setting SRP verifier");
+	//INFO("Setting SRP verifier");
     r = wc_SrpSetVerifier(srp, verifier, verifierLen);
     if (r) {
-        DEBUG("Failed to set SRP verifier (code %d)", r);
+		INFO("Failed to set SRP verifier (code %d)", r);
         free(verifier);
         return r;
     }
@@ -170,16 +191,24 @@ int crypto_srp_get_salt(Srp *srp, byte *buffer, size_t *buffer_size) {
 int crypto_srp_get_public_key(Srp *srp, byte *buffer, size_t *buffer_size) {
     if (buffer_size == NULL)
         return -1;
-
+	//INFO("crypto_srp_get_public_key  buffer_size=%d", *buffer_size);
     // TODO: Fix hardcoded public key size
+#ifdef ARDUINO8266_SERVER_X
+	if (*buffer_size < 128) {
+		*buffer_size = 128;
+		return -2;
+	}
+#else
     if (*buffer_size < 384) {
         *buffer_size = 384;
         return -2;
     }
-
-    DEBUG("Calculating public key");
+#endif
+    
     word32 len = *buffer_size;
+	INFO("Calculating public key len=%d",len);
     int r = wc_SrpGetPublic(srp, buffer, &len);
+	INFO("Calculating public key result %d",r);
     *buffer_size = len;
     return r;
 }

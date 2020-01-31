@@ -335,6 +335,18 @@ homekit_service_t* homekit_service_clone(homekit_service_t* service) {
     return clone;
 }
 
+void homekit_accessory_free(homekit_accessory_t* ac,bool freeservices) {
+	
+	if (freeservices && ac->services) {
+		for (int i = 0; ac->services[i]; i++) {
+			free(ac->services[i]);
+			ac->services[i] = 0;
+
+		}
+	}
+	free(ac);
+}
+
 homekit_accessory_t* homekit_accessory_clone(homekit_accessory_t* ac) {
     size_t size = sizeof(homekit_accessory_t);
     if (ac->services) {

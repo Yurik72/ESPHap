@@ -1,11 +1,14 @@
 
-
+#include "port_x.h"
+#include "xrtos.h"
+#include "debug.h"
 
 
 
 #include "homeintegration.h"
 
 #include <stdio.h>
+#if defined(ESP32) || defined(ESP_IDF)
 #include <esp_wifi.h>
 #include <esp_event_loop.h>
 #include <esp_log.h>
@@ -15,8 +18,14 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#endif
 
+#ifdef ESP8266
+#include <Arduino.h>
+//#include <gpio.h>
+#include "port.h"
 
+#endif
 
 
 
@@ -35,7 +44,11 @@ static int led_gpio = -1;
 void hap_set_identity_gpio(int gpio) {
 	led_gpio = gpio;
 	if (led_gpio > 0) {
+#if defined(ESP32)
 		gpio_set_direction(led_gpio, GPIO_MODE_OUTPUT);
+#elif defined(ESP8266)
+		gpio_enable(led_gpio, OUTPUT);
+#endif
 		led_write(false);
 	}
 
@@ -69,7 +82,7 @@ void identify_task(void *_args) {
 
 void identify(homekit_value_t _value) {
     printf("LED identify\n");
-    xTaskCreate(identify_task, "LED identify", 2048, NULL, 2, NULL);
+   // xTaskCreate(identify_task, "LED identify", 2048, NULL, 2, NULL);
 }
 
 
@@ -145,7 +158,8 @@ void hap_init_homekit_server() {
 					 NEW_HOMEKIT_ACCESSORY(
 					 				.category=(homekit_accessory_category_t)base_acctype,//  homekit_accessory_category_lightbulb,
 					 				.services=hap_services);
-					
+			// old->services = 0;  // do not destruct services
+			 //homekit_accessory_free(old,false);
 			 //TO DO  memory leak
 			 //Need release  homekit_accessory_t * old  
 		 }
@@ -160,7 +174,7 @@ void hap_init_homekit_server() {
 
 void hap_init_homekit_base_accessory(){
 if(base_accessory_index>=0){
-	INFO("base accessory already set ");
+//	INFO("base accessory already set ");
 	return;
 }
 hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
@@ -169,7 +183,7 @@ hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
 base_accessory_index=hap_mainaccesories_current;
 hap_mainaccesories_current++;
 hap_accessories[hap_mainaccesories_current] = NULL;
-INFO("base accessory index %d ",base_accessory_index);
+ //INFO("base accessory index %d ",base_accessory_index);
 }
 
 void hap_setbase_accessorytype(int val){
@@ -185,7 +199,7 @@ int hap_initbase_accessory_service(const char* szname_value,const char* szmanufa
 	hap_services[0]=hap_new_homekit_accessory_service(szname_value,szserialnumber);
 
 	hap_mainservices_current=1;
-	INFO("hap init base accessory service , next %d",hap_mainservices_current);
+//	INFO("hap init base accessory service , next %d",hap_mainservices_current);
 	return hap_mainservices_current;
 }
 homekit_service_t* hap_new_homekit_accessory_service(const char *szname,const char * szserialnumber){
@@ -254,7 +268,7 @@ homekit_service_t*  hap_add_lightbulb_service_as_accessory(int acctype,const cha
 
 	hap_mainaccesories_current++;
     hap_accessories[hap_mainaccesories_current] = NULL;
-    INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
+ //   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
 return lbservice;
 }
 homekit_service_t* hap_add_rgbstrip_service(const char* szname,hap_callback cb,void* context){
@@ -329,7 +343,7 @@ homekit_service_t*  hap_add_relaydim_service_as_accessory(int acctype,const char
 
 	hap_mainaccesories_current++;
     hap_accessories[hap_mainaccesories_current] = NULL;
-    INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
+ //   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
 return lbservice;
 }
 homekit_service_t* hap_add_temperature_service(const char* szname){
@@ -384,29 +398,89 @@ homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype,const char* szname
 return temp;
 
 }
-homekit_service_t* hap_new_light_service(const char* szname){
+homekit_service_t* hap_new_light_service(const char* szname, hap_callback cb, void* context){
 	return NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
 		            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-		            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 0),
+		            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 5.0, .min_value = (float[]) { 0.0 }, .max_value = (float[]) { 100.0 }),
 		            NULL
 		        });
 }
-homekit_service_t* hap_add_light_service(const char* szname){
+float min = 0.0;
+homekit_service_t* hap_add_light_service(const char* szname, hap_callback cb, void* context){
 
-
-	return hap_add_service(hap_new_light_service(szname));
+	homekit_service_t* lightsvc = hap_new_light_service(szname, cb, context);
+		/*
+		NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 5.0,.min_value= (float[]) { 0.0 }, .max_value = (float[]) {100.0 }),
+			NULL
+	});
+	*/
+	//lightsvc->characteristics[1]->min_value = &min;
+	DEBUG("hap_services added char 1 %f ", lightsvc->characteristics[1]->min_value[0]);
+	return hap_add_service(lightsvc);
+	//(hap_new_light_service(szname,cb,context));
 }
+
+homekit_service_t*  hap_add_light_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
+
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* lightservice = 
+	/*	NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 1.0),
+			NULL
+	});*/
+	 hap_new_light_service(szname, cb, context);
+	DEBUG("hap_services added char 1 %f ", lightservice->characteristics[1]->min_value[0]);
+	//lightservice->characteristics[1]->min_value[0] = 0.0;
+	
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = lightservice;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+	//   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
+	return lightservice;
+}
+homekit_service_t* hap_new_battery_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(BATTERY_SERVICE, .characteristics = (homekit_characteristic_t*[]) {
+			NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(BATTERY_LEVEL, 0),
+			NEW_HOMEKIT_CHARACTERISTIC(CHARGING_STATE, 0),
+			NEW_HOMEKIT_CHARACTERISTIC(STATUS_LOW_BATTERY, 0),
+			NULL
+	});
+}
+homekit_service_t* hap_add_battery_service(const char* szname, hap_callback cb, void* context) {
+
+	INFO("hap_add_battery_service");
+	return hap_add_service(hap_new_battery_service(szname, cb, context));
+}
+
 homekit_service_t* hap_add_service(homekit_service_t* service ){
 	if(hap_mainservices_current>=MAX_HAP_SERVICES){
-		INFO("hap_add_service NOT possible, maximum services reached");
+		DEBUG("hap_add_service NOT possible, maximum services reached");
 		return NULL;
 	}
 	hap_init_homekit_base_accessory();
+	int added = hap_mainservices_current;
 	hap_services[hap_mainservices_current]=service;
 
 	hap_mainservices_current++;
 	hap_services[hap_mainservices_current]=NULL;
 	INFO("hap_add_service next %d",hap_mainservices_current);
+	INFO("hap_services added %d ", (int)hap_services[added]);
+	INFO("hap_services added char 0 %d ", (int)hap_services[added]->characteristics[0]);
+	INFO("hap_services added char 1 %d ", (int)hap_services[added]->characteristics[1]);
+	INFO("hap_services added char 2 %d ", (int)hap_services[added]->characteristics[2]);
+
 	return service;
 }
 

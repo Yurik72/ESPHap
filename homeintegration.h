@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "homekit.h"
@@ -8,6 +10,9 @@
 #include "storage_ex.h"
 
 #define INFO(message, ...) printf(">>> Home Integration: " message "\n", ##__VA_ARGS__)
+
+
+
 
 void init_accessory();
 void init_homekit_server();
@@ -37,8 +42,12 @@ homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype,const char* szname
 
 homekit_service_t* hap_add_pressure_service(const char* szname);
 
-homekit_service_t* hap_add_light_service(const char* szname);
-homekit_service_t* hap_new_light_service(const char* szname);
+homekit_service_t* hap_add_light_service(const char* szname, hap_callback cb, void* context);
+homekit_service_t* hap_new_light_service(const char* szname, hap_callback cb, void* context);
+homekit_service_t*  hap_add_light_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+
+homekit_service_t* hap_new_battery_service(const char* szname, hap_callback cb, void* context);
+homekit_service_t* hap_add_battery_service(const char* szname, hap_callback cb, void* context);
 
 homekit_service_t* hap_add_service(homekit_service_t* service );
 

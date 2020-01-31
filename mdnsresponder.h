@@ -14,6 +14,7 @@
 #ifndef __MDNSRESPONDER_H__
 #define __MDNSRESPONDER_H__
 
+#include "port.h"
 #include <lwip/ip_addr.h>
 
 /* The default maximum reply size, increase as necessary. */

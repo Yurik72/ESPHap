@@ -1,5 +1,18 @@
 #include "port_x.h"
-#if !defined(ARDUINO8266_SERVER)
+#if defined(ARDUINO8266_SERVER)
+#include <Arduino.h>
+
+
+#include <lwip/sockets.h>
+#include <lwip/opt.h>
+#include <lwip/tcp.h>
+#include <lwip/inet.h>
+//#include <lwip/dns.h>
+//#include <lwip/init.h>
+#include <lwip/pbuf.h>
+#include <lwip/tcp.h>
+
+#include <unistd.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,24 +20,13 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include <lwip/sockets.h>
 
-#include <unistd.h>
 
-#if defined(ESP_IDF)
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/queue.h>
-#elif defined(ESP_OPEN_RTOS)
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#elif defined(ARDUINO)
-#include <Arduino.h>
+
 #include "os_settings.h"
-#else
-#error "Unknown target platform"
-#endif
+#include <sys/errno.h>
+
+
 
 #include "http_parser.h"
 #include "cJSON.h"
@@ -44,6 +46,7 @@
 #include "characteristics.h"
 #include "tlv.h""
 
+#include "xrtos.h"
 
 #define PORT 5556
 
@@ -122,7 +125,7 @@ struct _client_context_t {
     byte *data;
     size_t data_size;
     size_t data_available;
-
+	size_t data_len;
     char *body;
     size_t body_length;
     http_parser *parser;
@@ -147,16 +150,17 @@ struct _client_context_t {
     struct _client_context_t *next;
 };
 
-//#if !defined(ARDUINO) && !defined(ESP8266)
+#if !defined(ARDUINO) && !defined(ESP8266)
 typedef struct {
     homekit_characteristic_t *characteristic;
     homekit_value_t value;
 } characteristic_event_t;
-//#endif
+#endif
 
 void client_context_free(client_context_t *c);
 void pairing_context_free(pairing_context_t *context);
 
+typedef struct tcp_pcb tcp_pcb_t;
 
 homekit_server_t *server_new() {
     homekit_server_t *server = malloc(sizeof(homekit_server_t));
@@ -332,7 +336,8 @@ client_context_t *client_context_new() {
 
     c->data_size = 1024 + 18;
     c->data_available = 0;
-    c->data = malloc(c->data_size);
+	c->data_len = 0;
+	c->data =  malloc(c->data_size);
 
     c->body = NULL;
     c->body_length = 0;
@@ -401,6 +406,7 @@ pairing_context_t *pairing_context_new() {
 	//INFO("starting crypto");
     context->srp = crypto_srp_new();
 	INFO("started crypto");
+	INFO_HEAP();
     context->client = NULL;
     context->public_key = NULL;
     context->public_key_size = 0;
@@ -727,10 +733,10 @@ void client_notify_characteristic(homekit_characteristic_t *ch, homekit_value_t 
 
     DEBUG("Got characteristic %d.%d change event", ch->service->accessory->id, ch->id);
 
-    if (!client->event_queue) {
-        ERROR("Client has no event queue. Skipping notification");
-        return;
-    }
+//    if (!client->event_queue) {
+//        ERROR("Client has no event queue. Skipping notification");
+ //       return;
+//    }
 
     characteristic_event_t *event = malloc(sizeof(characteristic_event_t));
     event->characteristic = ch;
@@ -738,7 +744,7 @@ void client_notify_characteristic(homekit_characteristic_t *ch, homekit_value_t 
 	
     DEBUG("Sending event to client %d", client->socket);
 
-    xQueueSendToBack(client->event_queue, &event, 10);
+   xQueueSendToBack(client->event_queue, &event, 10);
 }
 
 
@@ -759,7 +765,9 @@ void client_send(client_context_t *context, byte *data, size_t data_size) {
             return;
         }
     } else {
-        write(context->socket, data, data_size);
+        //write(context->socket, data, data_size);
+		int res=tcp_write(context->socket, data, data_size,0);
+		CLIENT_DEBUG(context, "tcp_write result %d", res);
     }
 }
 
@@ -848,7 +856,7 @@ void send_tlv_error_response(client_context_t *context, int state, TLVError erro
 
 
 void send_tlv_response(client_context_t *context, tlv_values_t *values) {
-    CLIENT_DEBUG(context, "Sending TLV response");
+    CLIENT_INFO(context, "Sending TLV response");
     TLV_DEBUG(values);
 
     size_t payload_size = 0;
@@ -1019,7 +1027,7 @@ void homekit_server_on_identify(client_context_t *context) {
     }
 }
 
-void homekit_server_on_pair_setup(client_context_t *context, const byte *data, size_t size) {
+void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, const byte *data, size_t size) {
 	CLIENT_INFO(context, "Pair Setup ");
     DEBUG("Pair Setup");
     DEBUG_HEAP();
@@ -1055,7 +1063,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 context->server->pairing_context->client = context;
             }
 
-            CLIENT_DEBUG(context, "Initializing crypto");
+			CLIENT_INFO(context, "Initializing crypto");
             DEBUG_HEAP();
 
             char password[11];
@@ -1074,20 +1082,24 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
             if (context->server->config->password_callback) {
                 context->server->config->password_callback(password);
             }
+			
 
             crypto_srp_init(
                 context->server->pairing_context->srp,
                 "Pair-Setup", password
             );
-
+			CLIENT_INFO(context, "Initializing crypto done");
             if (context->server->pairing_context->public_key) {
                 free(context->server->pairing_context->public_key);
                 context->server->pairing_context->public_key = NULL;
             }
+
             context->server->pairing_context->public_key_size = 0;
             crypto_srp_get_public_key(context->server->pairing_context->srp, NULL, &context->server->pairing_context->public_key_size);
-
+			CLIENT_INFO(context, "crypto_srp_get_public_key done");
             context->server->pairing_context->public_key = malloc(context->server->pairing_context->public_key_size);
+			CLIENT_INFO(context, "public key allocated %d", context->server->pairing_context->public_key);
+			INFO_HEAP();
             int r = crypto_srp_get_public_key(context->server->pairing_context->srp, context->server->pairing_context->public_key, &context->server->pairing_context->public_key_size);
             if (r) {
                 CLIENT_ERROR(context, "Failed to dump SPR public key (code %d)", r);
@@ -1098,7 +1110,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
-			
+			CLIENT_INFO(context, "crypto_srp_get_salt ");
             size_t salt_size = 0;
             crypto_srp_get_salt(context->server->pairing_context->srp, NULL, &salt_size);
 			
@@ -1114,7 +1126,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
-			
+			CLIENT_INFO(context, "crypto_srp_get_salt done");
             tlv_values_t *response = tlv_new();
             tlv_add_value(response, TLVType_PublicKey, context->server->pairing_context->public_key, context->server->pairing_context->public_key_size);
             tlv_add_value(response, TLVType_Salt, salt, salt_size);
@@ -1123,7 +1135,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
             free(salt);
 			CLIENT_INFO(context, "send_tlv_response");
             send_tlv_response(context, response);
-			CLIENT_INFO(context, "send_tlv_response done");
+			
             break;
         }
         case 3: {
@@ -1143,7 +1155,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 break;
             }
 
-            CLIENT_DEBUG(context, "Computing SRP shared secret");
+			CLIENT_INFO(context, "Computing SRP shared secret");
             DEBUG_HEAP();
             int r = crypto_srp_compute_key(
                 context->server->pairing_context->srp,
@@ -1151,6 +1163,7 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
                 context->server->pairing_context->public_key,
                 context->server->pairing_context->public_key_size
             );
+			CLIENT_INFO(context, "Computing SRP shared secret done");
             if (r) {
                 CLIENT_ERROR(context, "Failed to compute SRP shared secret (code %d)", r);
                 send_tlv_error_response(context, 4, TLVError_Authentication);
@@ -2971,11 +2984,13 @@ static http_parser_settings homekit_http_parser_settings = {
 
 
 static void homekit_client_process(client_context_t *context) {
-    int data_len = read(
-        context->socket,
-        context->data+context->data_available,
-        context->data_size-context->data_available
-    );
+  //  int data_len = read(
+  //      context->socket,
+   //     context->data+context->data_available,
+   //     context->data_size-context->data_available
+   // );
+	int data_len = context->data_len;
+	
     if (data_len == 0) {
         context->disconnect = true;
         return;
@@ -2989,7 +3004,7 @@ static void homekit_client_process(client_context_t *context) {
         return;
     }
 
-    CLIENT_DEBUG(context, "Got %d incomming data", data_len);
+    CLIENT_INFO(context, "Got %d incomming data,data_available %d", data_len, context->data_available);
     byte *payload = (byte *)context->data;
     size_t payload_size = (size_t)data_len;
 
@@ -2997,7 +3012,7 @@ static void homekit_client_process(client_context_t *context) {
     size_t decrypted_size = 0;
 
     if (context->encrypted) {
-        CLIENT_DEBUG(context, "Decrypting data");
+		CLIENT_INFO(context, "Decrypting data");
 
         client_decrypt(context, context->data, data_len, NULL, &decrypted_size);
 
@@ -3012,7 +3027,7 @@ static void homekit_client_process(client_context_t *context) {
         if (r && context->data_available) {
             memmove(context->data, &context->data[r], context->data_available);
         }
-        CLIENT_DEBUG(context, "Decrypted %d bytes, available %d", decrypted_size, context->data_available);
+        CLIENT_INFO(context, "Decrypted %d bytes, available %d", decrypted_size, context->data_available);
 
         payload = decrypted;
         payload_size = decrypted_size;
@@ -3023,7 +3038,8 @@ static void homekit_client_process(client_context_t *context) {
     }
 
     current_client_context = context;
-
+	//CLIENT_INFO(context, "payload %s", (char *)payload);
+//	CLIENT_INFO(context, "http_parser_execute %s", (char *)payload);
     http_parser_execute(
         context->parser, &homekit_http_parser_settings,
         (char *)payload, payload_size
@@ -3073,50 +3089,131 @@ void homekit_server_close_client(homekit_server_t *server, client_context_t *con
 
     client_context_free(context);
 }
+static void homekit_close_tcp(tcp_pcb_t* pcb) {
+	INFO("homekit_close_tcp");
+	tcp_recv(pcb, NULL);
+	tcp_sent(pcb, NULL);
+	tcp_err(pcb, NULL);
+	tcp_poll(pcb, NULL, 0);
+	tcp_close(pcb);
+}
+void tcpreccallback(void * arg) {
+	INFO("timer cbk  ");
+	homekit_client_process((client_context_t *)arg);
+}
+LOCAL os_timer_t heartbeat_timer;
+static err_t _s_recv(void *arg, tcp_pcb_t* pcb, struct pbuf *pb, err_t err)
+{
+	//return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
+	INFO("_s_recv %d", pb->tot_len);
+	client_context_t *context = (client_context_t *)arg;
+	context->socket = pcb;
+	int max_size = pb->tot_len - context->data_available;
+	int size = (pb->tot_len < max_size) ? pb->tot_len : max_size;
+	context->data_len = 0;
+	int size_read = 0;
+	context->data_size = 0;
+	while (size) {
+		size_t buf_size = pb->len - context->data_available;
+		size_t copy_size = (size < buf_size) ? size : buf_size;
+		os_memcpy(context->data, pb->payload + context->data_available, copy_size);
+		size -= copy_size;
+		context->data_len += copy_size;
+		tcp_recved(pcb, copy_size);
+		pbuf_free(pb);
+		homekit_client_process(context);
+		INFO("process  %d", copy_size);
+		//os_timer_disarm(&heartbeat_timer);
+		//os_timer_setfn(&heartbeat_timer, (os_timer_func_t *)tcpreccallback, (void *)context);
+		//os_timer_arm(&heartbeat_timer, 500, FALSE);
+		//delay(1000);
+	}
 
+
+	//tcp_recved(pcb, pb->tot_len);
+
+	//pbuf_free(pb);
+	if(context->disconnect)
+		homekit_close_tcp(pcb);
+	//tcp_abort(pcb);
+	return ERR_OK;
+}
+
+static void _s_error(void *arg, err_t err)
+{
+	INFO("_s_error");
+	//return ERR_OK;
+}
+
+static err_t _s_poll(void *arg, struct tcp_pcb *tpcb)
+{
+	INFO("_s_poll");
+	//esp_schedule();
+	return ERR_OK;
+}
+
+static err_t _s_acked(void *arg, struct tcp_pcb *tpcb, uint16_t len)
+{
+	INFO("_s_acked");
+	return ERR_OK;
+}
 
 client_context_t *homekit_server_accept_client(homekit_server_t *server) {
-    int s = accept(server->listen_fd, (struct sockaddr *)NULL, (socklen_t *)NULL);
+	tcp_pcb_t* s = (tcp_pcb_t*)server->nfds;// accept(server->listen_fd, (struct sockaddr *)NULL, (socklen_t *)NULL);
+
     if (s < 0)
         return NULL;
 
-    if (server->nfds > HOMEKIT_MAX_CLIENTS) {
-        INFO("No more room for client connections (max %d)", HOMEKIT_MAX_CLIENTS);
-        close(s);
-        return NULL;
-    }
+ //   if (server->nfds > HOMEKIT_MAX_CLIENTS) {
+ //       INFO("No more room for client connections (max %d)", HOMEKIT_MAX_CLIENTS);
+  //      close(s);
+  //      return NULL;
+  //  }
 
     INFO("Got new client connection: %d", s);
-
+/*
+pcb->so_options |= SOF_KEEPALIVE;
+pcb->keep_idle = keep_idle;
+pcb->keep_intvl = keep_interval;
+pcb->keep_cnt = keep_count;
+*/
+	
     const struct timeval rcvtimeout = { 10, 0 }; /* 10 second timeout */
-    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &rcvtimeout, sizeof(rcvtimeout));
+    //setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &rcvtimeout, sizeof(rcvtimeout));
 
     const int yes = 1; /* enable sending keepalive probes for socket */
-    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(yes));
+    //setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &yes, sizeof(yes));
 
     const int idle = 180; /* 180 sec idle before start sending probes */
-    setsockopt(s, IPPROTO_TCP, TCP_KEEPIDLE, &idle, sizeof(idle));
+    //setsockopt(s, IPPROTO_TCP, TCP_KEEPIDLE, &idle, sizeof(idle));
 
-    const int interval = 20; /* 30 sec between probes */
-    setsockopt(s, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
+    const int interval = 30; /* 30 sec between probes */
+    //setsockopt(s, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
 
-    const int maxpkt = 5; /* Drop connection after 4 probes without response */
-    setsockopt(s, IPPROTO_TCP, TCP_KEEPCNT, &maxpkt, sizeof(maxpkt));
-
+    const int maxpkt = 4; /* Drop connection after 4 probes without response */
+    //setsockopt(s, IPPROTO_TCP, TCP_KEEPCNT, &maxpkt, sizeof(maxpkt));
+	
     client_context_t *context = client_context_new();
     context->server = server;
     context->socket = s;
     context->next = server->clients;
 
     server->clients = context;
+	tcp_setprio(s, TCP_PRIO_MIN);
+	tcp_arg(s, context);
+	tcp_recv(s, &_s_recv);
+	tcp_sent(s, &_s_acked);
+	tcp_err(s, &_s_error);
+	//tcp_poll(s, &_s_poll, 1);
 
-    FD_SET(s, &server->fds);
-    server->nfds++;
-    if (s > server->max_fd)
-        server->max_fd = s;
-
-    HOMEKIT_NOTIFY_EVENT(server, HOMEKIT_EVENT_CLIENT_CONNECTED);
-
+	tcp_accepted((tcp_pcb_t*)server->listen_fd);
+   // FD_SET(s, &server->fds);
+   // server->nfds++;
+   // if (s > server->max_fd)
+   //     server->max_fd = s;
+	//INFO("HOMEKIT_NOTIFY_EVENT");
+   // HOMEKIT_NOTIFY_EVENT(server, HOMEKIT_EVENT_CLIENT_CONNECTED);
+	//INFO("return context");
     return context;
 }
 
@@ -3137,6 +3234,7 @@ void homekit_server_process_notifications(homekit_server_t *server) {
     client_context_t *context = server->clients;
     while (context) {
         characteristic_event_t *event = NULL;
+
         if (xQueueReceive(context->event_queue, &event, 0)) {
             // Get and coalesce all client events
             client_event_t *events_head = malloc(sizeof(client_event_t));
@@ -3187,7 +3285,7 @@ void homekit_server_process_notifications(homekit_server_t *server) {
                 e = next;
             }
         }
-
+		
         context = context->next;
     }
 }
@@ -3205,20 +3303,57 @@ void homekit_server_close_clients(homekit_server_t *server) {
     }
 }
 
+static err_t _s_accept(void *arg, tcp_pcb_t* pcb, err_t err) {
+	homekit_server_t* server = (homekit_server_t*)arg;
+	server->nfds = pcb;
+	homekit_server_accept_client(server);
+	//homekit_server_accept_client(NULL);
+	INFO("_s_accept");
+	return ERR_OK;
+}
 
 static void homekit_run_server(homekit_server_t *server)
 {
     DEBUG("Staring HTTP server");
+	
+	tcp_pcb_t* pcb = tcp_new();
+	if (!pcb) {
+		return;
+	}
+	DEBUG_HEAP();
+	int8_t err;
+	ip_addr_t local_addr;
+	local_addr = *IP_ADDR_ANY;// (&ip_addr_any);
+	pcb->so_options |= SOF_REUSEADDR;
+	err = tcp_bind(pcb, &local_addr,  PORT);
+	INFO("tcp_bind done");
+	if (err != ERR_OK) {
+		tcp_close(pcb);
+		INFO("Error bind");
+		return;
+	}
+    //struct sockaddr_in serv_addr;
+    //server->listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+   // memset(&serv_addr, '0', sizeof(serv_addr));
+    //serv_addr.sin_family = AF_INET;
+    //serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    //serv_addr.sin_port = htons(PORT);
+    //bind(server->listen_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	
+	tcp_pcb_t* listen_pcb = tcp_listen(pcb);
+	if (!listen_pcb) {
+		tcp_close(pcb);
+		INFO("Error listen");
+		return;
+	}
+	server->listen_fd = listen_pcb;
+   // listen(server->listen_fd, 10);
+	tcp_arg(listen_pcb, (void*)server);
+	INFO("tcp_start accept");
+	tcp_accept(listen_pcb, &_s_accept);
+	INFO("waiting accept");
 
-    struct sockaddr_in serv_addr;
-    server->listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(PORT);
-    bind(server->listen_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-    listen(server->listen_fd, 10);
-
+	/*
     FD_SET(server->listen_fd, &server->fds);
     server->max_fd = server->listen_fd;
     server->nfds = 1;
@@ -3227,7 +3362,7 @@ static void homekit_run_server(homekit_server_t *server)
         fd_set read_fds;
         memcpy(&read_fds, &server->fds, sizeof(read_fds));
 
-        struct timeval timeout = { 1, 0 }; /* 1 second timeout */
+        struct timeval timeout = { 1, 0 }; // 1 second timeout 
         int triggered_nfds = select(server->max_fd + 1, &read_fds, NULL, NULL, &timeout);
         if (triggered_nfds > 0) {
             if (FD_ISSET(server->listen_fd, &read_fds)) {
@@ -3237,16 +3372,14 @@ static void homekit_run_server(homekit_server_t *server)
 
             client_context_t *context = server->clients;
             while (context && triggered_nfds) {
-				//INFO("triggered_nfds %d", triggered_nfds);
                 if (FD_ISSET(context->socket, &read_fds)) {
-					//INFO("homekit_client_process");
                     homekit_client_process(context);
                     triggered_nfds--;
                 }
 
                 context = context->next;
             }
-			//INFO("homekit_server_close_clients");
+
             homekit_server_close_clients(server);
         }
 
@@ -3254,6 +3387,7 @@ static void homekit_run_server(homekit_server_t *server)
     }
 
     server_free(server);
+	*/
 }
 
 
@@ -3370,14 +3504,15 @@ ed25519_key *homekit_accessory_key_generate() {
 void homekit_server_task(void *args) {
     homekit_server_t *server = args;
     INFO("Starting server");
-
+	DEBUG_HEAP();
     int r = homekit_storage_init();
-
+	INFO("Storage init done");
     if (r == 0) {
         server->accessory_id = homekit_storage_load_accessory_id();
         server->accessory_key = homekit_storage_load_accessory_key();
     }
     if (!server->accessory_id || !server->accessory_key) {
+		INFO("generating acc");
         server->accessory_id = homekit_accessory_id_generate();
         homekit_storage_save_accessory_id(server->accessory_id);
 
@@ -3402,15 +3537,16 @@ void homekit_server_task(void *args) {
         pairing_free(pairing);
         server->paired = true;
     }
-
+	INFO("homekit_mdns_init");
     homekit_mdns_init();
+	INFO("homekit_setup_mdns");
     homekit_setup_mdns(server);
-
+	//INFO("HOMEKIT_NOTIFY_EVENT");
     HOMEKIT_NOTIFY_EVENT(server, HOMEKIT_EVENT_SERVER_INITIALIZED);
-
+	//INFO("HOMEKIT_NOTIFY_EVENT");
     homekit_run_server(server);
 
-    vTaskDelete(NULL);
+   // vTaskDelete(NULL);
 }
 
 #define ISDIGIT(x) isdigit((unsigned char)(x))
