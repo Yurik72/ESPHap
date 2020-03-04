@@ -9,10 +9,13 @@ ESPHap
 This is a library for easily & efficiently integrating arduino projects based on Esp32 with Apple Home Kit by  native protocols 
 and without any additional bridges
 
-!At this moment only ESP32 supported
+At this moment only ESP32 supported and tested.
+ESP8266 is ported as well , at this moment under the testing stage
 
 Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
 this project uses this as well.
+
+Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for ESP8266 to stop watchdog and some functions with lower memory usage
 
 ## Build instruction
 
@@ -26,6 +29,10 @@ For simplify process you can use [wolfssl.rar](https://github.com/Yurik72/ESPHap
 If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from attached archive or
  [this location](https://github.com/Yurik72/ESPHap/tree/master/wolfssl)
  You need copy/replace this files in wolfssl components.
+
+
+! Note library as well working well with wolfssl 3.13.0. For ESP8266 it's MUST. Please extract wolfSSL_3_13_0.rar
+into  Arduino Libraries folder. user_setting.h and setting.h MUST be used from this Archive
 
 ## Getting help
 
