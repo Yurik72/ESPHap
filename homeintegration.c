@@ -47,23 +47,28 @@ void hap_set_identity_gpio(int gpio) {
 #if defined(ESP32)
 		gpio_set_direction(led_gpio, GPIO_MODE_OUTPUT);
 #elif defined(ESP8266)
-		gpio_enable(led_gpio, OUTPUT);
+		//gpio_enable(led_gpio, OUTPUT);
+		pinMode(led_gpio, OUTPUT);
 #endif
 		led_write(false);
 	}
 
 }
 void relay_write(int relay, bool on) {
-    printf("Relay %d %s\n", relay, on ? "ON" : "OFF");
+  //  INFO("Relay %d %s\n", relay, on ? "ON" : "OFF");
     gpio_set_level(relay, on ? 1 : 0);
 }
 
 void led_write(bool on) {
+#if defined(ESP32)
     gpio_set_level(led_gpio, on ? 0 : 1);
+#else
+	digitalWrite(led_gpio, on ? HIGH : LOW);
+#endif
 }
 
 
-
+#if defined(ESP32)
 void identify_task(void *_args) {
 	if (led_gpio > 0) {
 		led_write( true);
@@ -79,10 +84,37 @@ void identify_task(void *_args) {
 	}
     vTaskDelete(NULL);
 }
+#else
+LOCAL os_timer_t identtimer;
+void identify_task(void *_args) {
+	if (led_gpio > 0) {
+		led_write(true);
+
+		for (int i = 0; i < 3; i++) {
+			led_write(true);
+			delay(500);
+			led_write(false);
+			delay(500);
+		}
+
+		led_write(false);
+	}
+	os_timer_disarm(&identtimer);
+}
+#endif
 
 void identify(homekit_value_t _value) {
-    printf("LED identify\n");
+#if defined(ESP32)
+
+   // INFO("LED identify\n");
    // xTaskCreate(identify_task, "LED identify", 2048, NULL, 2, NULL);
+#else
+	if (led_gpio > 0) {
+		os_timer_disarm(&identtimer);
+		os_timer_setfn(&identtimer, (os_timer_func_t *)identify_task, (void *)NULL);
+		os_timer_arm(&identtimer, 100, false);
+	}
+#endif
 }
 
 

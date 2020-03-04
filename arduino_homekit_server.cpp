@@ -48,9 +48,9 @@
 //const int idle = 180; /* 180 sec idle before start sending probes */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      180
 //const int interval = 30; /* 30 sec between probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  30
+#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  40
 //const int maxpkt = 4; /* Drop connection after 4 probes without response */
-#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT     4
+#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT     8
 // if 180 + 30 * 4 = 300 sec without socket response, disconected it.
 
 #ifdef HOMEKIT_DEBUG
@@ -3158,7 +3158,7 @@ void homekit_client_process(client_context_t *context) {
 	size_t decrypted_size = 0;
 
 	if (context->encrypted) {
-		CLIENT_INFO(context, "Decrypting data");
+		//CLIENT_INFO(context, "Decrypting data");
 
 		client_decrypt_(context, context->data, data_len, NULL, &decrypted_size);
 
@@ -3185,7 +3185,7 @@ void homekit_client_process(client_context_t *context) {
 	}
 
 	current_client_context = context;
-	//CLIENT_INFO(context,"Payload %s",(char*) payload);
+//	CLIENT_INFO(context,"Payload %s",(char*) payload);
 
 	http_parser_execute(&context->parser, &homekit_http_parser_settings,
 			(char*) payload, payload_size);
