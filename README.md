@@ -50,6 +50,13 @@ At this moment QR is not generated, so please use manual pairing by enetering pa
 
 More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
+
+
+## Sonoff example
+
+Example folders contains sketch for Sonoff. As mentioned ESP8266 in process of testing (Sonoff is esp8265 )
+But example already works quite fine. Small problem detected during the pairing. But after that works well
+
 ## For more information
 
 
