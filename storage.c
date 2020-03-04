@@ -28,7 +28,9 @@
 #define MAX_PAIRINGS 16
 #endif
 
+#ifndef ACCESSORY_ID_SIZE
 #define ACCESSORY_ID_SIZE   17
+#endif
 #define ACCESSORY_KEY_SIZE  64
 
 const char magic1[] = "HAP";
@@ -111,6 +113,7 @@ int homekit_storage_init() {
 	if (strncmp(magic, magic1, sizeof(magic1))) {
 		INFO("Formatting flash at 0x%x", SPIFLASH_BASE_ADDR);
 #ifdef EX_STORAGE_CHAR
+		
 		memset((void *)&ex_storage[0], 0xff, sizeof(ex_storage));
 		//on_storage_change();
 		//INFO("storage %s",ex_storage);
@@ -166,6 +169,7 @@ static char ishex(unsigned char c) {
 
 char *homekit_storage_load_accessory_id() {
 	byte data[ACCESSORY_ID_SIZE + 1];
+//	INFO("homekit  load_accessory_id");
 #ifdef EX_STORAGE_CHAR
 	memcpy((void*)data, &ex_storage[ACCESSORY_ID_ADDR_EX], sizeof(data));
 #else
@@ -174,10 +178,10 @@ char *homekit_storage_load_accessory_id() {
 		return NULL;
 	}
 #endif
-	//INFO("homekit  load_accessory_id");
+
 	if (!data[0])
 		return NULL;
-	// INFO("data  0x%s",(char*)data);
+//	INFO("data  0x%s",(char*)data);
 	data[sizeof(data) - 1] = 0;
 
 	for (int i = 0; i < 17; i++) {

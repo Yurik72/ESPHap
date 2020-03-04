@@ -57,6 +57,10 @@ extern "C"	void  ICACHE_FLASH_ATTR mdns_init8266(const char* instanceName, const
 	//MDNS.begin(instanceName, INADDR_ANY, ttl);
 	//MDNS.addService(serviceName, serviceProto, port);
 }
+extern "C"	void ICACHE_FLASH_ATTR mdns_stop() {
+	//INFO("mdns_clear");
+	os_timer_disarm(&mdnstimer);
+}
 
 extern "C"	void ICACHE_FLASH_ATTR mdns_clear() {
 	INFO("mdns_clear");

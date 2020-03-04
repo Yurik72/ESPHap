@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+
 typedef void *homekit_client_id_t;
 
 

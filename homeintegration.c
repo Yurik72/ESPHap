@@ -100,10 +100,12 @@ void on_storage_changed(){
 	if(callbackstorage)
 		callbackstorage(get_ex_storage(),get_ex_storage_size());
 }
+#ifndef ARDUINO8266_SERVER_CPP
 void init_homekit_server() {
 	set_callback_storage(on_storage_changed);
     homekit_server_init(&config);
 }
+#endif
 /*
 void on_wifi_ready() {
     homekit_server_init(&config);
@@ -145,6 +147,7 @@ static int base_acctype=homekit_accessory_category_other;
 static int base_accessory_index=-1;
 static bool paired = false;
 
+#ifndef ARDUINO8266_SERVER_CPP
 void hap_init_homekit_server() {
 	if(hap_mainservices_current>1){
 		set_callback_storage(on_storage_changed);
@@ -172,6 +175,37 @@ void hap_init_homekit_server() {
 
 }
 
+#endif
+bool hap_setup_final_step() {
+	if (hap_mainservices_current > 1) {
+		set_callback_storage(on_storage_changed);
+		
+		INFO("homekit_is_paired %d", paired);
+		if (base_accessory_index == -1) {
+			hap_init_homekit_base_accessory();
+		}
+		else {
+			homekit_accessory_t*old = hap_accessories[base_accessory_index];
+			hap_accessories[base_accessory_index] =
+				NEW_HOMEKIT_ACCESSORY(
+					.category = (homekit_accessory_category_t)base_acctype,//  homekit_accessory_category_lightbulb,
+					.services = hap_services);
+			 old->services = 0;  // do not destruct services
+			homekit_accessory_free(old,false);
+			 //TO DO  memory leak
+			 //Need release  homekit_accessory_t * old  
+			return true;
+		}
+
+	}
+	else {
+		INFO("hap_init_homekit_server nothing to init ");
+		return false;
+	}
+}
+homekit_server_config_t* hap_get_server_config() {
+	return &hap_config;
+}
 void hap_init_homekit_base_accessory(){
 if(base_accessory_index>=0){
 //	INFO("base accessory already set ");
@@ -405,7 +439,7 @@ homekit_service_t* hap_new_light_service(const char* szname, hap_callback cb, vo
 		            NULL
 		        });
 }
-float min = 0.0;
+//float min = 0.0;
 homekit_service_t* hap_add_light_service(const char* szname, hap_callback cb, void* context){
 
 	homekit_service_t* lightsvc = hap_new_light_service(szname, cb, context);

@@ -1,5 +1,5 @@
 #include <stdarg.h>
-
+#include <port_x.h>
 
 #ifdef ESP_OPEN_RTOS
 
@@ -140,7 +140,7 @@ void homekit_mdns_configure_finalize() {
 #endif
 
 
-#if defined ARDUINO && defined ESP32
+#if defined(ARDUINO) && defined(ESP32)
 #include <Arduino.h>
 #include <string.h>
 #include <mdns.h>
@@ -202,7 +202,8 @@ void homekit_mdns_configure_finalize() {
 	*/
 }
 #endif
-#if defined(ARDUINO) && defined(ESP8266)
+
+#if defined(ARDUINO) && defined(ESP8266) && !defined(ARDUINO8266_SERVER_CPP)
 
 #include <string.h>
 //#include <esp/hwrand.h>
@@ -212,7 +213,7 @@ void homekit_mdns_configure_finalize() {
 
 #include "types.h"
 #include "Arduino.h"
-
+#include "user_interface.h"
 #include "mdnsA8266.h"
 
 #ifndef MDNS_TTL
@@ -234,14 +235,14 @@ void ICACHE_FLASH_ATTR homekit_system_restart() {
 
 void ICACHE_FLASH_ATTR homekit_overclock_start() {
 	//sdk_system_overclock();
-	system_update_cpu_freq(160);
-	ets_intr_lock();
+	system_update_cpu_freq(SYS_CPU_160MHZ);
+	//ets_intr_lock();
 }
 
 void homekit_overclock_end() {
 	//sdk_system_restoreclock();
-	system_update_cpu_freq(80);
-	ets_intr_unlock();
+//	system_update_cpu_freq(80);
+	//ets_intr_unlock();
 }
 
 //static char mdns_instance_name[65] = { 0 };
@@ -258,6 +259,9 @@ void ICACHE_FLASH_ATTR homekit_mdns_configure_init(const char *instance_name, in
 	//mdns_txt_rec[0] = 0;
 	mdns_port = port;
 	mdns_init8266(instance_name, mdns_base_service, mdns_base_service_proto, port, MDNS_TTL);
+}
+void homekit_mdns_stop() {
+	mdns_stop();
 }
 void ICACHE_FLASH_ATTR homekit_mdns_add_txt_ex(const char *key, const char *val) {
 	//mdns_TXT_append_ex(key, val);
@@ -294,3 +298,75 @@ void ICACHE_FLASH_ATTR homekit_mdns_configure_finalize() {
 #endif
 
 
+#if defined(ARDUINO) && defined(ESP8266) && defined(ARDUINO8266_SERVER_CPP)
+
+#include <string.h>
+
+
+
+#include "types.h"
+#include "Arduino.h"
+#include "user_interface.h"
+#include "debug.h"
+
+#ifndef MDNS_TTL
+#define MDNS_TTL 4500
+#endif
+	uint32_t homekit_random() {
+		return os_random();
+
+	}
+
+	void homekit_random_fill(uint8_t *data, size_t size) {
+	//	INFO("os_get_random");
+		os_get_random(data, size);
+		/*
+		    uint32_t x;
+    for (int i=0; i<size; i+=sizeof(x)) {
+        x = rand();//esp_random();
+      memcpy(data+i, &x, (size-i >= sizeof(x)) ? sizeof(x) : size-i);
+    }
+	*/
+	}
+	void  homekit_system_restart() {
+		//sdk_system_restart();
+	}
+
+	void  homekit_overclock_start() {
+		//sdk_system_overclock();
+		system_update_cpu_freq(SYS_CPU_160MHZ);
+		//ets_intr_lock();
+	}
+
+	void homekit_overclock_end() {
+		//sdk_system_restoreclock();
+		system_update_cpu_freq(80);
+		//ets_intr_unlock();
+	}
+
+	void homekit_mdns_init() {
+		mdns_init();
+	}
+
+	void homekit_mdns_configure_init(const char *instance_name, int port) {
+		mdns_hostname_set(instance_name);
+		mdns_instance_name_set(instance_name);
+		mdns_service_add(instance_name, "_hap", "_tcp", port, NULL, 0);
+	}
+
+	void homekit_mdns_add_txt(const char *key, const char *format, ...) {
+		va_list arg_ptr;
+		va_start(arg_ptr, format);
+
+		char value[128];
+		int value_len = vsnprintf(value, sizeof(value), format, arg_ptr);
+
+		va_end(arg_ptr);
+
+		if (value_len && value_len < sizeof(value) - 1) {
+			mdns_service_txt_item_set("_hap", "_tcp", key, value);
+		}
+	}
+
+
+#endif

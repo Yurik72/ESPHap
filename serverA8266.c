@@ -1,5 +1,5 @@
 #include "port_x.h"
-#if defined(ARDUINO8266_SERVER)
+#if defined(ARDUINO8266_SERVER) && !defined (ARDUINO8266_SERVER_CPP)
 #include <Arduino.h>
 
 
@@ -59,7 +59,7 @@ typedef struct _client_context_t client_context_t;
 
 
 #define HOMEKIT_NOTIFY_EVENT(server, event) \
-  if ((server)->config->on_event) \
+  if ((server) && ((server)->config) &&(server)->config->on_event) \
       (server)->config->on_event(event);
 
 
@@ -387,7 +387,7 @@ void client_context_free(client_context_t *c) {
 
     if (c->body)
         free(c->body);
-
+	INFO("context free");
     free(c);
 }
 
@@ -1064,8 +1064,8 @@ void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, c
             }
 
 			CLIENT_INFO(context, "Initializing crypto");
-            DEBUG_HEAP();
-
+           // DEBUG_HEAP();
+			homekit_mdns_stop();
             char password[11];
             if (context->server->config->password) {
                 strncpy(password, context->server->config->password, sizeof(password));
@@ -1083,22 +1083,29 @@ void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, c
                 context->server->config->password_callback(password);
             }
 			
-
+			watchdog_disable_all();
+			watchdog_check_begin();
             crypto_srp_init(
                 context->server->pairing_context->srp,
                 "Pair-Setup", password
             );
-			CLIENT_INFO(context, "Initializing crypto done");
+			watchdog_check_end("crypto_srp_init");  // 6585ms
+			watchdog_enable_all();
+			//CLIENT_INFO(context, "Initializing crypto done");
             if (context->server->pairing_context->public_key) {
                 free(context->server->pairing_context->public_key);
                 context->server->pairing_context->public_key = NULL;
             }
 
             context->server->pairing_context->public_key_size = 0;
+			watchdog_disable_all();
+			watchdog_check_begin();
             crypto_srp_get_public_key(context->server->pairing_context->srp, NULL, &context->server->pairing_context->public_key_size);
-			CLIENT_INFO(context, "crypto_srp_get_public_key done");
+			//CLIENT_INFO(context, "crypto_srp_get_public_key done");
+			watchdog_check_end("crypto_srp_get_public_key");  // 3310ms
+			watchdog_enable_all();
             context->server->pairing_context->public_key = malloc(context->server->pairing_context->public_key_size);
-			CLIENT_INFO(context, "public key allocated %d", context->server->pairing_context->public_key);
+			//CLIENT_INFO(context, "public key allocated %d", context->server->pairing_context->public_key);
 			INFO_HEAP();
             int r = crypto_srp_get_public_key(context->server->pairing_context->srp, context->server->pairing_context->public_key, &context->server->pairing_context->public_key_size);
             if (r) {
@@ -1157,12 +1164,16 @@ void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, c
 
 			CLIENT_INFO(context, "Computing SRP shared secret");
             DEBUG_HEAP();
+			watchdog_disable_all();
+			watchdog_check_begin();
             int r = crypto_srp_compute_key(
                 context->server->pairing_context->srp,
                 device_public_key->value, device_public_key->size,
                 context->server->pairing_context->public_key,
                 context->server->pairing_context->public_key_size
             );
+			watchdog_check_end("crypto_srp_compute_key"); // 13479ms
+			watchdog_enable_all();
 			CLIENT_INFO(context, "Computing SRP shared secret done");
             if (r) {
                 CLIENT_ERROR(context, "Failed to compute SRP shared secret (code %d)", r);
@@ -1530,7 +1541,7 @@ void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, c
             context->server->pairing_context = NULL;
 
             context->server->paired = 1;
-            homekit_setup_mdns(context->server);
+           // homekit_setup_mdns(context->server);
 
             CLIENT_INFO(context, "Successfully paired");
 
@@ -1547,6 +1558,7 @@ void ICACHE_FLASH_ATTR homekit_server_on_pair_setup(client_context_t *context, c
 #ifdef HOMEKIT_OVERCLOCK_PAIR_SETUP
     homekit_overclock_end();
 #endif
+	CLIENT_INFO(context, "pair setup end");
 }
 
 void homekit_server_on_pair_verify(client_context_t *context, const byte *data, size_t size) {
@@ -2564,7 +2576,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 }
 
 void homekit_server_on_pairings(client_context_t *context, const byte *data, size_t size) {
-    DEBUG("HomeKit Pairings");
+    INFO("HomeKit Pairings");
     DEBUG_HEAP();
 
     tlv_values_t *message = tlv_new();
@@ -2971,7 +2983,8 @@ int homekit_server_on_message_complete(http_parser *parser) {
         context->body = NULL;
         context->body_length = 0;
     }
-
+	//INFO("homekit_server_on_message_complete");
+	//INFO_HEAP();
     return 0;
 }
 
@@ -3004,7 +3017,7 @@ static void homekit_client_process(client_context_t *context) {
         return;
     }
 
-    CLIENT_INFO(context, "Got %d incomming data,data_available %d", data_len, context->data_available);
+   // CLIENT_INFO(context, "Got %d incomming data,data_available %d", data_len, context->data_available);
     byte *payload = (byte *)context->data;
     size_t payload_size = (size_t)data_len;
 
@@ -3105,7 +3118,7 @@ LOCAL os_timer_t heartbeat_timer;
 static err_t _s_recv(void *arg, tcp_pcb_t* pcb, struct pbuf *pb, err_t err)
 {
 	//return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
-	INFO("_s_recv %d", pb->tot_len);
+	//INFO("_s_recv %d", pb->tot_len);
 	client_context_t *context = (client_context_t *)arg;
 	context->socket = pcb;
 	int max_size = pb->tot_len - context->data_available;
@@ -3114,6 +3127,8 @@ static err_t _s_recv(void *arg, tcp_pcb_t* pcb, struct pbuf *pb, err_t err)
 	int size_read = 0;
 	context->data_size = 0;
 	while (size) {
+		INFO("Processing size %d", size);
+
 		size_t buf_size = pb->len - context->data_available;
 		size_t copy_size = (size < buf_size) ? size : buf_size;
 		os_memcpy(context->data, pb->payload + context->data_available, copy_size);
@@ -3121,8 +3136,13 @@ static err_t _s_recv(void *arg, tcp_pcb_t* pcb, struct pbuf *pb, err_t err)
 		context->data_len += copy_size;
 		tcp_recved(pcb, copy_size);
 		pbuf_free(pb);
+		watchdog_check_end("crypto_srp_init");  // 6585ms
+		watchdog_enable_all();
+
 		homekit_client_process(context);
-		INFO("process  %d", copy_size);
+		INFO("processed  %d", copy_size);
+		watchdog_check_end("");  // 3310ms
+		watchdog_enable_all();
 		//os_timer_disarm(&heartbeat_timer);
 		//os_timer_setfn(&heartbeat_timer, (os_timer_func_t *)tcpreccallback, (void *)context);
 		//os_timer_arm(&heartbeat_timer, 500, FALSE);
@@ -3133,8 +3153,13 @@ static err_t _s_recv(void *arg, tcp_pcb_t* pcb, struct pbuf *pb, err_t err)
 	//tcp_recved(pcb, pb->tot_len);
 
 	//pbuf_free(pb);
-	if(context->disconnect)
+	if (context->disconnect) {
+		INFO("Closing connection");
 		homekit_close_tcp(pcb);
+		
+	}
+	//INFO("end tcp rec");
+	//INFO_HEAP();
 	//tcp_abort(pcb);
 	return ERR_OK;
 }
@@ -3202,7 +3227,7 @@ pcb->keep_cnt = keep_count;
 	tcp_setprio(s, TCP_PRIO_MIN);
 	tcp_arg(s, context);
 	tcp_recv(s, &_s_recv);
-	tcp_sent(s, &_s_acked);
+	//tcp_sent(s, &_s_acked);
 	tcp_err(s, &_s_error);
 	//tcp_poll(s, &_s_poll, 1);
 
@@ -3326,7 +3351,7 @@ static void homekit_run_server(homekit_server_t *server)
 	local_addr = *IP_ADDR_ANY;// (&ip_addr_any);
 	pcb->so_options |= SOF_REUSEADDR;
 	err = tcp_bind(pcb, &local_addr,  PORT);
-	INFO("tcp_bind done");
+	//INFO("tcp_bind done");
 	if (err != ERR_OK) {
 		tcp_close(pcb);
 		INFO("Error bind");
@@ -3349,9 +3374,9 @@ static void homekit_run_server(homekit_server_t *server)
 	server->listen_fd = listen_pcb;
    // listen(server->listen_fd, 10);
 	tcp_arg(listen_pcb, (void*)server);
-	INFO("tcp_start accept");
+	//INFO("tcp_start accept");
 	tcp_accept(listen_pcb, &_s_accept);
-	INFO("waiting accept");
+	//INFO("waiting accept");
 
 	/*
     FD_SET(server->listen_fd, &server->fds);
@@ -3468,7 +3493,7 @@ void homekit_setup_mdns(homekit_server_t *server) {
         memset(encodedHash, 0, sizeof(encodedHash));
 
         word32 len = sizeof(encodedHash);
-        Base64_Encode_NoNl((const unsigned char *)shaHash, 4, encodedHash, &len);
+		base64_encode((const unsigned char *)shaHash, 4, encodedHash);// , &len);
 
         homekit_mdns_add_txt("sh", "%s", encodedHash);
     }

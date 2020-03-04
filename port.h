@@ -1,14 +1,24 @@
 #pragma once
 
 #include <stdint.h>
+#include "port_x.h"
 
-uint32_t homekit_random();
-void homekit_random_fill(uint8_t *data, size_t size);
+#ifdef ARDUINO8266_SERVER_CPP
+#ifdef __cplusplus
+extern "C" {
+#endif
+#endif
+	uint32_t homekit_random();
+	void homekit_random_fill(uint8_t *data, size_t size);
 
-void homekit_system_restart();
-void homekit_overclock_start();
-void homekit_overclock_end();
-
+	void homekit_system_restart();
+	void homekit_overclock_start();
+	void homekit_overclock_end();
+#ifdef ARDUINO8266_SERVER_CPP
+#ifdef __cplusplus
+}
+#endif
+#endif
 #ifdef ESP_OPEN_RTOS
 #include <spiflash.h>
 #define ESP_OK 0
@@ -38,6 +48,7 @@ void homekit_overclock_end();
 #include <Arduino.h>
 
 
+#define ACCESSORY_ID_SIZE   17
 //#define ARDUINO8266_SERVER
 
 
@@ -90,10 +101,12 @@ typedef struct {
 #endif
 
   
-
+#ifndef ARDUINO8266_SERVER_CPP
 void homekit_mdns_init();
+#endif
 void homekit_mdns_configure_init(const char *instance_name, int port);
 void homekit_mdns_add_txt(const char *key, const char *format, ...);
 void homekit_mdns_add_txt_ex(const char *key, const char *val);
 void homekit_mdns_configure_finalize();
 
+void homekit_mdns_stop();

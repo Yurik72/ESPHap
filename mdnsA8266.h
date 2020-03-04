@@ -44,6 +44,7 @@ extern "C" {
 	void mdns_init8266(const char* instanceName, const char* serviceName, const char* serviceProto, unsigned int port, unsigned int  ttl);
 	void mdns_TXT_append(char* txt, unsigned int txt_size, const char* record, unsigned int record_size);
 	void mdns_TXT_append_ex(const char* serviceName, const char* serviceProto, char* txt, const char* record);
+	void  mdns_stop();
 #ifdef __cplusplus
 }
 #endif

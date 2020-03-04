@@ -1,5 +1,5 @@
 #include "port_x.h"
-#if !defined(ARDUINO8266_SERVER)
+#if !defined(ARDUINO8266_SERVER) && !defined(ARDUINO8266_SERVER_CPP) 
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
