@@ -3185,13 +3185,13 @@ void homekit_client_process(client_context_t *context) {
 	}
 
 	current_client_context = context;
-	CLIENT_INFO(context,"Payload %s",(char*) payload);
+	//CLIENT_INFO(context,"Payload %s",(char*) payload);
 
 	http_parser_execute(&context->parser, &homekit_http_parser_settings,
 			(char*) payload, payload_size);
 	current_client_context = NULL;
 
-	CLIENT_INFO(context, "Finished processing");
+//	CLIENT_INFO(context, "Finished processing");
 
 	if (decrypted) {
 		free(decrypted);
