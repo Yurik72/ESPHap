@@ -57,6 +57,8 @@ More detail instruction can be found [there](https://www.instructables.com/id/Ar
 Example folders contains sketch for Sonoff. As mentioned ESP8266 in process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
 
+Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
+
 ## For more information
 
 
