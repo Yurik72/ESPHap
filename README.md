@@ -6,11 +6,11 @@
 ESPHap
 ===========
 
-This is a library for easily & efficiently integrating arduino projects based on Esp32 with Apple Home Kit by  native protocols 
+This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple Home Kit by  native protocols 
 and without any additional bridges
 
-At this moment only ESP32 supported and tested.
-ESP8266 is ported as well , at this moment under the testing stage
+At this moment  ESP32 supported and tested well.
+ESP8266 is ported as well , at this moment under the testing stage, Hovewer there is some minor bugs and especially in the pairing process. Not all of them finished smooth. Hovewer it can be maximum 3 attempts (in my experience) and after that everything working fine. I'd say that after pairing (once operation) devices works well and stable
 
 Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
 this project uses this as well.
