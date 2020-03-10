@@ -178,7 +178,7 @@ void arduino_homekit_loop();
 
 //homekit_server_t * arduino_homekit_get_running_server();
 int arduino_homekit_connected_clients_count();
-
+bool arduino_homekit_is_paired();
 #ifdef __cplusplus
 }
 #endif

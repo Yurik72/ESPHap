@@ -13,5 +13,7 @@ void hap_init_homekit_server()
 void hap_homekit_loop() {
 	arduino_homekit_loop();
 }
-
+bool hap_homekit_is_paired() {
+	return arduino_homekit_is_paired();
+}
 #endif

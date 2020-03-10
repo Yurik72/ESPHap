@@ -3737,7 +3737,9 @@ bool homekit_is_paired() {
 
 	return paired;;
 }
-
+bool arduino_homekit_is_paired() {
+	return homekit_is_paired();
+}
 int homekit_get_accessory_id(char *buffer, size_t size) {
 	char *accessory_id = homekit_storage_load_accessory_id();
 	if (!accessory_id)
