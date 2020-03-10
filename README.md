@@ -6,11 +6,11 @@
 ESPHap
 ===========
 
-This is a library for easily & efficiently integrating arduino projects based on Esp32 with Apple Home Kit by  native protocols 
+This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple Home Kit by  native protocols 
 and without any additional bridges
 
-At this moment only ESP32 supported and tested.
-ESP8266 is ported as well , at this moment under the testing stage
+At this moment  ESP32 supported and tested well.
+ESP8266 is ported as well , at this moment under the testing stage, Hovewer there is some minor bugs and especially in the pairing process. Not all of them finished smooth. Hovewer it can be maximum 3 attempts (in my experience) and after that everything working fine. I'd say that after pairing (once operation) devices works well and stable
 
 Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
 this project uses this as well.
@@ -57,7 +57,15 @@ More detail instruction can be found [there](https://www.instructables.com/id/Ar
 Example folders contains sketch for Sonoff. As mentioned ESP8266 in process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
 
-## For more information
+Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
+
+## Are you interesting to support this project ?
+
+You can easilly do that by donations
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JVZWJ6FSMURSL&currency_code=USD&source=url)
+
+
 
 
 
