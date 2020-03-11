@@ -541,11 +541,18 @@ homekit_service_t* hap_add_service(homekit_service_t* service ){
 
 	hap_mainservices_current++;
 	hap_services[hap_mainservices_current]=NULL;
-	INFO("hap_add_service next %d",hap_mainservices_current);
-	INFO("hap_services added %d ", (int)hap_services[added]);
-	INFO("hap_services added char 0 %d ", (int)hap_services[added]->characteristics[0]);
-	INFO("hap_services added char 1 %d ", (int)hap_services[added]->characteristics[1]);
-	INFO("hap_services added char 2 %d ", (int)hap_services[added]->characteristics[2]);
+	//INFO("hap_add_service next %d",hap_mainservices_current);
+	//INFO("hap_services added %d ", (int)hap_services[added]);
+	int i = 0;
+	homekit_characteristic_t* it = hap_services[added]->characteristics[i];
+	while (it) {
+		INFO("hap_services added chararacteristic  %d: %s ", i, it->type);
+		i++;
+		it = hap_services[added]->characteristics[i];
+	}
+	//INFO("hap_services added char 0 %d ", (int)hap_services[added]->characteristics[0]);
+	//INFO("hap_services added char 1 %d ", (int)hap_services[added]->characteristics[1]);
+	//INFO("hap_services added char 2 %d ", (int)hap_services[added]->characteristics[2]);
 
 	return service;
 }

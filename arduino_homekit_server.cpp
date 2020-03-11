@@ -40,7 +40,7 @@
 #define HOMEKIT_MDNS_PROTO   "tcp"//"_tcp"
 #define HOMEKIT_EVENT_QUEUE_SIZE 4 //original is 20
 //See WiFiClient.h WIFICLIENT_MAX_FLUSH_WAIT_MS
-#define HOMEKIT_SOCKET_FLUSH_WAIT_MS 200 //milliseconds
+#define HOMEKIT_SOCKET_FLUSH_WAIT_MS 1000 //milliseconds
 
 //#define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 //#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
@@ -48,7 +48,7 @@
 //const int idle = 180; /* 180 sec idle before start sending probes */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      180
 //const int interval = 30; /* 30 sec between probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  40
+#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  30
 //const int maxpkt = 4; /* Drop connection after 4 probes without response */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT     8
 // if 180 + 30 * 4 = 300 sec without socket response, disconected it.

@@ -40,16 +40,17 @@ const char TEXT_PLAIN [] PROGMEM ="text/plain";
   server.on("/edit", HTTP_GET, []() { \
     if (!handleFileRead("/edit.htm")) server.send(404, FPSTR(TEXT_PLAIN), "FileNotFound"); \
   }); \
-  server.on("/edit", HTTP_PUT, handleFileCreate); \
-  server.on("/edit", HTTP_DELETE, handleFileDelete); \
-  server.on("/edit", HTTP_POST, []() { \
-    server.sendHeader("Access-Control-Allow-Origin", "*"); \
-    server.send(200, "text/plain", ""); \
+  server.on(PSTR("/edit"), HTTP_PUT, handleFileCreate); \
+  server.on(PSTR("/restartesp"), HTTP_GET, [](){ESP.restart();}); \
+  server.on(PSTR("/edit"), HTTP_DELETE, handleFileDelete); \
+  server.on(PSTR("/edit"), HTTP_POST, []() { \
+    server.sendHeader(PSTR("Access-Control-Allow-Origin"), "*"); \
+    server.send(200, FPSTR(TEXT_PLAIN), ""); \
   }, handleFileUpload); \
-  server.on("/jsonsave", handleJsonSave); \
-  server.on("/jsonload", handleJsonLoad); \
-  server.on("/upload", HTTP_POST, []() { server.send(200,  FPSTR(TEXT_PLAIN), ""); }, handleFileUpload); \
-  server.on("/browse", handleFileBrowser);   \
+  server.on(PSTR("/jsonsave"), handleJsonSave); \
+  server.on(PSTR("/jsonload"), handleJsonLoad); \
+  server.on(PSTR("/upload"), HTTP_POST, []() { server.send(200,  FPSTR(TEXT_PLAIN), ""); }, handleFileUpload); \
+  server.on(PSTR("/browse"), handleFileBrowser);   \
   server.onNotFound([]() { \
 		if (!handleFileRead(server.uri())) \
 			handleNotFound(); \
@@ -165,7 +166,7 @@ String getContentType(String filename) {
 }
 
 bool handleFileRead(String path) {
-	//DBG_OUTPUT_PORT.println("handleFileRead: " + path);
+//	DBG_OUTPUT_PORT.println("handleFileRead: " + path);
 	if (path.endsWith("/")) path += FPSTR(FILE_INDEX);
 	if(path.indexOf(".")==-1) path += FPSTR(FILE_INDEX); //some body asking non existing service. can happen as well with react routing
 	String contentType = getContentType(path);
@@ -176,7 +177,7 @@ bool handleFileRead(String path) {
 		if (SPIFFS.exists(pathWithGz))
 			path += ".gz";
 		File file = SPIFFS.open(path, "r");
-    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader(PSTR("Access-Control-Allow-Origin"), "*");
 		size_t sent = server.streamFile(file, contentType);
 		file.close();
 		return true;
@@ -185,7 +186,7 @@ bool handleFileRead(String path) {
 }
 
 void handleFileUpload() {
-  DBG_OUTPUT_PORT.println("file upload start");
+ // DBG_OUTPUT_PORT.println("file upload start");
 
  if (server.uri() != "/upload") return;
 	HTTPUpload& upload = server.upload();
@@ -203,7 +204,7 @@ void handleFileUpload() {
 			}
 		}
 		//DBG_OUTPUT_PORT.print("handleFileUpload filename: "); 
-		DBG_OUTPUT_PORT.println(filename);
+		//DBG_OUTPUT_PORT.println(filename);
 		fsUploadFile = SPIFFS.open(filename, "w");
 		filename = String();
 	} else if (upload.status == UPLOAD_FILE_WRITE) {
@@ -213,7 +214,7 @@ void handleFileUpload() {
 	} else if (upload.status == UPLOAD_FILE_END) {
 		if (fsUploadFile)
 			fsUploadFile.close();
-		DBG_OUTPUT_PORT.print("handleFileUpload Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
+	//	DBG_OUTPUT_PORT.print(PSTR("handleFileUpload Size: ")); DBG_OUTPUT_PORT.println(upload.totalSize);
 	}
 }
 bool handleFileDownload(const char* szName=NULL)
@@ -221,7 +222,7 @@ bool handleFileDownload(const char* szName=NULL)
   String path;
   if(szName==NULL){
     if (server.args() == 0) {
-      server.send(500,  FPSTR(TEXT_PLAIN), "BAD ARGS");
+      server.send(500,  FPSTR(TEXT_PLAIN), PSTR("BAD ARGS"));
       return false;
     }
     path = server.arg(0);
@@ -247,13 +248,13 @@ bool handleFileDownload(const char* szName=NULL)
 void handleFileDeleteByName(String path) {
  // DBG_OUTPUT_PORT.println("handleFileDeleteByName: " + path);
   if (path == "/")
-    return server.send(500, "text/plain", "BAD PATH");
+    return server.send(500, FPSTR(TEXT_PLAIN), PSTR("BAD PATH"));
   String filetodel= path;
   if(!filetodel.startsWith("/"))
     filetodel="/"+filetodel;
   
   if (!SPIFFS.exists(filetodel))
-    return server.send(404,  FPSTR(TEXT_PLAIN), "FileNotFound");
+    return server.send(404,  FPSTR(TEXT_PLAIN), PSTR("FileNotFound"));
   SPIFFS.remove(filetodel);
   server.send(200, "text/plain", "");
   
@@ -261,7 +262,7 @@ void handleFileDeleteByName(String path) {
 void handleFileDelete() {
   String path;
   //DBG_OUTPUT_PORT.println("handleFileDeleteByName start");
- if (server.args() == 0) return server.send(500, "text/plain", "BAD ARGS");
+ if (server.args() == 0) return server.send(500, FPSTR(TEXT_PLAIN), PSTR("BAD ARGS"));
  path = server.arg(0);
  handleFileDeleteByName(path);
 	path = String();
@@ -273,14 +274,14 @@ void handleFileCreate() {
 	String path = server.arg(0);
 	//DBG_OUTPUT_PORT.println("handleFileCreate: " + path);
 	if (path == "/")
-		return server.send(500,  FPSTR(TEXT_PLAIN), "BAD PATH");
+		return server.send(500,  FPSTR(TEXT_PLAIN), PSTR("BAD PATH"));
 	if (SPIFFS.exists(path))
-		return server.send(500,  FPSTR(TEXT_PLAIN), "FILE EXISTS");
+		return server.send(500,  FPSTR(TEXT_PLAIN), PSTR("FILE EXISTS"));
 	File file = SPIFFS.open(path, "w");
 	if (file)
 		file.close();
 	else
-		return server.send(500,  FPSTR(TEXT_PLAIN), "CREATE FAILED");
+		return server.send(500,  FPSTR(TEXT_PLAIN), PSTR("CREATE FAILED"));
 	server.send(200, FPSTR(TEXT_PLAIN), "");
 	path = String();
 }
@@ -289,7 +290,7 @@ void handleFileList() {
 
   String path = "/";
 	if (server.hasArg("dir")) {
-		//server.send(500,  FPSTR(TEXT_PLAIN), "BAD ARGS");
+		//server.send(500,  FPSTR(TEXT_PLAIN), PSTR("BAD ARGS"));
 		//return;
     path = server.arg("dir");
 	}
@@ -385,12 +386,14 @@ void handleFileList() {
   */
 }
 void saveFileBrowse(){
+  //DBG_OUTPUT_PORT.println("saveFileBrowse: " );
   String data=FPSTR(FILE_BROWSE_HTML);
   File fb = SPIFFS.open(FPSTR(FILE_BROWSE_FILE), "w");
   if(fb)
     fb.print(data);
   if(fb)
     fb.close();
+ // DBG_OUTPUT_PORT.println("saveFileBrowse: " );  
 }
 void saveIndex(){
 
@@ -417,6 +420,7 @@ void handleFileBrowser()
       }
       else
       {
+        SPIFFS.remove(FPSTR(FILE_BROWSE_FILE));
         if (!SPIFFS.exists(FPSTR(FILE_BROWSE_FILE))){
           saveFileBrowse();
         }
@@ -424,7 +428,7 @@ void handleFileBrowser()
                                 //server.sendHeader("Content-Encoding", "gzip");
                                 //server.send_P(200, "text/html", PAGE_FSBROWSE, sizeof(PAGE_FSBROWSE));
                              
-                             server.send(500, "text/plain", "handleFileBrowser can't proceed");
+                             server.send(500, FPSTR(TEXT_PLAIN), "handleFileBrowser can't proceed");
         }
         //MyWebServer.isDownloading = true; //need to stop all cloud services from doing anything!  crashes on upload with mqtt...
       }
@@ -433,7 +437,7 @@ void handleJsonSave()
 {
 
   if (server.args() == 0)
-    return server.send(500,  FPSTR(TEXT_PLAIN), "BAD JsonSave ARGS");
+    return server.send(500,  FPSTR(TEXT_PLAIN), PSTR("BAD JsonSave ARGS"));
 
   String fname = "/" + server.arg(0);
   fname = urldecode(fname);
@@ -447,7 +451,7 @@ void handleJsonSave()
     file.close();
   }
   else  //cant create file
-    return server.send(500,  FPSTR(TEXT_PLAIN), "JSONSave FAILED");
+    return server.send(500,  FPSTR(TEXT_PLAIN), PSTR("JSONSave FAILED"));
   server.send(200,  FPSTR(TEXT_PLAIN), "");
 
 }
