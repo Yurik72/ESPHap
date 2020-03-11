@@ -31,8 +31,9 @@
                 background: #363636;
                 padding: 8px;
                 border-radius: 4px;
-                margin-top: -10px;
+                margin-top: 10px;
                 margin-right: 10px;
+
             }
 
             #content {
@@ -334,6 +335,50 @@
             .hidden {
                 display: none
             }
+		.checkbox {
+			position: absolute;
+			z-index: -1;
+			opacity: 0;
+			margin: 10px 0 0 20px;
+		}
+		.checkbox + label {
+			position: relative;
+			padding: 0 0 0 60px;
+			cursor: pointer;
+		}
+		.checkbox + label:before {
+			content: '';
+			position: absolute;
+			top: -4px;
+			left: 0;
+			width: 50px;
+			height: 26px;
+			border-radius: 13px;
+			background: #CDD1DA;
+			box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
+			transition: .2s;
+		}
+		.checkbox + label:after {
+			content: '';
+			position: absolute;
+			top: -2px;
+			left: 2px;
+			width: 22px;
+			height: 22px;
+			border-radius: 10px;
+			background: #FFF;
+			box-shadow: 0 2px 5px rgba(0,0,0,.3);
+			transition: .2s;
+		}
+		.checkbox:checked + label:before {
+			background: #9FD468;
+		}
+		.checkbox:checked + label:after {
+			left: 26px;
+		}
+		.checkbox:focus + label:before {
+			box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,255,0,.7);
+		}
 
     </style>
 </head>
@@ -347,10 +392,9 @@
                 <input type="checkbox" id="nav-toggle-cb" checked="checked">
                 <nav id="menu">
 				        <div class="input-group" id="vrotate-group">
-                            <label for="ch1">Switch state</label>
                            
-							 <input type="checkbox" id="ch1"  class="default-action" checked="checked">
-
+							 <input type="checkbox" id="ch1"  class="default-action checkbox" checked="checked">
+							 <label for="ch1">Switch state</label>
                         </div>
                        
                 </nav>
