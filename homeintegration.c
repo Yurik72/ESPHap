@@ -491,15 +491,7 @@ homekit_service_t* hap_add_light_service(const char* szname, hap_callback cb, vo
 homekit_service_t*  hap_add_light_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
 
 	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
-	homekit_service_t* lightservice = 
-	/*	NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
-		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 1.0),
-			NULL
-	});*/
-	 hap_new_light_service(szname, cb, context);
-	DEBUG("hap_services added char 1 %f ", lightservice->characteristics[1]->min_value[0]);
-	//lightservice->characteristics[1]->min_value[0] = 0.0;
+	homekit_service_t* lightservice = hap_new_light_service(szname, cb, context);
 	
 	homekit_service_t* svc[3];
 	svc[0] = baseservice;
@@ -512,7 +504,7 @@ homekit_service_t*  hap_add_light_service_as_accessory(int acctype, const char* 
 
 	hap_mainaccesories_current++;
 	hap_accessories[hap_mainaccesories_current] = NULL;
-	//   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
+	
 	return lightservice;
 }
 homekit_service_t* hap_new_battery_service(const char* szname, hap_callback cb, void* context) {
@@ -530,6 +522,38 @@ homekit_service_t* hap_add_battery_service(const char* szname, hap_callback cb, 
 	return hap_add_service(hap_new_battery_service(szname, cb, context));
 }
 
+homekit_service_t* hap_new_motion_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(MOTION_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(MOTION_DETECTED, 0),
+			NULL
+	});
+}
+homekit_service_t* hap_add_motion_service(const char* szname, hap_callback cb, void* context) {
+
+	INFO("hap_add_motion_service");
+	return hap_add_service(hap_new_motion_service(szname, cb, context));
+}
+homekit_service_t*  hap_add_motion_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
+
+	INFO("add hap_add_motion_service as accessory");
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* motionservice = hap_new_motion_service(szname, cb, context);
+
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = motionservice;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+
+	return motionservice;
+}
 homekit_service_t* hap_add_service(homekit_service_t* service ){
 	if(hap_mainservices_current>=MAX_HAP_SERVICES){
 		DEBUG("hap_add_service NOT possible, maximum services reached");
