@@ -3416,7 +3416,10 @@ void homekit_mdns_init(homekit_server_t *server) {
 	if (!staIP.isSet()) {
 		return;
 	}
-
+	if (!server->config || !server->config->accessories[0]) {
+		ERROR("Invalid server config ");
+		return;
+	}
 	homekit_accessory_t *accessory = server->config->accessories[0];
 	homekit_service_t *accessory_info = homekit_service_by_type(accessory,
 	HOMEKIT_SERVICE_ACCESSORY_INFORMATION);
@@ -3623,21 +3626,24 @@ void homekit_server_init(homekit_server_config_t *config) {
 			return;
 		}
 	}
-
+	
 	homekit_accessories_init(config->accessories);
 
 	if (!config->config_number) {
-		config->config_number = config->accessories[0]->config_number;
+		if (config->accessories[0]) {
+			config->config_number = config->accessories[0]->config_number;
+		}
 		if (!config->config_number) {
 			config->config_number = 1;
 		}
 	}
 
-	if (!config->category) {
+	if (!config->category && config->accessories[0]) {
 		config->category = config->accessories[0]->category;
 	}
-
+	
 	homekit_server_t *server = server_new();
+	
 	running_server = server;
 	server->config = config;
 
@@ -3884,8 +3890,9 @@ void arduino_homekit_setup(homekit_server_config_t *config) {
 		system_update_cpu_freq(SYS_CPU_160MHZ);
 		INFO("Update the CPU to run at 160MHz");
 	}
-
+	INFO_HEAP();
 	homekit_server_init(config);
+	
 	// The MDNS needs to be restarted when WiFi is connected to confirm the
 	// MDNS runs at the IPAddress of STA
 	// otherwise the iOS will not show the Accessory
