@@ -24,7 +24,8 @@
 #define GREENVALUE(x)  ((x >> 8) & 0xFF)
 #define BLUEVALUE(x) ((x >> 0) & 0xFF)
 
-
+#define MAXHS(x,y) ((x)>(y) ? (x) : (y))
+#define MINHS(x,y) ((x)<(y) ? (x) : (y))
 #include "my92XX.h"
 
 struct channel_t {
@@ -50,6 +51,7 @@ public:
   void show();
   static uint32_t Color(uint8_t r, uint8_t g, uint8_t b);
   static uint32_t HSVColor(float h, float s, float v);
+  static void ColorToHSI(uint32_t rgbcolor, uint32_t brightness,  double &Hue, double &Saturation, double &Intensity);
   unsigned int _toPWM(unsigned int value, bool gamma, bool inverse);
   unsigned int _toPWM(unsigned char id);
   void _setInputValue(const unsigned char id, const unsigned int value);

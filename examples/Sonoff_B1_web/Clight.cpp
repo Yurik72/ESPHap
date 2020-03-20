@@ -240,3 +240,73 @@ long  Clight::_toMireds(const long kelvin) {
 void  Clight::_lightMireds(const long kelvin) {
 	_light_mireds = _toMireds(kelvin);
 }
+
+void Clight::ColorToHSI(uint32_t rgbcolor, uint32_t brightness,  double &Hue, double &Saturation, double &Intensity)
+{
+  uint32_t r = REDVALUE(rgbcolor);
+  uint32_t g = GREENVALUE(rgbcolor);
+  uint32_t b = BLUEVALUE(rgbcolor);
+
+  if ((r < 0 && g < 0 && b < 0) || (r > 255 || g > 255 || b > 255))
+  {
+    Hue = Saturation = Intensity = 0;
+    return;
+  }
+
+  if (g == b)
+  {
+    if (b < 255)
+    {
+      b = b + 1;
+    }
+    else
+    {
+      b = b - 1;
+    }
+  }
+  uint32_t nImax, nImin, nSum, nDifference;
+  nImax = MAXHS(r, b);
+  nImax = MAXHS(nImax, g);
+  nImin = MINHS(r, b);
+  nImin = MINHS(nImin, g);
+  nSum = nImin + nImax;
+  nDifference = nImax - nImin;
+
+  Intensity = (float)nSum / 2;
+
+  if (Intensity < 128)
+  {
+    Saturation = (255 * ((float)nDifference / nSum));
+  }
+  else
+  {
+    Saturation = (float)(255 * ((float)nDifference / (510 - nSum)));
+  }
+
+  if (Saturation != 0)
+  {
+    if (nImax == r)
+    {
+      Hue = (60 * ((float)g - (float)b) / nDifference);
+    }
+    else if (nImax == g)
+    {
+      Hue = (60 * ((float)b - (float)r) / nDifference + 120);
+    }
+    else if (nImax == b)
+    {
+      Hue = (60 * ((float)r - (float)g) / nDifference + 240);
+    }
+
+    if (Hue < 0)
+    {
+      Hue = (60 * ((float)b - (float)r) / nDifference + 120);
+    }
+  }
+  else
+  {
+    Hue = -1;
+  }
+
+  return;
+}

@@ -141,15 +141,26 @@ void handleSetVal(){
   }
   //to do analyze
   if(server.arg("var") == "ch1"){
-    if(hapservice){
-
-      homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
-      if(ch){
+ 
 		  lamp.IsOn=(server.arg("val")=="true");
 		  lamp.show();
-      }
     }
-  }
+     else  if(server.arg("var") == "br"){
+
+      lamp.Brigthness =server.arg("br").toInt();
+      lamp.show();
+      }
+    else  if(server.arg("var") == "col"){
+      uint32_t color=server.arg("col").toInt();
+      double Hue;
+      double Saturation;
+      double Intensity;
+      Clight::ColorToHSI(color, lamp.Brigthness*255/100,Hue,Saturation,Intensity);
+      lamp.Saturation=Saturation;
+      lamp.Hue=Hue;
+      lamp.show();
+      }
+     
 }
 void loop() {
 

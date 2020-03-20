@@ -1,0 +1,614 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Sonoff web portal</title>
+    <style>
+
+            body {
+                font-family: Arial,Helvetica,sans-serif;
+                background: #181818;
+                color: #EFEFEF;
+                font-size: 16px
+            }
+
+            h2 {
+                font-size: 18px
+            }
+
+            section.main {
+                display: flex
+            }
+
+            #menu,section.main {
+                flex-direction: column
+            }
+
+            #menu {
+                display: none;
+                flex-wrap: nowrap;
+                min-width: 440px;
+                background: #363636;
+                padding: 8px;
+                border-radius: 4px;
+                margin-top: 10px;
+                margin-right: 10px;
+
+            }
+
+            #content {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: stretch
+            }
+
+            figure {
+                padding: 0px;
+                margin: 0;
+                -webkit-margin-before: 0;
+                margin-block-start: 0;
+                -webkit-margin-after: 0;
+                margin-block-end: 0;
+                -webkit-margin-start: 0;
+                margin-inline-start: 0;
+                -webkit-margin-end: 0;
+                margin-inline-end: 0
+            }
+
+            figure img {
+                display: block;
+                width: 100%;
+                height: auto;
+                border-radius: 4px;
+                margin-top: 8px;
+            }
+
+            @media (min-width: 800px) and (orientation:landscape) {
+                #content {
+                    display:flex;
+                    flex-wrap: nowrap;
+                    align-items: stretch
+                }
+
+                figure img {
+                    display: block;
+                    max-width: 100%;
+                    max-height: calc(100vh - 40px);
+                    width: auto;
+                    height: auto
+                }
+
+                figure {
+                    padding: 0 0 0 0px;
+                    margin: 0;
+                    -webkit-margin-before: 0;
+                    margin-block-start: 0;
+                    -webkit-margin-after: 0;
+                    margin-block-end: 0;
+                    -webkit-margin-start: 0;
+                    margin-inline-start: 0;
+                    -webkit-margin-end: 0;
+                    margin-inline-end: 0
+                }
+            }
+
+            section#buttons {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between
+            }
+
+            #nav-toggle {
+                cursor: pointer;
+                display: block
+            }
+
+            #nav-toggle-cb {
+                outline: 0;
+                opacity: 0;
+                width: 0;
+                height: 0
+            }
+
+            #nav-toggle-cb:checked+#menu {
+                display: flex
+            }
+
+            .input-group {
+                display: flex;
+                flex-wrap: nowrap;
+                line-height: 22px;
+                margin: 5px 0
+            }
+
+            .input-group>label {
+                display: inline-block;
+                padding-right: 10px;
+                min-width: 47%
+            }
+
+            .input-group input,.input-group select {
+                flex-grow: 1
+            }
+
+            .range-max,.range-min {
+                display: inline-block;
+                padding: 0 5px
+            }
+
+            button {
+                display: block;
+                margin: 5px;
+                padding: 0 12px;
+                border: 0;
+                line-height: 28px;
+                cursor: pointer;
+                color: #fff;
+                background: #ff3034;
+                border-radius: 5px;
+                font-size: 16px;
+                outline: 0
+            }
+
+            button:hover {
+                background: #ff494d
+            }
+
+            button:active {
+                background: #f21c21
+            }
+
+            button.disabled {
+                cursor: default;
+                background: #a0a0a0
+            }
+
+            input[type=range] {
+                -webkit-appearance: none;
+                width: 100%;
+                height: 22px;
+                background: #363636;
+                cursor: pointer;
+                margin: 0
+            }
+
+            input[type=range]:focus {
+                outline: 0
+            }
+
+            input[type=range]::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: #EFEFEF;
+                border-radius: 0;
+                border: 0 solid #EFEFEF
+            }
+
+            input[type=range]::-webkit-slider-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer;
+                -webkit-appearance: none;
+                margin-top: -11.5px
+            }
+
+            input[type=range]:focus::-webkit-slider-runnable-track {
+                background: #EFEFEF
+            }
+
+            input[type=range]::-moz-range-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: #EFEFEF;
+                border-radius: 0;
+                border: 0 solid #EFEFEF
+            }
+
+            input[type=range]::-moz-range-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer
+            }
+
+            input[type=range]::-ms-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: 0 0;
+                border-color: transparent;
+                color: transparent
+            }
+
+            input[type=range]::-ms-fill-lower {
+                background: #EFEFEF;
+                border: 0 solid #EFEFEF;
+                border-radius: 0
+            }
+
+            input[type=range]::-ms-fill-upper {
+                background: #EFEFEF;
+                border: 0 solid #EFEFEF;
+                border-radius: 0
+            }
+
+            input[type=range]::-ms-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer;
+                height: 2px
+            }
+
+            input[type=range]:focus::-ms-fill-lower {
+                background: #EFEFEF
+            }
+
+            input[type=range]:focus::-ms-fill-upper {
+                background: #363636
+            }
+
+            .switch {
+                display: block;
+                position: relative;
+                line-height: 22px;
+                font-size: 16px;
+                height: 22px
+            }
+
+            .switch input {
+                outline: 0;
+                opacity: 0;
+                width: 0;
+                height: 0
+            }
+
+            .slider {
+                width: 50px;
+                height: 22px;
+                border-radius: 22px;
+                cursor: pointer;
+                background-color: grey
+            }
+
+            .slider,.slider:before {
+                display: inline-block;
+                transition: .4s
+            }
+
+            .slider:before {
+                position: relative;
+                content: "";
+                border-radius: 50%;
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                top: 3px;
+                background-color: #fff
+            }
+
+            input:checked+.slider {
+                background-color: #ff3034
+            }
+
+            input:checked+.slider:before {
+                -webkit-transform: translateX(26px);
+                transform: translateX(26px)
+            }
+
+            select {
+                border: 1px solid #363636;
+                font-size: 14px;
+                height: 22px;
+                outline: 0;
+                border-radius: 5px
+            }
+
+            .image-container {
+                position: relative;
+                min-width: 160px
+            }
+
+            .close {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+                background: #ff3034;
+                width: 16px;
+                height: 16px;
+                border-radius: 100px;
+                color: #fff;
+                text-align: center;
+                line-height: 18px;
+                cursor: pointer
+            }
+
+            .hidden {
+                display: none
+            }
+		.checkbox {
+			position: absolute;
+			z-index: -1;
+			opacity: 0;
+			margin: 10px 0 0 20px;
+		}
+		.checkbox + label {
+			position: relative;
+			padding: 0 0 0 60px;
+			cursor: pointer;
+		}
+		.checkbox + label:before {
+			content: '';
+			position: absolute;
+			top: -4px;
+			left: 0;
+			width: 50px;
+			height: 26px;
+			border-radius: 13px;
+			background: #CDD1DA;
+			box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
+			transition: .2s;
+		}
+		.checkbox + label:after {
+			content: '';
+			position: absolute;
+			top: -2px;
+			left: 2px;
+			width: 22px;
+			height: 22px;
+			border-radius: 10px;
+			background: #FFF;
+			box-shadow: 0 2px 5px rgba(0,0,0,.3);
+			transition: .2s;
+		}
+		.checkbox:checked + label:before {
+			background: #9FD468;
+		}
+		.checkbox:checked + label:after {
+			left: 26px;
+		}
+		.checkbox:focus + label:before {
+			box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,255,0,.7);
+		}
+
+    </style>
+</head>
+<body>
+    <section class="main">
+        <div id="logo">
+            <label for="nav-toggle-cb" id="nav-toggle">☰&nbsp;&nbsp;Sonoff state</label>
+        </div>
+        <div id="content">
+            <div id="sidebar">
+                <input type="checkbox" id="nav-toggle-cb" checked="checked">
+                <nav id="menu">
+				        <div class="input-group" id="vrotate-group">
+                           
+							 <input type="checkbox" id="ch1"  class="default-action checkbox" checked="checked">
+							 <label for="ch1">Switch state</label>
+                        </div>
+						<div class="input-group" id="brigtness-group">
+						     <div class="range-min">0</div>
+							<input class="input-range" id="br" class="default-action"  orient="vertical" type="range" step="0.5" value="5" min="1" max="100">
+							<div class="range-max">100</div>
+							<span class="range-value">Brightness</span>
+						</div>
+						<div class="input-group" id="HS-group">
+						  <canvas id="canvas" width=330 height=330 >
+							</canvas>
+						</div>
+						
+                </nav>
+            </div>
+
+        </div>
+    </section>
+    <script>
+document.addEventListener('DOMContentLoaded', function (event) {
+    var baseHost = document.location.origin;
+
+
+
+    
+  function updateConfig (el,proto_val) {
+      let value;
+	 
+    switch (el.type) {
+     case 'input':
+            value = el.value;
+            break;
+     case 'range':
+            value = el.value;
+            break;
+	  case 'checkbox':
+			value=el.checked;
+			break;
+      case 'button':
+        case 'submit':
+            if (proto_val) {
+                value = proto_val;
+            } else {
+                value = '1';
+            }
+
+            break;
+        default:
+            return;
+      };
+
+      const query = `${baseHost}/set?var=${el.id}&val=${value}`;
+	console.log(query);
+    fetch(query)
+      .then(response => {
+        console.log(`request to ${query} finished, status: ${response.status}`)
+      })
+    };
+	document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+      el.onchange = () => updateConfig(el)
+    });
+
+	
+
+    
+ 
+  document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+      el.onchange = () => updateConfig(el);
+    })
+
+
+ var canvas = document.getElementById('canvas');
+ var context = canvas.getContext('2d');
+ function setupColorWill() {
+        
+        // FIX: Cancel touch end event and handle click via touchstart
+        // canvas.addEventListener("touchend", function(e) { e.preventDefault(); }, false);
+        canvas.addEventListener("touchmove", doTouch, false);
+        canvas.addEventListener("click", doClick, false);
+        //canvas.addEventListener("mousemove", doClick, false);
+
+
+        
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+        var innerRadius = canvas.width / 4.5;
+        var outerRadius = (canvas.width - 10) / 2
+
+        //outer border
+        context.beginPath();
+        //outer circle
+        context.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI, false);
+        //draw the outer border: (gets drawn around the circle!)
+        context.lineWidth = 4;
+        context.strokeStyle = '#000000';
+        context.stroke();
+        context.closePath();
+
+        //fill with beautiful colors 
+        //taken from here: http://stackoverflow.com/questions/18265804/building-a-color-wheel-in-html5
+        for (var angle = 0; angle <= 360; angle += 1) {
+            var startAngle = (angle - 2) * Math.PI / 180;
+            var endAngle = angle * Math.PI / 180;
+            context.beginPath();
+            context.moveTo(centerX, centerY);
+            context.arc(centerX, centerY, outerRadius, startAngle, endAngle, false);
+            context.closePath();
+            context.fillStyle = 'hsl(' + angle + ', 100%, 50%)';
+            context.fill();
+            context.closePath();
+        }
+
+        //inner border
+        context.beginPath();
+        //context.arc(centerX, centerY, radius, startAngle, endAngle, counterClockwise);
+        context.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI, false);
+        //fill the center
+        var my_gradient = context.createLinearGradient(0, 0, 170, 0);
+        my_gradient.addColorStop(0, "black");
+        my_gradient.addColorStop(1, "white");
+
+        context.fillStyle = my_gradient;
+        context.fillStyle = "white";
+        context.fill();
+
+        //draw the inner line
+        context.lineWidth = 2;
+        context.strokeStyle = '#000000';
+        context.stroke();
+        context.closePath();
+		}
+
+function doTouch(event) {
+        //to not also fire on click
+        event.preventDefault();
+        var el = event.target;
+
+        //touch position
+        var pos = {
+            x: Math.round(event.targetTouches[0].pageX - el.offsetLeft),
+            y: Math.round(event.targetTouches[0].pageY - el.offsetTop)
+        };
+        //color
+        var color = this.context.getImageData(pos.x, pos.y, 1, 1).data;
+
+        updateColor(pos, color);
+    }
+
+   function doClick(event) {
+        //click position   
+        var pos = getMousePos(this.canvas, event);
+        //color
+       
+        context = canvas.getContext('2d');
+        var color = context.getImageData(pos.x, pos.y, 1, 1).data;
+        updateColor(pos, color);
+
+        //now do sth with the color rgbToHex(color);
+        //don't do stuff when #000000 (outside circle and lines
+    }
+    function getMousePos(canvas, evt) {
+        var rect = this.canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+	function componentToHex(c) {
+
+
+        return ("0" + (Number(c).toString(16))).slice(-2).toUpperCase();
+    }
+   function  intToHex(val) {
+        let hexString = val.toString(16);
+        if (hexString.length % 2) {
+            hexString = '0' + hexString;
+        }
+        return hexString;
+    }
+    //rgb/rgba to Hex
+    function rgbToHex(rgb) {
+        return componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+    }
+	function updateColor(pos, color) {
+		var hexColor = rgbToHex(color);
+       
+        var intcolor = parseInt("0x" + hexColor);
+	    const querycolor = `${baseHost}/set?var="col"&val=${intcolor}`;
+		
+		fetch(querycolor)
+		  .then(response => {
+			
+		  })
+
+	}
+	setupColorWill();
+	document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+	  const query = `${baseHost}/get?var=${el.id}`;
+      fetch(query)
+	    .then(response => response.text())
+		.then(val => {
+			if(el.type=='checkbox') el.checked=val=='1';
+		
+		})
+    })
+})
+
+    </script>
+
+
+</body>
+</html>
