@@ -116,7 +116,7 @@ void init_hap_storage(){
   int size=hap_get_storage_size_ex();
   char* buf=new char[size];
   memset(buf,0xff,size);
-  int readed=fsDAT.readBytes(buf,size);
+ // int readed=fsDAT.readBytes(buf,size);
   Serial.print("Readed bytes ->");
 //  Serial.println(readed);
   hap_init_storage_ex(buf,size);
