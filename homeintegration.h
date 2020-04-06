@@ -44,7 +44,8 @@
 	homekit_service_t* hap_add_temperature_service(const char* szname);
 	homekit_service_t* hap_add_humidity_service(const char* szname);
 	homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype, const char* szname, homekit_service_t** pp_temp, homekit_service_t** pp_hum);
-
+	homekit_service_t*  hap_add_hum_as_accessory(int acctype, const char* szname);
+	homekit_service_t*  hap_add_temp_as_accessory(int acctype, const char* szname);
 	homekit_service_t* hap_add_pressure_service(const char* szname);
 
 	homekit_service_t* hap_add_light_service(const char* szname, hap_callback cb, void* context);
@@ -58,6 +59,8 @@
 	homekit_service_t* hap_new_motion_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_motion_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_motion_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context);
 
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 

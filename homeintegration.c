@@ -464,6 +464,57 @@ homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype,const char* szname
 return temp;
 
 }
+homekit_service_t*  hap_add_temp_as_accessory(int acctype, const char* szname) {
+
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* temp = NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
+			NULL
+	});
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = temp;
+	svc[2] = NULL;
+
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+	INFO("add_temp as accessory , next accessory %d", hap_mainaccesories_current);
+
+	return temp;
+
+}
+homekit_service_t*  hap_add_hum_as_accessory(int acctype, const char* szname) {
+
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+
+	homekit_service_t* hum = NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0),
+			NULL
+	});
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = hum;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+	INFO("add_hum as accessory , next accessory %d", hap_mainaccesories_current);
+
+
+	return hum;
+
+}
 homekit_service_t* hap_new_light_service(const char* szname, hap_callback cb, void* context){
 	return NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
 		            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
@@ -554,6 +605,19 @@ homekit_service_t*  hap_add_motion_service_as_accessory(int acctype, const char*
 
 	return motionservice;
 }
+homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(MOTION_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(ROTATION_SPEED, 0),
+			NULL
+	});
+}
+homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context) {
+
+	INFO("hap_add_motion_service");
+	return hap_add_service(hap_new_fan_service(szname, cb, context));
+}
+
 homekit_service_t* hap_add_service(homekit_service_t* service ){
 	if(hap_mainservices_current>=MAX_HAP_SERVICES){
 		DEBUG("hap_add_service NOT possible, maximum services reached");
