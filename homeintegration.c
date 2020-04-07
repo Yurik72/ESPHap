@@ -606,7 +606,7 @@ homekit_service_t*  hap_add_motion_service_as_accessory(int acctype, const char*
 	return motionservice;
 }
 homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context) {
-	return NEW_HOMEKIT_SERVICE(MOTION_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+	return NEW_HOMEKIT_SERVICE(FAN2, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 			NEW_HOMEKIT_CHARACTERISTIC(ROTATION_SPEED, 0),
 			NULL
