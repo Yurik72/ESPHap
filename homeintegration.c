@@ -212,7 +212,7 @@ bool hap_setup_final_step() {
 	if (hap_mainservices_current > 1) {
 		set_callback_storage(on_storage_changed);
 		
-		INFO("homekit_is_paired %d", paired);
+		//INFO("homekit_is_paired %d", paired);
 		if (base_accessory_index == -1) {
 			hap_init_homekit_base_accessory();
 		}
@@ -438,7 +438,7 @@ homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype,const char* szname
         NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
         NULL
     });
-	homekit_service_t* hum= NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
+	homekit_service_t* hum= NEW_HOMEKIT_SERVICE(HUMIDITY_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
         NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
         NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0),
         NULL

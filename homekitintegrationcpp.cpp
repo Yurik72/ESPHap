@@ -1,4 +1,5 @@
 #include "port_x.h"
+#include "debug.h"
 #ifdef ARDUINO8266_SERVER_CPP
 extern "C" {
 #include "homeintegration.h"
@@ -7,6 +8,8 @@ extern "C" {
 void hap_init_homekit_server()
 {
 	hap_setup_final_step();
+	
+	INFO("homekit_is_paired %d", arduino_homekit_is_paired());
 	homekit_server_config_t* cfg = hap_get_server_config();
 	arduino_homekit_setup(cfg);
 }
