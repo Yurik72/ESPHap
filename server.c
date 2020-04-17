@@ -2230,6 +2230,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
         }
 
         cJSON *j_value = cJSON_GetObjectItem(j_ch, "value");
+		//CLIENT_INFO(context, "Update Characteristics desc %s, id %d,format %d",ch->description,ch->id,(int)ch->format);
         if (j_value) {
             homekit_value_t h_value = HOMEKIT_NULL();
 
@@ -2253,8 +2254,8 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
                         return HAPStatus_InvalidValue;
                     }
 
-                    CLIENT_DEBUG(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
-
+                   // CLIENT_DEBUG(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
+					//CLIENT_INFO(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
                     h_value = HOMEKIT_BOOL(value);
                     if (ch->setter_ex) {
                         ch->setter_ex(ch, h_value);
@@ -2376,7 +2377,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
                     }
 
                     CLIENT_DEBUG(context, "Updating characteristic %d.%d with %g", aid, iid, value);
-
+					CLIENT_INFO(context, "Updating characteristic %d.%d with %g", aid, iid, value);
                     h_value = HOMEKIT_FLOAT(value);
                     if (ch->setter_ex) {
                         ch->setter_ex(ch, h_value);
