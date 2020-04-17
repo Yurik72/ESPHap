@@ -423,7 +423,7 @@ homekit_service_t* hap_add_temperature_service(const char* szname){
 }
 homekit_service_t* hap_add_humidity_service(const char* szname){
 
-	homekit_service_t*service=NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
+	homekit_service_t*service=NEW_HOMEKIT_SERVICE(HUMIDITY_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
 	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 	            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0),
 	            NULL
