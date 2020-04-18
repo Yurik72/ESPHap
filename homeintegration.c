@@ -162,6 +162,7 @@ int hap_init_storage_ex(char* szdata,int size){
 //ESP Home Controller usage
 static int hap_mainservices_current=0;
 static int hap_mainaccesories_current=0;
+
 #define MAX_HAP_SERVICES 7
 #define MAX_HAP_ACCESSORIES 4
 homekit_accessory_t *hap_accessories[MAX_HAP_ACCESSORIES+1]={0};
@@ -267,6 +268,9 @@ int hap_initbase_accessory_service(const char* szname_value,const char* szmanufa
 	hap_mainservices_current=1;
 //	INFO("hap init base accessory service , next %d",hap_mainservices_current);
 	return hap_mainservices_current;
+}
+void hap_set_device_password(char* szpwd) {
+	hap_config.password = szpwd;
 }
 homekit_service_t* hap_new_homekit_accessory_service(const char *szname,const char * szserialnumber){
 	return NEW_HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]) {

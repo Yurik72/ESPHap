@@ -28,7 +28,7 @@
 	int hap_init_storage_ex(char* szdata, int size);
 	int hap_get_storage_size_ex();
 	void hap_set_identity_gpio(int gpio);
-
+	void hap_set_device_password(char* szpwd);
 	//esp controller usage
 	int hap_initbase_accessory_service(const char* szname_value, const char* szmanufacturer, const char* szserialnumber, const char* szmodels, const char* szfirmware);
 	homekit_service_t* hap_new_homekit_accessory_service(const char *szname, const char *szserialnumber);
