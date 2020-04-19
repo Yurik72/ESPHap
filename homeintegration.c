@@ -323,6 +323,7 @@ homekit_service_t* hap_add_lightbulb_service(const char* szname,hap_callback cb,
 
 	return hap_add_service(hap_new_lightbulb_service(szname,cb,context));
 }
+
 homekit_service_t*  hap_add_lightbulb_service_as_accessory(int acctype,const char* szname,hap_callback cb,void* context){
 
 	homekit_service_t* baseservice=hap_new_homekit_accessory_service(szname,"0");
@@ -612,14 +613,34 @@ homekit_service_t*  hap_add_motion_service_as_accessory(int acctype, const char*
 homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context) {
 	return NEW_HOMEKIT_SERVICE(FAN2, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-			NEW_HOMEKIT_CHARACTERISTIC(ROTATION_SPEED, 0),
-			NULL
+		NEW_HOMEKIT_CHARACTERISTIC(ROTATION_SPEED, 0),
+		NULL
 	});
 }
+
 homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context) {
 
 	INFO("hap_add_motion_service");
 	return hap_add_service(hap_new_fan_service(szname, cb, context));
+}
+
+homekit_service_t* hap_new_switch_service(const char* szname,hap_callback cb,void* context){
+
+	return NEW_HOMEKIT_SERVICE(SWITCH, .primary = true,.characteristics=(homekit_characteristic_t*[]) {
+	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+	            NEW_HOMEKIT_CHARACTERISTIC(
+	                ON, true,
+	                .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(
+	                		cb, .context=context
+	                ),
+	            ),
+	            NULL
+	        });
+}
+
+homekit_service_t* hap_add_switch_service(const char* szname,hap_callback cb,void* context){
+
+	return hap_add_service(hap_new_switch_service(szname,cb,context));
 }
 
 homekit_service_t* hap_add_service(homekit_service_t* service ){
