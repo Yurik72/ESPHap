@@ -39,7 +39,7 @@ into  Arduino Libraries folder. user_setting.h and setting.h MUST be used from t
 
 ## Simple example
 
-examples folder contains simple example EspHapLed how to handle led (or any such as relay) 
+examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266)how to handle led (or any such as relay) 
 More examples will be later, hovewer you can see the same examples/implemenmtation
 [esphapcontroller](https://github.com/Yurik72/esphapcontroller)
 
