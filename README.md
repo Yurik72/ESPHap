@@ -59,6 +59,17 @@ But example already works quite fine. Small problem detected during the pairing.
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
 
+## Thermostat example
+
+Example folders contains sketch for [Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/ESP8266_DHT11), which shows on Apple Home two icons Temperathure and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT11 sensor.
+Hovewer any sensor can be used with simple code cahnges
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+
+Build instruction the same as for sketchs avove.
+
+
+
+
 ## Are you interesting to support this project ?
 
 You can easilly do that by donations
