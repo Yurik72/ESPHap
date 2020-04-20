@@ -62,10 +62,10 @@ Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-S
 ## Thermostat example
 
 Example folders contains sketch for [Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), which shows on Apple Home two icons Temperathure and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT11 sensor.
-Hovewer any sensor can be used with simple code cahnges
+Hovewer any sensor can be used with simple code changes...
 Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
 
-Build instruction the same as for sketchs avove.
+Build instruction the same as for sketches avove.
 
 
 
