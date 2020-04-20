@@ -207,7 +207,9 @@ void hap_init_homekit_server() {
 	}
 
 }
-
+bool hap_homekit_is_paired() {
+	return homekit_is_paired();
+}
 #endif
 bool hap_setup_final_step() {
 	if (hap_mainservices_current > 1) {
