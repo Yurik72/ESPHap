@@ -34,6 +34,14 @@ If you are going to prepare this manually, please reuse/check settings.h and use
 ! Note library as well working well with wolfssl 3.13.0. For ESP8266 it's MUST. Please extract wolfSSL_3_13_0.rar
 into  Arduino Libraries folder. user_setting.h and setting.h MUST be used from this Archive
 
+This library was tested in the following enviropment
+
+ESP32 board library  version 1.0.4
+
+ESP8266 board library  version 2.6.3
+
+Arduino version 1.8.12
+
 ## Getting help
 
 
