@@ -3470,7 +3470,11 @@ void homekit_server_init(homekit_server_config_t *config) {
 
     xTaskCreate(homekit_server_task, "HomeKit Server", SERVER_TASK_STACK, server, 1, NULL);
 }
-
+void homekit_server_restart() {
+	
+		ERROR("Not Implemented for ESp32");
+	
+}
 void homekit_server_reset() {
     homekit_storage_reset();
 }

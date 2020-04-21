@@ -3409,11 +3409,13 @@ void homekit_mdns_init(homekit_server_t *server) {
 	INFO("Configuring mDNS");
 
 	if (!WiFi.isConnected()) {
+		ERROR("homekit_mdns_init no possible, WiFi is not connected");
 		return;
 	}
 
 	IPAddress staIP = WiFi.localIP();
 	if (!staIP.isSet()) {
+		ERROR("homekit_mdns_init no possible, IP is not set");
 		return;
 	}
 	if (!server->config || !server->config->accessories[0]) {
@@ -3723,7 +3725,26 @@ void homekit_server_init(homekit_server_config_t *config) {
 void homekit_server_reset() {
 	homekit_storage_reset();
 }
-
+void homekit_server_restart() {
+	if (!running_server) {
+		ERROR("Server is not started, hotning to restart...");
+	}
+	if (running_server->wifi_server) {
+		INFO("Deleting old WiFi server");
+		running_server->wifi_server->stop();
+		running_server->wifi_server->close();
+		delete running_server->wifi_server;
+		running_server->wifi_server = nullptr;
+		INFO("Creating new WiFi server");
+		running_server->wifi_server = new WiFiServer(HOMEKIT_SERVER_PORT);
+		running_server->wifi_server->begin();
+		running_server->wifi_server->setNoDelay(true);
+		DEBUG("WiFiServer begin at port: %d\n", HOMEKIT_ARDUINO_SERVER_PORT);
+		
+	}
+	INFO("Restaring MDNS");
+	homekit_mdns_init(running_server);
+}
 bool homekit_is_paired() {
 	pairing_iterator_t *pairing_it = homekit_storage_pairing_iterator();
 	pairing_t *pairing;

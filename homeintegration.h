@@ -76,8 +76,10 @@
 #ifndef ARDUINO8266_SERVER_CPP
 	void hap_init_homekit_server();
 	bool hap_homekit_is_paired();
+	void hap_restart_server();
 #endif
 	void hap_init_homekit_base_accessory();
 
 	homekit_server_config_t* hap_get_server_config();
 	bool hap_setup_final_step();
+	
