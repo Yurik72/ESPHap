@@ -53,7 +53,15 @@
 	homekit_service_t*  hap_add_light_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 
 	homekit_service_t* hap_new_battery_service(const char* szname, hap_callback cb, void* context);
-	homekit_service_t* hap_add_battery_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_new_battery_service(const char* szname, hap_callback cb, void* context);
+	
+	//switch
+	homekit_service_t* hap_add_switch_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_new_switch_service(const char* szname, hap_callback cb, void* context);
+	
+	//button
+	homekit_service_t* hap_add_button_service(const char* szname);
+	homekit_service_t* hap_new_button_service(const char* szname);
 
 	//motion
 	homekit_service_t* hap_new_motion_service(const char* szname, hap_callback cb, void* context);
