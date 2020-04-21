@@ -31,13 +31,13 @@ WebServer server(80);
 #include "spiffs_webserver.h"
 bool isWebserver_started=false;
 
-#include "DHT.h"
+#include "DHT.h"   //https://github.com/adafruit/DHT-sensor-library
 #define DHT11_PIN 4
 DHT DHT(DHT11_PIN,DHT11);
 
 
-const char* ssid     = "LIS007";
-const char* password = "Andru2000!";
+const char* ssid     = "ssid";
+const char* password = "pwd";
 
 const int identity_led=2;
 
@@ -53,8 +53,8 @@ extern "C"{
 
 String pair_file_name="/pair.dat";
 
-homekit_service_t* temperature;
-homekit_service_t* humidity;  
+homekit_service_t* temperature=NULL;
+homekit_service_t* humidity=NULL;  
 
 
 #define DHT_READ_PERIOD_MS 5000
@@ -226,18 +226,21 @@ void storage_changed(char * szstorage,int bufsize){
 }
 
 void notify_hap(){
+
+ if(temperature){
   homekit_characteristic_t * ch_temp= homekit_service_characteristic_by_type(temperature, HOMEKIT_CHARACTERISTIC_CURRENT_TEMPERATURE);
   if(ch_temp && !isnan(DeviceData.temp) &&  ch_temp->value.float_value!=DeviceData.temp ){
     ch_temp->value.float_value=DeviceData.temp;
     homekit_characteristic_notify(ch_temp,ch_temp->value);
   }
-
+ }
+if(humidity){
   homekit_characteristic_t * ch_hum= homekit_service_characteristic_by_type(humidity, HOMEKIT_CHARACTERISTIC_CURRENT_RELATIVE_HUMIDITY);
   if(ch_hum && !isnan(DeviceData.hum) && ch_hum->value.float_value!=DeviceData.hum){
     ch_hum->value.float_value=DeviceData.hum;
     homekit_characteristic_notify(ch_hum,ch_hum->value);
   }
-
+}
 }
 
 
