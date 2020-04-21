@@ -76,6 +76,16 @@ Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple 
 Build instruction the same as for sketches avove.
 
 
+## RGB Strip (WS2812) & Motion example
+
+Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb  and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site and allows to demonstrate  two direction for the Apple Home Kit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple Home Kit refreshes the RGB bulb state.
+For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
+As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple.
+
+Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched ON/OFF...
+
+Build instruction the same as for sketches avove.
 
 
 ## Are you interesting to support this project ?
