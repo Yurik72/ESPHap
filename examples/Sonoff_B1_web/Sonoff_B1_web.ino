@@ -147,11 +147,11 @@ void handleSetVal(){
     }
      else  if(server.arg("var") == "br"){
 
-      lamp.Brigthness =server.arg("br").toInt();
+      lamp.Brigthness =server.arg("val").toInt();
       lamp.show();
       }
     else  if(server.arg("var") == "col"){
-      uint32_t color=server.arg("col").toInt();
+      uint32_t color=server.arg("val").toInt();
       double Hue;
       double Saturation;
       double Intensity;
