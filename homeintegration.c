@@ -379,6 +379,7 @@ homekit_service_t* hap_add_rgbstrip_service(const char* szname,hap_callback cb,v
 						  )
 			          ),
 
+
 	            NULL
 	        });
 	return hap_add_service(service);
@@ -649,18 +650,21 @@ homekit_service_t* hap_add_switch_service(const char* szname,hap_callback cb,voi
 }
 
 
-homekit_service_t* hap_new_button_service(const char* szname){
+homekit_service_t* hap_new_button_service(const char* szname/*, hap_callback cb, void* context*/){
 
 	return NEW_HOMEKIT_SERVICE(STATELESS_PROGRAMMABLE_SWITCH,.characteristics=(homekit_characteristic_t*[]) {
 	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-	            NEW_HOMEKIT_CHARACTERISTIC(PROGRAMMABLE_SWITCH_EVENT, 0),
+	            NEW_HOMEKIT_CHARACTERISTIC(PROGRAMMABLE_SWITCH_EVENT, 0,
+					//.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(cb, .context = context)
+					),
 	            NULL
 	        });
 }
 
-homekit_service_t* hap_add_button_service(const char* szname){
 
-	return hap_add_service(hap_new_button_service(szname));
+homekit_service_t* hap_add_button_service(const char* szname/*, hap_callback cb, void* context*/) {
+
+	return hap_add_service(hap_new_button_service(szname/*, cb, context*/));
 }
 
 homekit_service_t* hap_add_service(homekit_service_t* service ){
