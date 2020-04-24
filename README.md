@@ -75,6 +75,13 @@ Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple 
 
 Build instruction the same as for sketches avove.
 
+## Switch example
+
+Example folders contains sketch for [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which shows on Apple simple Switch icon. There is universal sketch applicable for ESP32 and ESP8266 and any relay can be used to manage external devices.
+
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+
+Build instruction the same as for sketches avove.
 
 ## RGB Strip (WS2812) & Motion example
 
