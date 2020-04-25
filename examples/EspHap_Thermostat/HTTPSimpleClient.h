@@ -10,6 +10,10 @@
 #include <WiFiClientSecure.h>
 
 
+#if !defined(DBG_OUTPUT_PORT)
+#define DBG_OUTPUT_PORT Serial  
+#endif
+
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors

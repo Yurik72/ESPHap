@@ -1,5 +1,5 @@
 #include <HardwareSerial.h>
-
+//#define DEBUG_HTTPCLIENT
 
 #include <Arduino.h>
 
@@ -15,12 +15,7 @@
 #endif
 
 #include "HTTPSimpleClient.h"
-#if defined(ESPHOMECONTROLLER)
-#include "config.h"
-#endif
-#if !defined(DBG_OUTPUT_PORT)
-#define DBG_OUTPUT_PORT Serial  
-#endif
+
 
 //#define DEBUG_HTTPCLIENT
 /**

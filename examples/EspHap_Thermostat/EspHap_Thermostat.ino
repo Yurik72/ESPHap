@@ -3,6 +3,10 @@
 #define SENSOR_TYPE_DHT  
 //#define SENSOR_TYPE_BME280
 //#define SENSOR_TYPE_DALLAS 
+//#define SEND_DATA_TO_THINGSPEAK  //To send data please specify your api_key to Thingspeak
+
+const char* ssid     = "ssid";
+const char* password = "pwd";
 
 #include <Arduino.h>
 
@@ -59,13 +63,14 @@ OneWire  OW(DALLAS_PIN);
 DallasTemperature DALLAS(&OW);
 #endif
 
-const char* ssid     = "ssid";
-const char* password = "pwd";
+
 
 const int identity_led=2;
 
+#ifdef SEND_DATA_TO_THINGSPEAK
 //validate compiltion for issue #14
-///#include "HTTPSimpleClient.h"
+#include "HTTPSimpleClient.h"
+#endif
 ///HTTPSimpleClient http;
 extern "C"{
 #include "homeintegration.h"
@@ -82,12 +87,14 @@ homekit_service_t* humidity=NULL;
 
 
 #define SENSOR_READ_PERIOD_MS 5000
+#define SEND_THINGSPEAK_PERIOD_MS 500000
 
 struct device_data_t{
   float temp=20.0;
   float hum=50.0;
   float pressure=1000.0;
-  unsigned long next_read_dht_ms=0;
+  unsigned long next_read_sensor_ms=0;
+  unsigned long next_send_thingspeak_ms=0;
 };
 
 device_data_t DeviceData;
@@ -211,11 +218,20 @@ void handleSetVal(){
      
 }
 void loop() {
- if(DeviceData.next_read_dht_ms<=millis()){
+ if(DeviceData.next_read_sensor_ms<=millis()){
     readSensor();
     notify_hap();
-    DeviceData.next_read_dht_ms=millis()+SENSOR_READ_PERIOD_MS;
+    DeviceData.next_read_sensor_ms=millis()+SENSOR_READ_PERIOD_MS;
  }
+
+#ifdef SEND_DATA_TO_THINGSPEAK
+if(DeviceData.next_send_thingspeak_ms<=millis()){
+    sendToThingspeak();
+    
+    DeviceData.next_send_thingspeak_ms=millis()+SEND_THINGSPEAK_PERIOD_MS;
+ }
+#endif
+ 
 #ifdef ESP8266
   hap_homekit_loop();
 #endif
@@ -311,3 +327,27 @@ DALLAS.requestTemperatures(); // Send the command to get temperatures
   }
   
 }
+
+
+#ifdef SEND_DATA_TO_THINGSPEAK
+const char* thing_api_key="YOUR KEY";
+void sendToThingspeak(){
+   Serial.println("sendToThingspeak start");
+    String url="http://api.thingspeak.com";
+    url=" https://api.thingspeak.com/update?api_key="+String(thing_api_key);
+    HTTPSimpleClient http;
+  
+    
+     url+="&field1="+String(DeviceData.temp);
+     url+="&field2="+String(DeviceData.hum);
+     url+="&field3="+String(DeviceData.pressure);
+     Serial.println(url);
+     //nt httpcode=http.POST(poststr);
+     if(!http.begin(url)){
+       Serial.println("Failed to connect to"+url );
+    }
+    int httpCode = http.GET();
+   Serial.println("http code returns"+String(httpCode) );
+     
+}
+#endif
