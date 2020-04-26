@@ -131,7 +131,7 @@ public:
 	int PUT(String payload);
 
 	int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-
+	void addHeader(const String& name, const String& value);
 
 
 	/// Response handling
@@ -145,6 +145,8 @@ public:
 	WiFiClient* getStreamPtr(void);
 	int writeToStream(Stream* stream);
 	String getString(void);
+
+
 
 	bool downloadfile(String baseurl, String filename);
 
@@ -164,7 +166,7 @@ protected:
 	bool sendHeader(const char * type);
 	int handleHeaderResponse();
 	int writeToStreamDataBlock(Stream * stream, int len);
-
+    String userHeaders;
 
 
 	WiFiClient* _client = nullptr;

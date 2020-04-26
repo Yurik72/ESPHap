@@ -348,6 +348,7 @@ void sendToThingspeak(){
     }
     int httpCode = http.GET();
    Serial.println("http code returns"+String(httpCode) );
+    Serial.println("http returns"+http.getString() );
      
 }
 #endif

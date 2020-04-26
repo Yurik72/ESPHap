@@ -24,7 +24,7 @@
 HTTPSimpleClient::HTTPSimpleClient()
 {
 	_client = NULL;
-
+	userHeaders = "";
 }
 
 /**
@@ -42,7 +42,7 @@ void HTTPSimpleClient::clear()
 {
 	_returnCode = 0;
 	_size = -1;
-
+	
 }
 
 
@@ -200,12 +200,30 @@ int HTTPSimpleClient::PUT(String payload) {
 int HTTPSimpleClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 {
 
-
+	if (payload && size > 0) {
+		addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
+	}
 	// send Header
 	if (!sendHeader(type)) {
 		return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
 	}
-
+    if (payload && size > 0) {
+            size_t bytesWritten = 0;
+            const uint8_t *p = payload;
+            size_t originalSize = size;
+            while (bytesWritten < originalSize) {
+                int written;
+                int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
+                written = _client->write(p + bytesWritten, towrite);
+                if (written < 0) {
+                        return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+                } else if (written == 0) {
+                        return returnError(HTTPC_ERROR_CONNECTION_LOST);
+                }
+                bytesWritten += written;
+                size -= written;
+            }
+      }
 
 	// handle Server Response (Header)
 	return returnError(handleHeaderResponse());
@@ -477,9 +495,11 @@ bool HTTPSimpleClient::sendHeader(const char * type)
 		header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
 	}
 
-
+	
 
 	header += "\r\n";
+
+	header += userHeaders;
 
 	return (_client->write((const uint8_t *)header.c_str(), header.length()) == header.length());
 }
@@ -576,7 +596,13 @@ int HTTPSimpleClient::handleHeaderResponse()
 
 	return HTTPC_ERROR_CONNECTION_LOST;
 }
+void HTTPSimpleClient::addHeader(const String& name, const String& value){
+	userHeaders += name;
+	userHeaders += ": ";
+	userHeaders += value;
+	userHeaders += "\r\n";
 
+}
 /**
  * write one Data Block to Stream
  * @param stream Stream *
