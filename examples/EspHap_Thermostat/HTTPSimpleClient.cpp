@@ -17,7 +17,7 @@
 #include "HTTPSimpleClient.h"
 
 
-//#define DEBUG_HTTPCLIENT
+#define DEBUG_HTTPCLIENT
 /**
  * constructor
  */
@@ -284,6 +284,9 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 	}
 
 	if (!connected()) {
+  #ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream -> not connected");
+#endif
 		return returnError(HTTPC_ERROR_NOT_CONNECTED);
 	}
 
@@ -296,6 +299,9 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 
 		// have we an error?
 		if (ret < 0) {
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream -> ret < 0");
+#endif
 			return returnError(ret);
 		}
 	}
@@ -303,11 +309,17 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 		int size = 0;
 		while (1) {
 			if (!connected()) {
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream -> CONNECTION_LOST");
+#endif
 				return returnError(HTTPC_ERROR_CONNECTION_LOST);
 			}
 			String chunkHeader = _client->readStringUntil('\n');
 
 			if (chunkHeader.length() <= 0) {
+        #ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream -> READ_TIMEOUT");
+#endif
 				return returnError(HTTPC_ERROR_READ_TIMEOUT);
 			}
 
@@ -317,12 +329,19 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 			len = (uint32_t)strtol((const char *)chunkHeader.c_str(), NULL, 16);
 			size += len;
 			//log_d(" read chunk len: %d", len);
-
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.print("Write to stream -> read chunk len");
+  DBG_OUTPUT_PORT.println(len);
+#endif
 			// data left?
 			if (len > 0) {
 				int r = writeToStreamDataBlock(stream, len);
 				if (r < 0) {
 					// error in writeToStreamDataBlock
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream ->  error in writeToStreamDataBlock");
+ 
+#endif
 					return returnError(r);
 				}
 				ret += r;
@@ -336,6 +355,9 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 
 				// check if we have write all data out
 				if (ret != _size) {
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream ->  ERROR_STREAM_WRITE");
+#endif
 					return returnError(HTTPC_ERROR_STREAM_WRITE);
 				}
 				break;
@@ -345,6 +367,9 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 			char buf[2];
 			auto trailing_seq_len = _client->readBytes((uint8_t*)buf, 2);
 			if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream ->  ERROR_READ_TIMEOUT");
+#endif
 				return returnError(HTTPC_ERROR_READ_TIMEOUT);
 			}
 
@@ -352,6 +377,9 @@ int HTTPSimpleClient::writeToStream(Stream * stream)
 		}
 	}
 	else {
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("Write to stream ->  HTTPC_ERROR_ENCODING");
+#endif
 		return returnError(HTTPC_ERROR_ENCODING);
 	}
 
@@ -372,6 +400,9 @@ String HTTPSimpleClient::getString(void)
 		// try to reserve needed memmory
 		if (!sstring.reserve((_size + 1))) {
 			//log_d("not enough memory to reserve a string! need: %d", (_size + 1));
+#ifdef DEBUG_HTTPCLIENT
+  DBG_OUTPUT_PORT.println("not enough memory to reserve a string!");
+#endif
 			return "";
 		}
 	}
