@@ -16,6 +16,13 @@
 
 #define INFO(message, ...) printf(">>> Home Integration: " message "\n", ##__VA_ARGS__)
 
+#ifndef HAP_NOTIFY_CHANGES
+#define HAP_NOTIFY_CHANGES(name,home_characteristic,val,tollerance) \
+	if (home_characteristic && abs(home_characteristic->value.name ##_value - val)>tollerance){ \
+		home_characteristic->value.name ##_value = val ;\
+		homekit_characteristic_notify(home_characteristic, home_characteristic->value); \
+	};
+#endif
 
 
 
@@ -69,6 +76,12 @@
 	homekit_service_t* hap_add_motion_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context);
+
+	//air quality
+	homekit_service_t* hap_new_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
+	homekit_service_t* hap_add_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
+	homekit_service_t*  hap_add_air_quality_service_as_accessory(int acctype, const char* szname/*, hap_callback cb, void* context*/);
+
 
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 

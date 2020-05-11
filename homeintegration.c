@@ -667,6 +667,46 @@ homekit_service_t* hap_add_button_service(const char* szname/*, hap_callback cb,
 	return hap_add_service(hap_new_button_service(szname/*, cb, context*/));
 }
 
+homekit_service_t* hap_new_air_quality_service(const char* szname/*, hap_callback cb, void* context*/) {
+
+	return NEW_HOMEKIT_SERVICE(AIR_QUALITY_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(AIR_QUALITY, 0,
+				//.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(cb, .context = context)
+				),
+			NEW_HOMEKIT_CHARACTERISTIC(CARBON_DIOXIDE_LEVEL, 0,
+				//.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(cb, .context = context)
+				),
+			NULL
+	});
+}
+
+
+homekit_service_t* hap_add_air_quality_service(const char* szname/*, hap_callback cb, void* context*/) {
+
+	return hap_add_service(hap_new_air_quality_service(szname/*, cb, context*/));
+}
+homekit_service_t*  hap_add_air_quality_service_as_accessory(int acctype, const char* szname/*, hap_callback cb, void* context*/) {
+
+	INFO("add hap_add_air_quality_service as accessory");
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* airservice = hap_new_air_quality_service(szname/*, cb, context*/);
+
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = airservice;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+
+	return airservice;
+}
+
 homekit_service_t* hap_add_service(homekit_service_t* service ){
 	if(hap_mainservices_current>=MAX_HAP_SERVICES){
 		DEBUG("hap_add_service NOT possible, maximum services reached");
