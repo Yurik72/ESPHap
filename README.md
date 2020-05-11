@@ -96,6 +96,14 @@ Those combination potentially has good demonstration for Apple Home Automation, 
 
 Build instruction the same as for sketches avove.
 
+## Button example
+
+Example folders contains sketch for [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which shows on Apple simple Button icon. There is universal sketch applicable for ESP32 and ESP8266 (Testing in progress on ESP8266) and any Button scenarios on Appllle  can be used to manage automation.
+
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+
+Build instruction the same as for sketches avove.
+
 
 ## Are you interesting to support this project ?
 
