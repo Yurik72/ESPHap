@@ -104,6 +104,19 @@ Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple 
 
 Build instruction the same as for sketches avove.
 
+## Air Quality sensor example
+
+Example folders contains sketch for [ Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which shows on Apple Air quality Sensor icon.
+Sketch is designed with usage for MQ135 sensor. There is universal sketch applicable for ESP32 and ESP8266. Main advantage that build-in web site shows history trends of PPM level of dioxide.  
+Code is contains comments and one of the important thing for this sketch is calibration based on your real sensor, for this purpose following line should be changed 
+
+const float factor=14.0;//to be calibrated with your MQ135
+
+
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+
+Build instruction the same as for sketches avove.
+
 
 ## Are you interesting to support this project ?
 
