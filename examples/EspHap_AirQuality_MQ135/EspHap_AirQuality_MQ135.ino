@@ -41,7 +41,7 @@ bool isWebserver_started=false;
 
 const int identity_led=2;
 const int sensorpin=36;
-const float factor=14.0;
+const float factor=14.0;  //to be calibrated with your MQ135
 
 #ifdef SEND_DATA_TO_THINGSPEAK
 
