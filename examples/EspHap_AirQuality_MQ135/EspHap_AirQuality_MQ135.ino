@@ -1,6 +1,6 @@
 
 #define ENABLE_OTA  //if OTA need
-
+#define ENABLE_HISTORY
 //#define SEND_DATA_TO_THINGSPEAK  //To send data please specify your api_key to Thingspeak
 
 const char* ssid     = "ssid";
@@ -44,7 +44,7 @@ const int sensorpin=36;
 const float factor=14.0;
 
 #ifdef SEND_DATA_TO_THINGSPEAK
-//validate compiltion for issue #14
+
 #include "HTTPSimpleClient.h"
 #endif
 ///HTTPSimpleClient http;
@@ -79,6 +79,12 @@ homekit_characteristic_t*  airqualitylevelcharacteristic=NULL;
 #define MQ_READ_PERIOD_MS 5000
 #define SEND_THINGSPEAK_PERIOD_MS 500000
 
+#define HISTORY_TIME_MS 3600
+#define  HISTORYCOUNT 30
+#ifdef ENABLE_HISTORY
+#include "Array.h"
+#endif
+
 struct device_data_t{
  // float temp=20.0;
   //float hum=50.0;
@@ -87,6 +93,10 @@ struct device_data_t{
   //unsigned long next_read_sensor_ms=0;
   //unsigned long next_send_thingspeak_ms=0;
   unsigned long next_read_mq135_ms=0;
+#ifdef ENABLE_HISTORY
+  unsigned long next_pushhistory_ms=0;
+   CSimpleArray<float> ppmhistory;
+#endif
 };
 
 device_data_t DeviceData;
@@ -180,9 +190,12 @@ String strIp=String(WiFi.localIP()[0]) + String(".") + String(WiFi.localIP()[1])
 void handleGetVal(){
   if(server.arg("var") == "ppm")
     server.send(200, FPSTR(TEXT_PLAIN),String(DeviceData.ppm));
-
-    server.send(505, FPSTR(TEXT_PLAIN),"Bad args");  
-     
+ #ifdef ENABLE_HISTORY
+  else if(server.arg("var") == "ppmhist")
+    server.send(200, FPSTR(TEXT_PLAIN),DeviceData.ppmhistory.toJsonArray(200.0,6000.0));
+#endif 
+  else 
+  server.send(505, FPSTR(TEXT_PLAIN),"Bad args");  
 }
 void handleSetVal(){
   if (server.args() !=2){
@@ -210,7 +223,13 @@ if(DeviceData.next_send_thingspeak_ms<=millis()){
     DeviceData.next_send_thingspeak_ms=millis()+SEND_THINGSPEAK_PERIOD_MS;
  }
 #endif
- 
+ #ifdef ENABLE_HISTORY
+  if(DeviceData.next_pushhistory_ms<=millis()){
+    pushhistory();
+   
+    DeviceData.next_pushhistory_ms=millis()+HISTORY_TIME_MS;
+ }
+#endif
 #ifdef ESP8266
   hap_homekit_loop();
 #endif
@@ -277,7 +296,17 @@ DeviceData.ppm = calc_PPM(meassure());
   Serial.println("PPM:"+String(DeviceData.ppm));
 }
 
-
+#ifdef ENABLE_HISTORY
+void pushhistory(){
+   if (DeviceData.ppmhistory.GetSize() >= HISTORYCOUNT) {
+    DeviceData.ppmhistory.AddWithShiftLeft(DeviceData.ppm);
+  }
+  else {
+    DeviceData.ppmhistory.Add(DeviceData.ppm);
+  }
+ // Serial.println(DeviceData.ppmhistory.toJsonArray(200.0,6000.0));
+}
+#endif 
 #ifdef SEND_DATA_TO_THINGSPEAK
 const char* thing_api_key="YOUR KEY";
 void sendToThingspeak(){
@@ -287,9 +316,8 @@ void sendToThingspeak(){
     HTTPSimpleClient http;
   
     
-     url+="&field1="+String(DeviceData.temp);
-     url+="&field2="+String(DeviceData.hum);
-     url+="&field3="+String(DeviceData.pressure);
+     url+="&field1="+String(DeviceData.ppm);
+
      Serial.println(url);
      //nt httpcode=http.POST(poststr);
      if(!http.begin(url)){
