@@ -79,7 +79,7 @@ homekit_characteristic_t*  airqualitylevelcharacteristic=NULL;
 #define MQ_READ_PERIOD_MS 5000
 #define SEND_THINGSPEAK_PERIOD_MS 500000
 
-#define HISTORY_TIME_MS 3600
+#define HISTORY_TIME_MS 36000
 #define  HISTORYCOUNT 30
 #ifdef ENABLE_HISTORY
 #include "Array.h"
