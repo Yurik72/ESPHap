@@ -110,7 +110,7 @@ Example folders contains sketch for [Switch](https://github.com/Yurik72/ESPHap/t
 
 Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
 
-Build instruction the same as for sketches avove.
+Build instruction the same as for sketches above.
 
 ## RGB Strip (WS2812) & Motion example
 
