@@ -201,7 +201,9 @@ therefore first we need a setup it. For instance for the lighBulb
   hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
 ```
  "Led" is the name of accessory 
+ 
  led_callback is callback function called from the apple when changes 
+ 
  (void*)&led_gpio  is callback parameter
  
  After that we can add more accessories like this
@@ -220,10 +222,15 @@ hap_init_homekit_server();
 That is all for setup
 
 3. Implement callback and notify function
+
 Every callback has the same signature and parameters
+
  - characteristic
+ 
  - value 
+ 
  -context (callback parameters)
+ 
  This function is called when accessories state is changed from the Apple. You  can manage your devices there, based on the value.
  Please check which type (bool, int, float ) must be used for different characteristic
   ```c
