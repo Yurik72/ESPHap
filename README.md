@@ -229,7 +229,7 @@ Every callback has the same signature and parameters
  
  - value 
  
- -context (callback parameters)
+ - context (callback parameters)
  
  This function is called when accessories state is changed from the Apple. You  can manage your devices there, based on the value.
  Please check which type (bool, int, float ) must be used for different characteristic
@@ -244,6 +244,7 @@ optionally implement notify function, which is neccessary to inform Apple about 
 void notify_hap(){
 homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
  HAP_NOTIFY_CHANGES(bool, ch, <new bool value>, 0)
+ }
  ```
  To get characteristic , API function homekit_service_characteristic_by_type should be used. 
  First parameter is pointer to the hapservice (from the setup), second is characteristic type
