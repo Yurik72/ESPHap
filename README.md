@@ -20,21 +20,21 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for E
 ## Build instruction
 
 This library should be located under standart Arduino libraries folder. 
-Library is depends from [wolfssl](https://github.com/wolfSSL)  , but it requires some preparation before usage,
-full instruction how to do that, can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
+Library is depends from [wolfssl](https://github.com/wolfSSL)  , but it requires some preparation before usage...
 
+
+#For ESP32
+ESP32 works well with  wolfssl versions 4.2.0 and 3.13.0
+Full instruction how to prepare, can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
 if you are doing this manually you should made specific configuration before usage.
-For simplify process you can use [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
-
-If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from attached archive or
- [this location](https://github.com/Yurik72/ESPHap/tree/master/wolfssl)
+For simplify process you can use  [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
+If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from the attached archives
  You need copy/replace this files in wolfssl components.
 
+#For ESP8266
+ESP8266 works only with version 3.13.0. For preparation you should extract a content [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to Arduino libraries folder.  Those version of wolfssl is slightly changed to work with ESP8266 and only this sources must be used.
 
-! Note library as well working well with wolfssl 3.13.0. For ESP8266 it's MUST. Please extract wolfSSL_3_13_0.rar
-into  Arduino Libraries folder. user_setting.h and setting.h MUST be used from this Archive
-
-This library was tested in the following enviropment:
+ESPHAP library was tested in the following enviropment:
 
 ESP32 board library  version 1.0.4
 
@@ -70,7 +70,7 @@ Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-S
 ## Thermostat example
 
 Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
-[Universal Thermostat] (https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat)which shows on Apple Home two icons Temperathure and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, 
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat)which shows on Apple Home two icons Temperathure and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, 
 as well any other hardware can be easily implemented
 Hovewer any sensor can be used with simple code changes...
 Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site. For the [Universal Thermostat] (https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
