@@ -27,12 +27,12 @@ Library is depends from [wolfssl](https://github.com/wolfSSL)  , but it requires
 ESP32 works well with  wolfssl versions 4.2.0 and 3.13.0
 Full instruction how to prepare, can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
 if you are doing this manually you should made specific configuration before usage.
-For simplify process you can use  [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
+For simplify a process you can use  [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder
 If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from the attached archives
  You need copy/replace this files in wolfssl components.
 
 #For ESP8266
-ESP8266 works only with version 3.13.0. For preparation you should extract a content [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to Arduino libraries folder.  Those version of wolfssl is slightly changed to work with ESP8266 and only this sources must be used.
+ESP8266 works only with version 3.13.0. For preparation you should extract a content [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder.  Those version of wolfssl is slightly changed to work with ESP8266 and only this sources must be used.
 
 ESPHAP library was tested in the following enviropment:
 
