@@ -18,9 +18,9 @@ this project uses this as well.
 Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for ESP8266 to stop watchdog and some functions with lower memory usage
 
 # Build instruction
-
-This library should be located under standart Arduino libraries folder. 
-Library is depends from [wolfssl](https://github.com/wolfSSL)  , but it requires some preparation before usage...
+Before usage your Arduino enviropment should be prepared to works with ESP32 and/or ESP8266.
+This library (ESPHAP) should be located under the  standart Arduino libraries folder. You can install this from the library manager or clone sources.
+Library is depends from  the [wolfssl](https://github.com/wolfSSL)  and you need to have wolfssl library as well in the library folder , but it requires some preparation before usage...
 
 
 ## For ESP32
