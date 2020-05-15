@@ -49,9 +49,8 @@ ESP8266 works only with version 3.13.0.
 For preparation you should extract a content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder named "wolfssl" .  Those version of wolfssl is slightly changed to work with ESP8266 and ONLY this sources must be used.
 
 
-### Enviropment versions
 
-ESPHAP library was tested in the following enviropment:
+### ESPHAP library was tested in the following enviropment:
 
 ESP32 board library  version 1.0.4
 
