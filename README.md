@@ -151,6 +151,16 @@ Build instruction the same as for sketches avove.
 
 1. Prepare include section
 ```c
+
+#ifdef ESP32
+#include <SPIFFS.h>
+#endif
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+
+#include <ESP8266mDNS.h>
+#include "coredecls.h"
+#endif
 extern "C"{
 #include "homeintegration.h"
 }
@@ -160,6 +170,25 @@ extern "C"{
 #include <hapfilestorage\hapfilestorage.hpp>
 ```
 
+
+2. In the setup you have to do following, instead of other 
+
+Small adujstment for the ESP8266
+```c
+ #ifdef ESP8266 
+  disable_extra4k_at_link_time();
+ #endif 
+```
+Initialize file storage to keep pairing information (you can put any file name as you want
+```c
+ init_hap_storage("/pair.dat");
+```
+
+Set base accessory type, means you will have at least one accessory and you need define a type
+```c
+ hap_setbase_accessorytype(homekit_accessory_category_sensor);
+```
+full list of availbale accessories you can find in the [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) , see enum homekit_accessory_category_t
 
 ## Are you interesting to support this project ?
 
