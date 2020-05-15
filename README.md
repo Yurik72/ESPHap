@@ -12,6 +12,8 @@ and without any additional bridges
 At this moment  ESP32 supported and tested well.
 ESP8266 is ported as well and under the testing stage. There are some minor bugs and especially in the pairing process. Not all of them finished smooth. Hovewer it can be maximum 3 attempts (in my experience) and after that everything working fine. I'd say that after pairing (once operation) devices works well and stable
 
+Library allows to setup up to the 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/)  on the same ESP32/ESP8266 board
+
 Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
 this project uses this as well.
 
@@ -143,6 +145,20 @@ const float factor=14.0;//to be calibrated with your MQ135
 Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
 
 Build instruction the same as for sketches avove.
+
+
+# How to build your own sketch
+
+1. Prepare include section
+```c
+extern "C"{
+#include "homeintegration.h"
+}
+#ifdef ESP8266
+#include "homekitintegrationcpp.h"
+#endif
+#include <hapfilestorage\hapfilestorage.hpp>
+```
 
 
 ## Are you interesting to support this project ?
