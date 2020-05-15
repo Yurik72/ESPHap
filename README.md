@@ -37,7 +37,7 @@ If you are going to prepare this manually, please reuse/check settings.h and use
 ESP8266 works only with version 3.13.0. For preparation you should extract a content [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder.  Those version of wolfssl is slightly changed to work with ESP8266 and only this sources must be used.
 
 
-# Enviropment versions
+### Enviropment versions
 
 ESPHAP library was tested in the following enviropment:
 
