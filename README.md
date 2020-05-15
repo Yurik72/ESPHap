@@ -44,7 +44,7 @@ ESP8266 board library  version 2.6.3
 
 Arduino version 1.8.12
 
-## Getting help
+# Getting help
 
 
 ## Simple example
