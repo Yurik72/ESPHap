@@ -25,6 +25,7 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for E
 
 3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  to the Arduino Libraries folder named "wolfssl"
 
+4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the  [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
 
 #  wolfssl manual preparation
 
