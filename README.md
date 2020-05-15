@@ -91,7 +91,15 @@ Those examples can be used to handle other device like relays, which supports tw
 
 ## Sonoff example
 
-Example folders contains sketch for Sonoff. As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
+Example folders contains 3 sketches for the Sonoff devices. 
+
+- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
+
+- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device  with built in web portal and file nmanager 
+
+- [Sonoff_B!](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web)  sonoff B1 lamp 
+
+As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
