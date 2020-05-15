@@ -97,7 +97,7 @@ Example folders contains 3 sketches for the Sonoff devices.
 
 - [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device  with built in web portal and file manager 
 
-- [Sonoff_B!](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web)  sonoff B1 lamp 
+- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web)  sonoff B1 lamp 
 
 As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
