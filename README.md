@@ -25,7 +25,7 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for E
 
 3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  to the Arduino Libraries folder named "wolfssl"
 
-4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the  [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
+4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the  [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 #  wolfssl manual preparation
 
@@ -64,22 +64,32 @@ Arduino version 1.8.12
 
 ## Simple example
 
-examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266)how to handle led (or any such as relay) 
-More examples will be later, hovewer you can see the same examples/implemenmtation
-[esphapcontroller](https://github.com/Yurik72/esphapcontroller)
+Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle Led status
 
-This example used as well implemenation for pairing storage. it will be stored in spiffs system with file name pair.dat
+Before compile you need:
 
-In the ino file change your wifi name and password. After connecting to wifi device should be accesible for pairing from Apple home.
+1.  Change your Wifi setting by the editing following lines:
+
+const char* ssid     = "your ssid";
+const char* password = "pwd to ssid";
+
+2. Change your GPIO, where Led is connected
+
+const int led_gpio = 4;
+
+.
 At this moment QR is not generated, so please use manual pairing by enetering password  11111111
 
 More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+
+Those examples can be used to handle other device like relays, which supports two statuses ON/OFF.
+
 
 
 
 ## Sonoff example
 
-Example folders contains sketch for Sonoff. As mentioned ESP8266 in process of testing (Sonoff is esp8265 )
+Example folders contains sketch for Sonoff. As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
