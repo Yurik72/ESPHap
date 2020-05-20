@@ -72,13 +72,15 @@ Before compile you need:
 
 1.  Change your Wifi setting by the editing following lines:
 
+```c
 const char* ssid     = "your ssid";
 const char* password = "pwd to ssid";
-
+```
 2. Change your GPIO, where Led is connected
 
+```c
 const int led_gpio = 4;
-
+```
 .
 At this moment QR is not generated, so please use manual pairing by enetering password  11111111
 
@@ -95,7 +97,7 @@ Example folders contains 3 sketches for the Sonoff devices.
 
 - [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
 
-- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device  with built in web portal and file manager 
+- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device  with built in web portal and file manager 
 
 - [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web)  sonoff B1 lamp 
 
@@ -150,7 +152,11 @@ Code is contains comments and one of the important thing for this sketch is cali
 const float factor=14.0;//to be calibrated with your MQ135
 
 
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+Those sketch as well includes advanced feathures: 
+-  Web File Manager
+- OTA
+- Built-in web site
+- Sending data to ThingSpeak
 
 Build instruction the same as for sketches avove.
 
