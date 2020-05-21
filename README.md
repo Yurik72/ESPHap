@@ -82,7 +82,7 @@ const char* password = "pwd to ssid";
 const int led_gpio = 4;
 ```
 .
-At this moment QR is not generated, so please use manual pairing by enetering password  11111111
+At this example QR is not generated, so please use manual pairing by enetering password  11111111
 
 More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
@@ -110,7 +110,7 @@ Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-S
 
 Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
-This is sketch compatible with both ESP32 & ESP8266 and contains advance features:
+This is sketch compatible with both ESP32 & ESP8266 and contains advanced features:
 
 - Built-in web site
 
