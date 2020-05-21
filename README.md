@@ -272,7 +272,15 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 #endif
 ``` 
  
+# Versions history
+
+ ## v1.0  
  
+ -  First success version works both with ESP32 and ESP8266
+ 
+ ## v1.0.1
+ 
+ - Minor bug fixes and more examples
  
 ## Are you interesting to support this project ?
 
