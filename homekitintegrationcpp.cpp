@@ -22,4 +22,10 @@ bool hap_homekit_is_paired() {
 void hap_restart_server() {
 	homekit_server_restart();
 }
+int hap_get_setup_uri(char *buffer, size_t buffer_size) {
+	int res = homekit_get_setup_uri(hap_get_server_config(), buffer, buffer_size);
+	//INFO("hap_get_setup_uri returned %d", res);
+	return res;
+}
+
 #endif

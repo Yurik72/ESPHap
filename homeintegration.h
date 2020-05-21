@@ -24,6 +24,15 @@
 	};
 #endif
 
+#define HAP_IMPLEMENT_GETVAL(name,type,service,characteristic)\
+type name() { \
+	if (service) { \
+		homekit_characteristic_t * ch = homekit_service_characteristic_by_type(service, characteristic);\
+		if (ch) {\
+			return ch->value.type ##_value;\
+		}\
+	}\
+};
 
 
 	void init_accessory();
@@ -36,6 +45,9 @@
 	int hap_get_storage_size_ex();
 	void hap_set_identity_gpio(int gpio);
 	void hap_set_device_password(char* szpwd);
+
+	void hap_set_device_setupId(char* szpwd);
+
 	//esp controller usage
 	int hap_initbase_accessory_service(const char* szname_value, const char* szmanufacturer, const char* szserialnumber, const char* szmodels, const char* szfirmware);
 	homekit_service_t* hap_new_homekit_accessory_service(const char *szname, const char *szserialnumber);
@@ -90,9 +102,13 @@
 	void hap_init_homekit_server();
 	bool hap_homekit_is_paired();
 	void hap_restart_server();
+
+	
 #endif
 	void hap_init_homekit_base_accessory();
 
 	homekit_server_config_t* hap_get_server_config();
 	bool hap_setup_final_step();
-	
+#ifndef ARDUINO8266_SERVER_CPP
+	int hap_get_setup_uri(char *buffer, size_t buffer_size);
+#endif

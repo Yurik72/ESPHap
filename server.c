@@ -3515,23 +3515,29 @@ int homekit_get_accessory_id(char *buffer, size_t size) {
 }
 
 int homekit_get_setup_uri(const homekit_server_config_t *config, char *buffer, size_t buffer_size) {
-    static const char base36Table[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	static const char base36Table[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    if (buffer_size < 20)
-        return -1;
+	if (buffer_size < 20) {
+		//INFO("homekit_get_setup_uri wrong buffer size");
+		return -1;
+	}
+	if (!config->password) {
+		//INFO("homekit_get_setup_uri wrong password");
+		return -1;
+	}
+	// TODO: validate password in case it is run beffore server is started
 
-    if (!config->password)
-        return -1;
-    // TODO: validate password in case it is run beffore server is started
+	if (!config->setupId) {
+		//INFO("homekit_get_setup_uri wrong setupId");
+		return -1;
+	}
+	// TODO: validate setupID in case it is run beffore server is started
 
-    if (!config->setupId)
-        return -1;
-    // TODO: validate setupID in case it is run beffore server is started
-
-    homekit_accessory_t *accessory = homekit_accessory_by_id(config->accessories, 1);
-    if (!accessory)
-        return -1;
-
+	homekit_accessory_t *accessory = homekit_accessory_by_id(config->accessories, 1);
+	if (!accessory) {
+		//INFO("homekit_get_setup_uri wrong accessory");
+		return -1;
+	}
     uint32_t setup_code = 0;
     for (const char *s = config->password; *s; s++)
         if ISDIGIT(*s)

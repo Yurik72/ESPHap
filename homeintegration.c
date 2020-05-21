@@ -121,12 +121,22 @@ void identify(homekit_value_t _value) {
 
 homekit_accessory_t *accessories[2];
 
-
+/*
 homekit_server_config_t config = {
     .accessories = accessories,
     .password = "111-11-111"
 };
+*/
 
+#define MAX_HAP_SERVICES 7
+#define MAX_HAP_ACCESSORIES 4
+homekit_accessory_t *hap_accessories[MAX_HAP_ACCESSORIES + 1] = { 0 };
+homekit_service_t* hap_services[MAX_HAP_SERVICES + 1] = { 0 };
+homekit_server_config_t hap_config = {
+	.accessories = hap_accessories,
+	.password = "111-11-111",
+	.setupId = "YK72"
+};
 void on_storage_changed(){
 
 	if(callbackstorage)
@@ -135,7 +145,7 @@ void on_storage_changed(){
 #ifndef ARDUINO8266_SERVER_CPP
 void init_homekit_server() {
 	set_callback_storage(on_storage_changed);
-    homekit_server_init(&config);
+    homekit_server_init(&hap_config);
 }
 #endif
 /*
@@ -163,14 +173,7 @@ int hap_init_storage_ex(char* szdata,int size){
 static int hap_mainservices_current=0;
 static int hap_mainaccesories_current=0;
 
-#define MAX_HAP_SERVICES 7
-#define MAX_HAP_ACCESSORIES 4
-homekit_accessory_t *hap_accessories[MAX_HAP_ACCESSORIES+1]={0};
-homekit_service_t* hap_services[MAX_HAP_SERVICES+1]={0};
-homekit_server_config_t hap_config = {
-    .accessories = hap_accessories,
-    .password = "111-11-111"
-};
+
 static const char* sz_acc_name=NULL;
 static const char* sz_acc_manufacturer=NULL;
 static const char* sz_acc_serialnumber=NULL;
@@ -276,6 +279,9 @@ int hap_initbase_accessory_service(const char* szname_value,const char* szmanufa
 }
 void hap_set_device_password(char* szpwd) {
 	hap_config.password = szpwd;
+}
+void hap_set_device_setupId(char* szpwd) {
+	hap_config.setupId = szpwd;
 }
 homekit_service_t* hap_new_homekit_accessory_service(const char *szname,const char * szserialnumber){
 	return NEW_HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]) {
@@ -734,4 +740,11 @@ homekit_service_t* hap_add_service(homekit_service_t* service ){
 	return service;
 }
 
+#ifndef ARDUINO8266_SERVER_CPP
+int hap_get_setup_uri( char *buffer, size_t buffer_size) {
+	int res=homekit_get_setup_uri(hap_get_server_config(), buffer, buffer_size);
+	//INFO("hap_get_setup_uri returned %d", res);
+	return res;
+}
 
+#endif

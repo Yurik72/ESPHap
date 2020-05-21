@@ -180,6 +180,7 @@ void arduino_homekit_loop();
 int arduino_homekit_connected_clients_count();
 bool arduino_homekit_is_paired();
 void homekit_server_restart();
+int homekit_get_setup_uri(const homekit_server_config_t *config, char *buffer, size_t buffer_size);
 #ifdef __cplusplus
 }
 #endif
