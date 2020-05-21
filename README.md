@@ -209,10 +209,12 @@ Small adujstment for the ESP8266
   disable_extra4k_at_link_time();
  #endif 
 ```
-Initialize file storage to keep pairing information (you can put any file name as you want
+Initialize file storage to keep pairing information (you can put any file name as you want)
 ```c
  init_hap_storage("/pair.dat");
 ```
+Hovewer you can hahdle your function how to keep your  pairing information  examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contains code to show custom implementation
+
 
 Set base accessory type, means you will have at least one accessory and you need define a type
 ```c
