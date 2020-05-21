@@ -118,7 +118,7 @@ This is sketch compatible with both ESP32 & ESP8266 and contains advanced featur
 
 - OTA
 
-- Setup/pairing via QR Code  (to access QR code you need enter http://<ip address>/setup.html)
+- Setup/pairing via QR Code  (to access QR code you need enter http://ipaddress/setup.html)
 
 This is basic demonstration of powerfull IOT device, which contains such feathures
 
