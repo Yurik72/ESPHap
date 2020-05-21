@@ -106,6 +106,22 @@ But example already works quite fine. Small problem detected during the pairing.
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
 
+## Advanced Led example
+
+Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+
+This is sketch compatible with both ESP32 & ESP8266 and contains advance features:
+
+- Built-in web site
+
+- Built in web file manager
+
+- OTA
+
+- Setup/pairing via QR Code  (to access QR code you need enter http://<ip address>/setup.html)
+
+This is basic demonstration of powerfull IOT device, which contains such feathures
+
 ## Thermostat example
 
 Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
@@ -271,7 +287,31 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
   hap_homekit_loop();
 #endif
 ``` 
- 
+
+Advanced feathures
+
+- Built in web server
+
+Since version 1.0.2, library contains submodule for built in web server. To use it you need
+
+Include header
+```c
+#include <hapweb\hap_webserver.hpp>
+``` 
+call 
+```c
+set_indexhml(FPSTR(INDEX_HTML));  // optional if you want to have your own root page
+hap_webserver_begin();
+``` 
+in the setup function
+
+set_indexhml(FPSTR(INDEX_HTML));   allows to define your root page content , see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+
+
+- Setup by QR Code
+
+If you use built in web server, by default theit provide access to setup/pairing by QR code, you just need enter http://<ip address>/setup.html ,see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+
 # Versions history
 
  ## v1.0  
@@ -281,6 +321,15 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
  ## v1.0.1
  
  - Minor bug fixes and more examples
+ 
+ ## v1.0.2
+ 
+ - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
+ 
+ - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
+ 
+- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://<ip address>/setup.html .
+ 
  
 ## Are you interesting to support this project ?
 
