@@ -310,7 +310,7 @@ set_indexhml(FPSTR(INDEX_HTML));   allows to define your root page content , see
 
 - Setup by QR Code
 
-If you use built in web server, by default theit provide access to setup/pairing by QR code, you just need enter http://<ip address>/setup.html ,see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://<ip address>/setup.html ,see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
 
