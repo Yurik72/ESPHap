@@ -654,7 +654,27 @@ homekit_service_t* hap_add_switch_service(const char* szname,hap_callback cb,voi
 
 	return hap_add_service(hap_new_switch_service(szname,cb,context));
 }
+homekit_service_t* hap_new_switch_service_as_accessory(const char* szname, hap_callback cb, void* context) {
 
+	INFO("add hap_new_switch_service_as_accessory as accessory");
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* switch_service = hap_new_switch_service(szname, cb, context);
+
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = switch_service;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = homekit_accessory_category_switch,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+
+	return switch_service;
+
+}
 
 homekit_service_t* hap_new_button_service(const char* szname/*, hap_callback cb, void* context*/){
 
@@ -703,7 +723,7 @@ homekit_service_t*  hap_add_air_quality_service_as_accessory(int acctype, const 
 	svc[1] = airservice;
 	svc[2] = NULL;
 	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
-		.category = (homekit_accessory_category_t)acctype,
+		.category = homekit_accessory_category_sensor,
 		.services = svc
 	);
 
