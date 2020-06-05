@@ -106,11 +106,11 @@ But example already works quite fine. Small problem detected during the pairing.
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
 
-## Advanced Led example
+## Advanced Led example (simple switch and dimmable)
 
 Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
-
-This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF and contains advanced features:
+ and [Advanced dimmable led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
+This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF , LED brightness and contains advanced features:
 
 - Built-in web site
 
