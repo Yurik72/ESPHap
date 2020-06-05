@@ -87,9 +87,12 @@ type name() { \
 	homekit_service_t* hap_new_motion_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_motion_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_motion_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+
+	//fan
 	homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context);
-
+	homekit_service_t* hap_new_fan2_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_fan2_service(const char* szname, hap_callback cb, void* context);
 	//air quality
 	homekit_service_t* hap_new_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
 	homekit_service_t* hap_add_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
