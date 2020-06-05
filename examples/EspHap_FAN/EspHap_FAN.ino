@@ -65,6 +65,7 @@ extern "C"{
 }
 #ifdef ESP8266
 #include "homekitintegrationcpp.h"
+#define HOMEKIT_SHORT_APPLE_UUIDS
 #endif
 
 
