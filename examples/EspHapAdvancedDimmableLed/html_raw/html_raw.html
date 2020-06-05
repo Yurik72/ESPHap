@@ -1,0 +1,430 @@
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Dimmable Led web portal</title>
+    <style>
+            body {
+                font-family: Arial,Helvetica,sans-serif;
+                background: #181818;
+                color: #EFEFEF;
+                font-size: 16px
+            }
+            h2 {
+                font-size: 18px
+            }
+            section.main {
+                display: flex
+            }
+            #menu,section.main {
+                flex-direction: column
+            }
+            #menu {
+                display: none;
+                flex-wrap: nowrap;
+                min-width: 440px;
+                background: #363636;
+                padding: 8px;
+                border-radius: 4px;
+                margin-top: 10px;
+                margin-right: 10px;
+            }
+            #content {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: stretch
+            }
+            figure {
+                padding: 0px;
+                margin: 0;
+                -webkit-margin-before: 0;
+                margin-block-start: 0;
+                -webkit-margin-after: 0;
+                margin-block-end: 0;
+                -webkit-margin-start: 0;
+                margin-inline-start: 0;
+                -webkit-margin-end: 0;
+                margin-inline-end: 0
+            }
+            figure img {
+                display: block;
+                width: 100%;
+                height: auto;
+                border-radius: 4px;
+                margin-top: 8px;
+            }
+            @media (min-width: 800px) and (orientation:landscape) {
+                #content {
+                    display:flex;
+                    flex-wrap: nowrap;
+                    align-items: stretch
+                }
+                figure img {
+                    display: block;
+                    max-width: 100%;
+                    max-height: calc(100vh - 40px);
+                    width: auto;
+                    height: auto
+                }
+                figure {
+                    padding: 0 0 0 0px;
+                    margin: 0;
+                    -webkit-margin-before: 0;
+                    margin-block-start: 0;
+                    -webkit-margin-after: 0;
+                    margin-block-end: 0;
+                    -webkit-margin-start: 0;
+                    margin-inline-start: 0;
+                    -webkit-margin-end: 0;
+                    margin-inline-end: 0
+                }
+            }
+            section#buttons {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between
+            }
+            #nav-toggle {
+                cursor: pointer;
+                display: block
+            }
+            #nav-toggle-cb {
+                outline: 0;
+                opacity: 0;
+                width: 0;
+                height: 0
+            }
+            #nav-toggle-cb:checked+#menu {
+                display: flex
+            }
+            .input-group {
+                display: flex;
+                flex-wrap: nowrap;
+                line-height: 22px;
+                margin: 5px 0
+            }
+            .input-group>label {
+                display: inline-block;
+                padding-right: 10px;
+                min-width: 47%
+            }
+            .input-group input,.input-group select {
+                flex-grow: 1
+            }
+            .range-max,.range-min {
+                display: inline-block;
+                padding: 0 5px
+            }
+            button {
+                display: block;
+                margin: 5px;
+                padding: 0 12px;
+                border: 0;
+                line-height: 28px;
+                cursor: pointer;
+                color: #fff;
+                background: #ff3034;
+                border-radius: 5px;
+                font-size: 16px;
+                outline: 0
+            }
+            button:hover {
+                background: #ff494d
+            }
+            button:active {
+                background: #f21c21
+            }
+            button.disabled {
+                cursor: default;
+                background: #a0a0a0
+            }
+            input[type=range] {
+                -webkit-appearance: none;
+                width: 100%;
+                height: 22px;
+                background: #363636;
+                cursor: pointer;
+                margin: 0
+            }
+            input[type=range]:focus {
+                outline: 0
+            }
+            input[type=range]::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: #EFEFEF;
+                border-radius: 0;
+                border: 0 solid #EFEFEF
+            }
+            input[type=range]::-webkit-slider-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer;
+                -webkit-appearance: none;
+                margin-top: -11.5px
+            }
+            input[type=range]:focus::-webkit-slider-runnable-track {
+                background: #EFEFEF
+            }
+            input[type=range]::-moz-range-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: #EFEFEF;
+                border-radius: 0;
+                border: 0 solid #EFEFEF
+            }
+            input[type=range]::-moz-range-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer
+            }
+            input[type=range]::-ms-track {
+                width: 100%;
+                height: 2px;
+                cursor: pointer;
+                background: 0 0;
+                border-color: transparent;
+                color: transparent
+            }
+            input[type=range]::-ms-fill-lower {
+                background: #EFEFEF;
+                border: 0 solid #EFEFEF;
+                border-radius: 0
+            }
+            input[type=range]::-ms-fill-upper {
+                background: #EFEFEF;
+                border: 0 solid #EFEFEF;
+                border-radius: 0
+            }
+            input[type=range]::-ms-thumb {
+                border: 1px solid rgba(0,0,30,0);
+                height: 22px;
+                width: 22px;
+                border-radius: 50px;
+                background: #ff3034;
+                cursor: pointer;
+                height: 2px
+            }
+            input[type=range]:focus::-ms-fill-lower {
+                background: #EFEFEF
+            }
+            input[type=range]:focus::-ms-fill-upper {
+                background: #363636
+            }
+            .switch {
+                display: block;
+                position: relative;
+                line-height: 22px;
+                font-size: 16px;
+                height: 22px
+            }
+            .switch input {
+                outline: 0;
+                opacity: 0;
+                width: 0;
+                height: 0
+            }
+            .slider {
+                width: 50px;
+                height: 22px;
+                border-radius: 22px;
+                cursor: pointer;
+                background-color: grey
+            }
+            .slider,.slider:before {
+                display: inline-block;
+                transition: .4s
+            }
+            .slider:before {
+                position: relative;
+                content: "";
+                border-radius: 50%;
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                top: 3px;
+                background-color: #fff
+            }
+            input:checked+.slider {
+                background-color: #ff3034
+            }
+            input:checked+.slider:before {
+                -webkit-transform: translateX(26px);
+                transform: translateX(26px)
+            }
+            select {
+                border: 1px solid #363636;
+                font-size: 14px;
+                height: 22px;
+                outline: 0;
+                border-radius: 5px
+            }
+            .image-container {
+                position: relative;
+                min-width: 160px
+            }
+            .close {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+                background: #ff3034;
+                width: 16px;
+                height: 16px;
+                border-radius: 100px;
+                color: #fff;
+                text-align: center;
+                line-height: 18px;
+                cursor: pointer
+            }
+            .hidden {
+                display: none
+            }
+    .checkbox {
+     position: absolute;
+     z-index: -1;
+     opacity: 0;
+     margin: 10px 0 0 20px;
+   }
+   .checkbox + label {
+     position: relative;
+     padding: 0 0 0 60px;
+     cursor: pointer;
+   }
+   .checkbox + label:before {
+     content: '';
+     position: absolute;
+     top: -4px;
+     left: 0;
+     width: 50px;
+     height: 26px;
+     border-radius: 13px;
+     background: #CDD1DA;
+     box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
+     transition: .2s;
+   }
+   .checkbox + label:after {
+     content: '';
+     position: absolute;
+     top: -2px;
+     left: 2px;
+     width: 22px;
+     height: 22px;
+     border-radius: 10px;
+     background: #FFF;
+     box-shadow: 0 2px 5px rgba(0,0,0,.3);
+     transition: .2s;
+   }
+   .checkbox:checked + label:before {
+     background: #9FD468;
+   }
+   .checkbox:checked + label:after {
+     left: 26px;
+   }
+   .checkbox:focus + label:before {
+     box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,255,0,.7);
+   }
+    </style>
+</head>
+<body>
+    <section class="main">
+        <div id="logo">
+            <label for="nav-toggle-cb" id="nav-toggle">☰&nbsp;&nbsp;Led state</label>
+        </div>
+        <div id="content">
+            <div id="sidebar">
+                <input type="checkbox" id="nav-toggle-cb" checked="checked">
+                <nav id="menu">
+                <div class="input-group" id="state-group">
+                           
+					  <input type="checkbox" id="ch1"  class="default-action checkbox" checked="checked">
+					  <label for="ch1">LED ON/OFF</label>
+
+               </div>        
+			   <div class="input-group" id="level-group">
+				     <div class="range-min">0</div>
+						<input class="input-range default-action" id="level" orient="vertical" type="range" step="0.5" value="5" min="1" max="100">
+						<div class="range-max">100</div>
+					<span class="range-value">Brigthness</span>
+				</div>
+               </nav>
+            </div>
+        </div>
+    </section>
+    <script>
+document.addEventListener('DOMContentLoaded', function (event) {
+    var baseHost = document.location.origin;
+    
+  function updateConfig (el,proto_val) {
+      let value;
+  
+    switch (el.type) {
+     case 'input':
+            value = el.value;
+            break;
+     case 'range':
+            value = el.value;
+            break;
+   case 'checkbox':
+     value=el.checked;
+     break;
+      case 'button':
+        case 'submit':
+            if (proto_val) {
+                value = proto_val;
+            } else {
+                value = '1';
+            }
+            break;
+        default:
+            return;
+      };
+      const query = `${baseHost}/set?var=${el.id}&val=${value}`;
+ console.log(query);
+    fetch(query)
+      .then(response => {
+        console.log(`request to ${query} finished, status: ${response.status}`)
+      })
+    };
+ document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+      el.onchange = () => updateConfig(el)
+    });
+ 
+    
+ 
+ var tm=500;
+  document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+      el.onchange = () => updateConfig(el);
+    })
+  document
+    .querySelectorAll('.default-action')
+    .forEach(el => {
+	function dofetch(el){
+	const query = `${baseHost}/get?var=${el.id}`;
+		fetch(query)
+		.then(response => response.text())
+	.then(val => {
+		el.value=val;
+
+   
+   })
+   }
+   setTimeout(dofetch,tm,el); 
+	tm+=1000;
+    })
+})
+    </script>
+</body>
+</html>
