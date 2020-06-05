@@ -350,6 +350,11 @@ If you use built in web server, by default it provides access to setup/pairing p
  
 - implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http:// ip address  /  setup.html .
  
+ ## v1.0.3
+ 
+  - small bug fixes
+  
+  -  new examples
  
 ## Are you interesting to support this project ?
 
