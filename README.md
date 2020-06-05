@@ -176,6 +176,24 @@ Those sketch as well includes advanced feathures:
 
 Build instruction the same as for sketches avove.
 
+## FAN servicer example
+
+Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple FAN  icon. You are able to control FAN characteristic such as 
+
+- ON/OFF
+
+- Speed
+
+- Direction
+
+
+Those sketch as well includes advanced feathures: 
+-  Web File Manager
+- OTA
+- Built-in web site
+
+Build instruction the same as for sketches avove.
+
 
 # Library API and how to build your own sketch 
 
