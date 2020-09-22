@@ -1,7 +1,7 @@
 {
     "name": "ESPHap",
     "description": "Native support Apple home kit protocol with Arduino projects",
-    "keywords": "Apple Home Kit native esp32",
+    "keywords": "Apple Home Kit native ESP32/ESP8266",
     "authors": [
         {
             "name": "Yurik72",
