@@ -1,5 +1,5 @@
 {
-    "name": "FastLED",
+    "name": "ESPHap",
     "description": "Native support Apple home kit protocol with Arduino projects",
     "keywords": "Apple Home Kit native esp32",
     "authors": [
