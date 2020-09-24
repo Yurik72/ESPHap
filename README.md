@@ -3,7 +3,7 @@
 
 
 
-ESPHap
+ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
 This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple Home Kit by  native protocols 
