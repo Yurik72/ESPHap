@@ -43,7 +43,7 @@ WebServer server(80);
 #include "hap_filebrowse.h"
 //#include "file_index_html.h"
 #include "hap_file_setup.h"
-#include "../qr/hapqr.hpp""
+#include "../qr/hapqr.hpp"
 #include "../debug.h"
 
 const char FILE_BROWSE_FILE[] PROGMEM = "/filebrowse.html";
