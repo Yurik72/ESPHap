@@ -22,28 +22,23 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to
 
 # Installing and configuring wolfSSL
 
-This project makes use of [wolfSSL](https://github.com/wolfSSL), an embedded, lightweight SSL library written in ANSI C and targeted for embedded systems like RTOS.
-This section is describes more technical details for professional users if they have already wolfssl installed.
-[wolfssl](https://github.com/wolfSSL) requires some preparation before usage...
-
+This project makes use of [wolfSSL](https://github.com/wolfSSL), an embedded, lightweight SSL library written in ANSI C and targeted for embedded systems like RTOS. wolfSSL needs to be slightly patched and this section describes some technical details for users who had already installed wolfSSL. 
 
 ## For ESP32
 
-ESP32 works well with wolfssl versions 4.2.0 and 3.13.0
-Full instruction how to prepare, can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
+ESPHap for ESP32 works well with wolfSSL versions 4.2.0 and 3.13.0. Full instruction on how to configure wolfSSL can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
 
-For simplify a process you can use [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content into Arduino Libraries folder named "wolfssl"
+To simplify installation, ESPHap comes with pre-configured versions of wolfSSL which can be used out of the box. Extract either [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) into an Arduino library folder named "wolfssl".
 
-If you are going to prepare this manually, please reuse/check settings.h and user_settings.h from the attached archives
- You need copy/replace this files in wolfssl components.
+If you want to configure wolfSSL yourself, please use settings.h and user_settings.h from the provided preconfigured libraries as reference, you will need to edit these files according to your needs.
 
 ## For ESP8266
 
-ESP8266 works only with version 3.13.0.
+ESPHap for ESP8266 only works with version 3.13.0.
 
-For preparation you should extract a content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder named "wolfssl". Those version of wolfssl is slightly changed to work with ESP8266 and ONLY this sources must be used.
+To simplify installation, ESPHap comes with a pre-configured and slightly patched versions of wolfSSL 3.13.0 which can be used out of the box. Extract [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) into an Arduino library folder named "wolfssl". ESPHap ONLY works with this patched wolfSSL version.
 
-### ESPHAP library was tested in the following enviropment:
+### ESPHap library was tested in the following environment:
 
 - ESP32 board library version 1.0.4
 - ESP8266 board library version 2.6.3
