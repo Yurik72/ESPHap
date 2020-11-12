@@ -91,12 +91,12 @@ Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-S
 
 Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
  and [Advanced dimmable led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
-This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF , LED brightness and contains advanced features:
+This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF, LED brightness and contains advanced features:
 
 - Built-in web site
 - Built in web file manager
 - OTA
-- Setup/pairing via QR Code (to access QR code you need enter http:// ipaddress /setup.html)
+- Setup/pairing via QR Code (to access QR code you need enter http://\<IP ADDRESS\>/setup.html)
 
 This is basic demonstration of powerfull IOT device, which contains such features
 
@@ -126,7 +126,7 @@ As well for RGB can be used any strip, the question is how to proceed with Brigh
 
 Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched ON/OFF...
 
-Build instruction the same as for sketches avove.
+Build instruction the same as for sketches above.
 
 ## Button example
 
@@ -134,7 +134,7 @@ Example folders contains sketch for [Button](https://github.com/Yurik72/ESPHap/t
 
 Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site.
 
-Build instruction the same as for sketches avove.
+Build instruction the same as for sketches above.
 
 ## Air Quality sensor example
 
@@ -152,7 +152,7 @@ Those sketch as well includes advanced features:
 - Built-in web site
 - Sending data to ThingSpeak
 
-Build instruction the same as for sketches avove.
+Build instruction the same as for sketches above.
 
 ## FAN servicer example
 
@@ -167,8 +167,7 @@ Those sketch as well includes advanced features:
 - OTA
 - Built-in web site
 
-Build instruction the same as for sketches avove.
-
+Build instruction the same as for sketches above.
 
 # Library API and how to build your own sketch 
 
@@ -236,7 +235,7 @@ Than you need a setup all accessories and their services and characteristic. Do 
 ```
 
 Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). Header is well documented and descibes services types and their characteristic)
-The list of Api to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
+The list of API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
 
 When accessories, services and characteristic is defined we need to finally call
 ```c
