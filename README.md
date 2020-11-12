@@ -219,11 +219,9 @@ Than you need a setup all accessories and their services and characteristic. Do 
 ```c
   hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
-"LED" is the name of accessory 
- 
-led_callback is callback function called from the Apple Home app when changes 
- 
- (void*)&led_gpio is callback parameter
+- "LED" is the name of accessory 
+- led_callback is callback function called from the Apple Home app when changes 
+- `(void*)&led_gpio` is callback parameter
  
  After that we can add more accessories like this
  ```c
@@ -237,8 +235,6 @@ When accessories, services and characteristic is defined we need to finally call
 ```c
 hap_init_homekit_server();
 ```
-
-That is all for setup.
 
 3. Implement callback and notify function
 
@@ -278,10 +274,7 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 ### Advanced features
 
 #### Built-in web server
-
-Since version 1.0.2, library contains submodule for built-in web server. To use it you need
-
-Include header
+Since version 1.0.2, library contains submodule for built-in web server. To use it you need include header
 ```c
 #include <hapweb/hap_webserver.hpp>
 ``` 
@@ -295,36 +288,27 @@ in the setup function
 set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 #### Setup by QR Code
-
 If you use built-in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
-
  ## v1.0
- 
  - First success version works both with ESP32 and ESP8266
  
  ## v1.0.1
- 
  - Minor bug fixes and more examples
  
  ## v1.0.2
- 
  - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
  - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
 - implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://\<IPADDRESS\>/setup.html.
  
- ## v1.0.3
- 
+## v1.0.3
 - small bug fixes
 - new examples
  
 ## Support this project
-
 You can easilly do that by donating
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JVZWJ6FSMURSL&currency_code=USD&source=url)
 
-
-
-//*TODO* - 
+*TODO* - 
