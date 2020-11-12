@@ -18,7 +18,7 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to
 1. Prepare the Arduino IDE to work with ESP32 and/or ESP8266 (i.e. install the corresponding boards from within Arduino Board Manager).
 2. Install this libary (EspHap) from the Arduino IDE library manager or clone the sources into an Arduino library folder named "ESPHap".
 3. Extract the content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to a Arduino library folder named "wolfssl".
-4. Open any sketch from the provided examples and compile. Detailed instructions on how to upload and pair with Apple Home app can be found in the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or on [instructables.com](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+4. Open any sketch from the provided examples and compile. Detailed instructions on how to upload and pair with Apple Home app can be found in the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or on [instructables.com](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
 
 # Installing and configuring wolfSSL
 
@@ -26,7 +26,7 @@ This project makes use of [wolfSSL](https://github.com/wolfSSL), an embedded, li
 
 ## For ESP32
 
-ESPHap for ESP32 works well with wolfSSL versions 4.2.0 and 3.13.0. Full instruction on how to configure wolfSSL can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
+ESPHap for ESP32 works well with wolfSSL versions 4.2.0 and 3.13.0. Full instruction on how to configure wolfSSL can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html).
 
 To simplify installation, ESPHap comes with pre-configured versions of wolfSSL which can be used out of the box. Extract either [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) into an Arduino library folder named "wolfssl".
 
@@ -34,7 +34,7 @@ If you want to configure wolfSSL yourself, please use settings.h and user_settin
 
 ## For ESP8266
 
-ESPHap for ESP8266 only works with version 3.13.0.
+ESPHap for ESP8266 only works with wolfSSL 3.13.0.
 
 To simplify installation, ESPHap comes with a pre-configured and slightly patched versions of wolfSSL 3.13.0 which can be used out of the box. Extract [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) into an Arduino library folder named "wolfssl". ESPHap ONLY works with this patched wolfSSL version.
 
