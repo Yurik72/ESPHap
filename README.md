@@ -38,13 +38,13 @@ ESPHap for ESP8266 only works with wolfSSL 3.13.0.
 
 To simplify installation, ESPHap comes with a pre-configured and slightly patched versions of wolfSSL 3.13.0 which can be used out of the box. Extract [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) into an Arduino library folder named "wolfssl". ESPHap ONLY works with this patched wolfSSL version.
 
-### ESPHap library was tested in the following environment:
+### ESPHap library was tested in the following environments:
 
 - ESP32 board library version 1.0.4
 - ESP8266 board library version 2.6.3
 - Arduino version 1.8.12
 
-# Getting help
+# Code examples
 ## Simple example
 
 Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle LED status
