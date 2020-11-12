@@ -122,7 +122,7 @@ Build instruction the same as for sketches above.
 Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
 Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
 For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
-As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple.
+As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple Home app.
 
 Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched ON/OFF...
 
@@ -223,9 +223,9 @@ Than you need a setup all accessories and their services and characteristic. Do 
 ```c
   hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
 ```
- "Led" is the name of accessory 
+"Led" is the name of accessory 
  
- led_callback is callback function called from the apple when changes 
+led_callback is callback function called from the Apple Home app when changes 
  
  (void*)&led_gpio  is callback parameter
  
@@ -234,24 +234,22 @@ Than you need a setup all accessories and their services and characteristic. Do 
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
 
-Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). Header is well documented and descibes services types and their characteristic)
-The list of API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
+Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). Header is well documented and descibes service types and their characteristics).
+The list of API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names.
 
 When accessories, services and characteristic is defined we need to finally call
 ```c
 hap_init_homekit_server();
 ```
 
-That is all for setup
+That is all for setup.
 
 3. Implement callback and notify function
 
 Every callback has the same signature and parameters
 
  - characteristic
- 
  - value 
- 
  - context (callback parameters)
  
  This function is called when accessories state is changed from the Apple. You can manage your devices there, based on the value.
@@ -299,7 +297,6 @@ hap_webserver_begin();
 in the setup function
 
 set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
-
 
 - Setup by QR Code
 
