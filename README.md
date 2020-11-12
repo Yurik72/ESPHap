@@ -194,6 +194,19 @@ Those sketch as well includes advanced feathures:
 
 Build instruction the same as for sketches avove.
 
+## Sonoff RF plus Sonoff PIR2
+Example folders contains sketch for [](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapSonoff_RFBridge) 
+This is firmware for Sonoff RF switch, which provides two accessories: Switch And Motion. Main idea to reuse Sonoff RF module to accept signal from Sonoff PIR2 and notify Apple 
+about motion detection. Any other scenario can be defined on the Apple, what should happens when motion detected.
+Due to the Sonof RF has RF module assigned to button, sketch lost functionality on button press reaction. Button press (directly or from RF signal) threated as Motion detection.
+ This is good example hot to use Sonoff PIR without addiotnal bridges.
+
+Those sketch as well includes advanced feathures: 
+-  Web File Manager
+- OTA
+- Built-in web site
+
+Build instruction the same as for sketches avove.
 
 # Library API and how to build your own sketch 
 
