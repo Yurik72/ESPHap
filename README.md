@@ -74,20 +74,15 @@ More detail instruction can be found [here](https://www.instructables.com/id/Ard
 
 Those examples can be used to handle other device like relays, which supports two statuses ON/OFF.
 
-
-
-
 ## Sonoff example
 
 Example folders contains 3 sketches for the Sonoff devices. 
 
 - [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
-
 - [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built in web portal and file manager 
-
 - [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
-As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
+As mentioned ESP8266 in the process of testing (Sonoff is ESP8265)
 But example already works quite fine. Small problem detected during the pairing. But after that works well
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
@@ -99,21 +94,18 @@ Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ES
 This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF , LED brightness and contains advanced features:
 
 - Built-in web site
-
 - Built in web file manager
-
 - OTA
-
 - Setup/pairing via QR Code (to access QR code you need enter http:// ipaddress /setup.html)
 
-This is basic demonstration of powerfull IOT device, which contains such feathures
+This is basic demonstration of powerfull IOT device, which contains such features
 
 ## Thermostat example
 
 Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
 [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which shows on Apple Home two icons Temperature and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, as well any other hardware can be easily implemented
 Hovewer any sensor can be used with simple code changes...
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site. For the [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
+Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site. For the [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
 
 Build instruction the same as for sketches above.
 
@@ -121,14 +113,14 @@ Build instruction the same as for sketches above.
 
 Example folders contains sketch for [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which shows on Apple simple Switch icon. There is universal sketch applicable for ESP32 and ESP8266 and any relay can be used to manage external devices.
 
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site.
 
 Build instruction the same as for sketches above.
 
 ## RGB Strip (WS2812) & Motion example
 
 Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
+Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
 For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
 As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple.
 
@@ -140,7 +132,7 @@ Build instruction the same as for sketches avove.
 
 Example folders contains sketch for [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which shows on Apple simple Button icon. There is universal sketch applicable for ESP32 and ESP8266 (Testing in progress on ESP8266) and any Button scenarios on Apple can be used to manage automation.
 
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site.
 
 Build instruction the same as for sketches avove.
 
@@ -148,12 +140,13 @@ Build instruction the same as for sketches avove.
 
 Example folders contains sketch for [ Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which shows on Apple Air quality Sensor icon.
 Sketch is designed with usage for MQ135 sensor. There is universal sketch applicable for ESP32 and ESP8266. Main advantage that build-in web site shows history trends of PPM level of dioxide. 
-Code is contains comments and one of the important thing for this sketch is calibration based on your real sensor, for this purpose following line should be changed 
+Code is contains comments and one of the important thing for this sketch is calibration based on your real sensor, for this purpose following line should be changed
 
-const float factor=14.0;//to be calibrated with your MQ135
+```c
+const float factor=14.0; //to be calibrated with your MQ135
+```
 
-
-Those sketch as well includes advanced feathures: 
+Those sketch as well includes advanced features: 
 - Web File Manager
 - OTA
 - Built-in web site
@@ -166,13 +159,10 @@ Build instruction the same as for sketches avove.
 Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple FAN icon. You are able to control FAN characteristic such as 
 
 - ON/OFF
-
 - Speed
-
 - Direction
 
-
-Those sketch as well includes advanced feathures: 
+Those sketch as well includes advanced features: 
 - Web File Manager
 - OTA
 - Built-in web site
@@ -292,7 +282,7 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 #endif
 ``` 
 
-Advanced feathures
+Advanced features
 
 - Built in web server
 
@@ -339,13 +329,10 @@ If you use built in web server, by default it provides access to setup/pairing p
  
 ## Support this project
 
-You can easilly do that by donations
+You can easilly do that by donating
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JVZWJ6FSMURSL&currency_code=USD&source=url)
 
 
 
-
-
-
-*TODO* - 
+//*TODO* - 
