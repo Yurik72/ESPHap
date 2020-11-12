@@ -52,7 +52,7 @@ For preparation you should extract a content of [wolfSSL_3_13_0.rar](https://git
 # Getting help
 ## Simple example
 
-Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle Led status
+Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle LED status
 
 Before actually compiling your sketch you first need to:
 
@@ -72,7 +72,7 @@ This example does not generate a QR code for pairing, so please use manual pairi
 
 More detail instruction can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
-Those examples can be used to handle other device like relays, which supports two statuses ON/OFF.
+Those examples can be used to handle other device like relays, which supports two statuses On/Off.
 
 ## Sonoff example
 
@@ -87,11 +87,11 @@ But example already works quite fine. Small problem detected during the pairing.
 
 Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
 
-## Advanced Led example (simple switch and dimmable)
+## Advanced LED example (simple switch and dimmable)
 
-Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
- and [Advanced dimmable led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
-This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF, LED brightness and contains advanced features:
+Example folders contains sketch for [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+ and [Advanced dimmable LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
+This is sketch compatible with both ESP32 & ESP8266, handles LED Switching On/Off, LED brightness and contains advanced features:
 
 - Built-in web site
 - Built in web file manager
@@ -119,12 +119,12 @@ Build instruction the same as for sketches above.
 
 ## RGB Strip (WS2812) & Motion example
 
-Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
+Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 LED strip.
 Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
 For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
 As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple Home app.
 
-Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched ON/OFF...
+Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched On/Off...
 
 Build instruction the same as for sketches above.
 
@@ -158,7 +158,7 @@ Build instruction the same as for sketches above.
 
 Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple FAN icon. You are able to control FAN characteristic such as 
 
-- ON/OFF
+- On/Off
 - Speed
 - Direction
 
@@ -221,13 +221,13 @@ Set base information HostName, Manufacture, Serial number, Model,Firmware versio
 
 Than you need a setup all accessories and their services and characteristic. Do not forgot that you already have one base accessory, therefore first we need a setup it. For instance for the lighBulb
 ```c
-  hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
+  hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
-"Led" is the name of accessory 
+"LED" is the name of accessory 
  
 led_callback is callback function called from the Apple Home app when changes 
  
- (void*)&led_gpio  is callback parameter
+ (void*)&led_gpio is callback parameter
  
  After that we can add more accessories like this
  ```c
@@ -300,7 +300,7 @@ set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see ex
 
 - Setup by QR Code
 
-If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
 
