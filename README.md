@@ -1,12 +1,9 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)]
 
-
-
-
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
-This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple Home Kit by  native protocols 
+This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple HomeKit by  native protocols 
 and without any additional bridges
 
 At this moment  ESP32 supported and tested well.
@@ -51,38 +48,32 @@ ESP8266 works only with version 3.13.0.
 
 For preparation you should extract a content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder named "wolfssl" .  Those version of wolfssl is slightly changed to work with ESP8266 and ONLY this sources must be used.
 
-
-
 ### ESPHAP library was tested in the following enviropment:
 
-ESP32 board library  version 1.0.4
-
-ESP8266 board library  version 2.6.3
-
-Arduino version 1.8.12
+- ESP32 board library  version 1.0.4
+- ESP8266 board library  version 2.6.3
+- Arduino version 1.8.12
 
 # Getting help
-
-
 ## Simple example
 
 Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle Led status
 
-Before compile you need:
+Before actually compiling your sketch you first need to:
 
-1.  Change your Wifi setting by the editing following lines:
+1.  Change your Wifi setting by editing the following lines:
 
 ```c
-const char* ssid     = "your ssid";
-const char* password = "pwd to ssid";
+const char* ssid     = "WLAN SSID";
+const char* password = "WLAN password";
 ```
-2. Change your GPIO, where Led is connected
+2. Change your GPIO data pin for the connected LED
 
 ```c
 const int led_gpio = 4;
 ```
-.
-At this example QR is not generated, so please use manual pairing by enetering password  11111111
+
+This example does not generate a QR code for pairing, so please use manual pairing by entering password 111 11 111.
 
 More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
@@ -143,7 +134,7 @@ Build instruction the same as for sketches above.
 ## RGB Strip (WS2812) & Motion example
 
 Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb  and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site and allows to demonstrate  two direction for the Apple Home Kit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple Home Kit refreshes the RGB bulb state.
+Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site and allows to demonstrate  two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
 For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
 As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple.
 
