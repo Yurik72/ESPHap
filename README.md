@@ -10,19 +10,15 @@ ESP8266 is ported as well and under the testing stage. There are some minor bugs
 
 Library allows to setup up to the 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board
 
-Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
-this project uses this as well.
+Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration, this project uses this as well.
 
 Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) to give a hint for ESP8266 to stop watchdog and some functions with lower memory usage
 
 # Short Build instruction
 
 1. Prepare Arduino enviropment to works with ESP32 and/or ESP8266.
-
 2. Install this libary (EspHap) from the library manager or clone sources to the Arduino library folder named EspHap.
-
 3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino Libraries folder named "wolfssl"
-
 4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 # wolfssl manual preparation
