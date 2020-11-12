@@ -82,7 +82,6 @@ void loop() {
 
 void init_hap_storage() {
   Serial.print("init_hap_storage");
-
   File fsDAT = SPIFFS.open(pair_file_name, "r");
   if (!fsDAT) {
     Serial.println("Failed to read file pair.dat");
@@ -97,10 +96,9 @@ void init_hap_storage() {
   hap_init_storage_ex(buf, size);
   fsDAT.close();
   delete []buf;
-
 }
-void storage_changed(char * szstorage, int size) {
 
+void storage_changed(char * szstorage, int size) {
   SPIFFS.remove(pair_file_name);
   File fsDAT = SPIFFS.open(pair_file_name, "w+");
   if (!fsDAT) {
@@ -108,15 +106,14 @@ void storage_changed(char * szstorage, int size) {
     return;
   }
   fsDAT.write((uint8_t*)szstorage, size);
-
   fsDAT.close();
 }
+
 //can be used for any logic, it will automatically inform Apple Home app about state changes
 void set_led(bool val) {
   Serial.println("set_led");
   digitalWrite(led_gpio, val ? HIGH : LOW);
   //we need notify apple about changes
-
   if (hapservice) {
     Serial.println("notify hap");
     //getting on/off characteristic
