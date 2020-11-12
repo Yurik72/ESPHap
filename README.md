@@ -304,7 +304,7 @@ set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see ex
 
 - Setup by QR Code
 
-If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<ip address\>/setup.html, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
 
@@ -320,7 +320,7 @@ If you use built in web server, by default it provides access to setup/pairing p
  
  - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
  - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
-- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http:// IPADDRESS / setup.html.
+- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://\<IPADDRESS\>/setup.html.
  
  ## v1.0.3
  
