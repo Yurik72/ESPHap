@@ -9,16 +9,16 @@ Please note: There are some minor known bugs within the ESP8266 implementation, 
 
 ESPHap allows to implement up to 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board.
 
-Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing some fine libraries for native integration which are part of this project.
+Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing some fine libraries for native integration and which are part of this project.
 
 Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to stop the watchdog on ESP8266 and also on how to implement low memory usage functions. 
 
-# Short Build instruction
+# Build instructions
 
-1. Prepare Arduino enviropment to works with ESP32 and/or ESP8266.
-2. Install this libary (EspHap) from the library manager or clone sources to the Arduino library folder named EspHap.
-3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino Libraries folder named "wolfssl"
-4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+1. Prepare the Arduino IDE to work with ESP32 and/or ESP8266.
+2. Install this libary (EspHap) from the Arduino IDE library manager or clone the sources into an Arduino library folder named "ESPHap".
+3. Extract the content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to a Arduino library folder named "wolfssl".
+4. Open any sketch from the provided examples and compile. Detailed instructions on how to upload and pair with Apple Home app can be found in the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or on [instructables.com](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 # wolfssl manual preparation
 
