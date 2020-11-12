@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "types.h""
+#include "types.h"
 
 bool homekit_value_equal(homekit_value_t *a, homekit_value_t *b) {
     if (a->is_null != b->is_null)

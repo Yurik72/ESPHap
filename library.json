@@ -1,7 +1,7 @@
 {
     "name": "ESPHap",
-    "description": "Native support Apple home kit protocol with Arduino projects",
-    "keywords": "Apple Home Kit native ESP32/ESP8266",
+    "description": "Native support Apple HomeKit protocol with Arduino projects",
+    "keywords": "Apple HomeKit native ESP32/ESP8266",
     "authors": [
         {
             "name": "Yurik72",
@@ -17,7 +17,8 @@
     "license": "MIT",
 
     "frameworks": "arduino",
-    "platforms": "espressif32",   
+    "platforms": "espressif32",
+    "examples": "examples/*/*.ino",   
     "export": {
         "exclude": [
             "docs",
