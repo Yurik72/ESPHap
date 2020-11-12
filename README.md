@@ -263,14 +263,14 @@ void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *con
     digitalWrite(led_gpio, value.bool_value?HIGH:LOW);
 }
 ```
-optionally implement notify function, which is neccessary to inform Apple about device state changes. This is must for accessories like termostat , for instance for the LightBulb we can notify about power state On/Off , which is bool value true/false
+optionally implement notify function, which is neccessary to inform Apple about device state changes. This is must for accessories like termostat, for instance for the LightBulb we can notify about power state On/Off, which is bool value true/false
 ```c
 void notify_hap(){
 homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
  HAP_NOTIFY_CHANGES(bool, ch, <new bool value>, 0)
  }
  ```
- To get characteristic , API function homekit_service_characteristic_by_type should be used. 
+ To get characteristic, API function homekit_service_characteristic_by_type should be used. 
  First parameter is pointer to the hapservice (from the setup), second is characteristic type
  
  4. Loop function
@@ -290,7 +290,7 @@ Since version 1.0.2, library contains submodule for built in web server. To use 
 
 Include header
 ```c
-#include <hapweb\hap_webserver.hpp>
+#include <hapweb/hap_webserver.hpp>
 ``` 
 call 
 ```c
@@ -299,12 +299,12 @@ hap_webserver_begin();
 ``` 
 in the setup function
 
-set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content , see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 
 - Setup by QR Code
 
-If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://<ip address>/setup.html ,see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<ip address\>/setup.html, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
 
