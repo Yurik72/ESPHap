@@ -20,8 +20,9 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to
 3. Extract the content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to a Arduino library folder named "wolfssl".
 4. Open any sketch from the provided examples and compile. Detailed instructions on how to upload and pair with Apple Home app can be found in the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or on [instructables.com](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
-# wolfssl manual preparation
+# Installating and configuring wolfSSL
 
+This project makes use of [wolfSSL](https://github.com/wolfSSL), an embedded, lightweight SSL library written in ANSI C and targeted for embedded systems like RTOS.
 This section is describes more technical details for professional users if they have already wolfssl installed.
 [wolfssl](https://github.com/wolfSSL) requires some preparation before usage...
 
