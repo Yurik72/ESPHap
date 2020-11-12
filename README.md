@@ -187,7 +187,7 @@ extern "C"{
 #include "homekitintegrationcpp.h"
 #endif
 
-#include <hapfilestorage\hapfilestorage.hpp>
+#include <hapfilestorage/hapfilestorage.hpp>
 ```
 
 2. In the setup you have to do following, instead of other 
@@ -202,8 +202,7 @@ Initialize file storage to keep pairing information (you can put any file name a
 ```c
  init_hap_storage("/pair.dat");
 ```
-Hovewer you can hahdle your function how to keep your pairing information examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contains code to show custom implementation
-
+Hovewer you can hahdle your function how to keep your pairing information examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contains code to show custom implementation.
 
 Set base accessory type, means you will have at least one accessory and you need define a type
 ```c
@@ -276,7 +275,7 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 #endif
 ``` 
 
-Advanced features
+###Advanced features
 
 - Built-in web server
 
