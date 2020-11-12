@@ -3,17 +3,15 @@
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
-ESPHap is an Arduino library to natively implement Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges.
+ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports ESP32 and ESP8266.
 
-ESPHap currently supports ESP32 and ESP8266.
+Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices, but once paired, devices work well and stable.
 
-Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, hovewer it can be maximum 3 attempts (in my experience) and after that everything working fine. I'd say that after pairing (once operation) devices works well and stable
+ESPHap allows to setup up to 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board.
 
-Library allows to setup up to the 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board
+Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration which this project uses.
 
-Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration, this project uses this as well.
-
-Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) to give a hint for ESP8266 to stop watchdog and some functions with lower memory usage
+Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to stop the watchdog on ESP8266 and also on how to implement low memory usage functions. 
 
 # Short Build instruction
 
