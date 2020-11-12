@@ -277,7 +277,7 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 
 ### Advanced features
 
-- Built-in web server
+#### Built-in web server
 
 Since version 1.0.2, library contains submodule for built-in web server. To use it you need
 
@@ -294,7 +294,7 @@ in the setup function
 
 set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
-- Setup by QR Code
+#### Setup by QR Code
 
 If you use built-in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
