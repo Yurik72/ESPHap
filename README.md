@@ -74,7 +74,7 @@ Those examples can be used to handle other device like relays, which supports tw
 Example folders contains 3 sketches for the Sonoff devices. 
 
 - [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
-- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built in web portal and file manager 
+- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built-in web portal and file manager 
 - [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
 As mentioned ESP8266 in the process of testing (Sonoff is ESP8265)
@@ -89,7 +89,7 @@ Example folders contains sketch for [Advanced LED](https://github.com/Yurik72/ES
 This is sketch compatible with both ESP32 & ESP8266, handles LED Switching On/Off, LED brightness and contains advanced features:
 
 - Built-in web site
-- Built in web file manager
+- Built-in web file manager
 - OTA
 - Setup/pairing via QR Code (to access QR code you need enter http://\<IP ADDRESS\>/setup.html)
 
@@ -112,7 +112,7 @@ Those sketch as well includes advanced features: Web File Manager, OTA, Simple w
 
 Build instruction the same as for sketches above.
 
-## RGB Strip (WS2812) & Motion example
+## RGB Strip (WS2812) & motion example
 
 Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 LED strip.
 Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
@@ -149,9 +149,9 @@ Those sketch as well includes advanced features:
 
 Build instruction the same as for sketches above.
 
-## FAN servicer example
+## Fan servicer example
 
-Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple FAN icon. You are able to control FAN characteristic such as 
+Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple fan icon. You are able to control fan characteristic such as 
 
 - On/Off
 - Speed
@@ -172,21 +172,23 @@ Build instruction the same as for sketches above.
 #ifdef ESP32
 #include <SPIFFS.h>
 #endif
+
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
-
 #include <ESP8266mDNS.h>
 #include "coredecls.h"
 #endif
+
 extern "C"{
 #include "homeintegration.h"
 }
+
 #ifdef ESP8266
 #include "homekitintegrationcpp.h"
 #endif
+
 #include <hapfilestorage\hapfilestorage.hpp>
 ```
-
 
 2. In the setup you have to do following, instead of other 
 
@@ -276,9 +278,9 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 
 Advanced features
 
-- Built in web server
+- Built-in web server
 
-Since version 1.0.2, library contains submodule for built in web server. To use it you need
+Since version 1.0.2, library contains submodule for built-in web server. To use it you need
 
 Include header
 ```c
@@ -295,7 +297,7 @@ set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see ex
 
 - Setup by QR Code
 
-If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+If you use built-in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 # Versions history
 
