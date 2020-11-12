@@ -19,7 +19,7 @@ Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) to give a hint for ES
 1. Prepare Arduino enviropment to works with ESP32 and/or ESP8266.
 2. Install this libary (EspHap) from the library manager or clone sources to the Arduino library folder named EspHap.
 3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino Libraries folder named "wolfssl"
-4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 # wolfssl manual preparation
 
@@ -30,7 +30,7 @@ This section is describes more technical details for professional users if they 
 ## For ESP32
 
 ESP32 works well with wolfssl versions 4.2.0 and 3.13.0
-Full instruction how to prepare, can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
+Full instruction how to prepare, can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
 
 For simplify a process you can use [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content into Arduino Libraries folder named "wolfssl"
 
@@ -70,7 +70,7 @@ const int led_gpio = 4;
 
 This example does not generate a QR code for pairing, so please use manual pairing by entering password 111 11 111.
 
-More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+More detail instruction can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
 
 Those examples can be used to handle other device like relays, which supports two statuses ON/OFF.
 
@@ -85,7 +85,7 @@ Example folders contains 3 sketches for the Sonoff devices.
 
 - [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built in web portal and file manager 
 
-- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [there](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
+- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
 As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
 But example already works quite fine. Small problem detected during the pairing. But after that works well
@@ -111,12 +111,11 @@ This is basic demonstration of powerfull IOT device, which contains such feathur
 ## Thermostat example
 
 Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
-[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which shows on Apple Home two icons Temperature and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, 
-as well any other hardware can be easily implemented
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which shows on Apple Home two icons Temperature and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, as well any other hardware can be easily implemented
 Hovewer any sensor can be used with simple code changes...
 Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site. For the [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
 
-Build instruction the same as for sketches avove.
+Build instruction the same as for sketches above.
 
 ## Switch example
 
@@ -231,7 +230,7 @@ Set base information HostName, Manufacture, Serial number, Model,Firmware versio
   hap_initbase_accessory_service(HOSTNAME,"Yurik72","0","EspHapLed","1.0");
 ```
 
-Than you need a setup all accessories and their services and characteristic. Do not forgot that you already have one base accessory,therefore first we need a setup it. For instance for the lighBulb
+Than you need a setup all accessories and their services and characteristic. Do not forgot that you already have one base accessory, therefore first we need a setup it. For instance for the lighBulb
 ```c
   hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
 ```
@@ -246,8 +245,8 @@ Than you need a setup all accessories and their services and characteristic. Do 
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
 
-Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h) . Header is well documented and descibes services types and their characteristic)
-The list of Api to add services and accessories can be found there [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
+Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). Header is well documented and descibes services types and their characteristic)
+The list of Api to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
 
 When accessories, services and characteristic is defined we need to finally call
 ```c
@@ -274,7 +273,7 @@ void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *con
     digitalWrite(led_gpio, value.bool_value?HIGH:LOW);
 }
 ```
-optionally implement notify function, which is neccessary to inform Apple about device state changes . This is must for accessories like termostat , for instance for the LightBulb we can notify about power state On/Off , which is bool value true/false
+optionally implement notify function, which is neccessary to inform Apple about device state changes. This is must for accessories like termostat , for instance for the LightBulb we can notify about power state On/Off , which is bool value true/false
 ```c
 void notify_hap(){
 homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
@@ -330,17 +329,15 @@ If you use built in web server, by default it provides access to setup/pairing p
  ## v1.0.2
  
  - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
- 
  - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
- 
-- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http:// IPADDRESS / setup.html .
+- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http:// IPADDRESS / setup.html.
  
  ## v1.0.3
  
 - small bug fixes
 - new examples
  
-## Are you interesting to support this project ?
+## Support this project
 
 You can easilly do that by donations
 
