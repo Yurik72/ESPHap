@@ -275,7 +275,7 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 #endif
 ``` 
 
-###Advanced features
+### Advanced features
 
 - Built-in web server
 
