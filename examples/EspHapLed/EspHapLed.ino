@@ -1,5 +1,5 @@
 /*
-  ESPHap example EspHapLed
+  ESPHap example EspHapLed for ESP32
 
   This example for ESPHap shows how to control a LED
   with Apple Home app. It implements accessory type "light bulb".
