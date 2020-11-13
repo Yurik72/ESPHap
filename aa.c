@@ -1,2 +1,2 @@
-// to be shure that IDE will found wolfssl lib
+// to be shure that IDE will find wolfssl lib
 #include <wolfssl.h>
