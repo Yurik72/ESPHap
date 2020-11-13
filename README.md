@@ -52,17 +52,14 @@ EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples fo
 Before you compile your sketch you first need to:
 
 1. Change your Wifi settings by editing the following lines:
-
 ```c
 const char* ssid     = "WLAN SSID";
 const char* password = "WLAN password";
 ```
 2. Change your GPIO data pin for the connected LED
-
 ```c
 const int led_gpio = 4;
 ```
-
 This example does not generate a QR code for pairing, so please use manual pairing by entering password 111 11 111.
 
 More detail instruction can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
