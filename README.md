@@ -47,29 +47,28 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 # Code examples
 ## Simple example
 
-EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples for how to handle a simple LED connected to your board.
+The sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples for how to handle (switching on/off) a simple LED connected to your board.
 
 Before you compile your sketch you first need to:
 
-1. Change your Wifi settings by editing the following lines:
+1. Change your Wifi settings by editing these lines:
 ```c
 const char* ssid     = "WLAN SSID";
 const char* password = "WLAN password";
 ```
-2. Change your GPIO data pin for the connected LED
+2. Connect a LED to your board and change GPIO data pin
 ```c
 const int led_gpio = 4;
 ```
-This example does not generate a QR code for pairing, so please use manual pairing by entering password 111 11 111.
+This example does not implement any of the more sophisticated pairing options (like QR code), instead please choose manual pairing within your Apple Home app using the password 111 11 111.
 
-More detail instruction can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+More detailed instructions on how to pair HomeKit devices with you Home app can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
 
-Those examples can be used to handle other device like relays, which supports two statuses On/Off.
+These examples can be used to handle other device like relays which implement two statuses On/Off.
 
 ## Sonoff example
 
-Example folders contains 3 sketches for the Sonoff devices. 
-
+The example folders contains 3 sketches for Sonoff devices: 
 - [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
 - [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built-in web portal and file manager 
 - [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
