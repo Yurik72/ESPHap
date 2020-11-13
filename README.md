@@ -3,9 +3,9 @@
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
-ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports ESP32 and ESP8266.
+ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports both ESP32 and ESP8266.
 
-Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices, but once paired, devices work well and stable.
+Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices. Once paired, devices work well and stable though.
 
 ESPHap allows to implement up to 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board.
 
@@ -38,7 +38,7 @@ ESPHap for ESP8266 only works with wolfSSL 3.13.0.
 
 To simplify installation, ESPHap comes with a pre-configured and slightly patched versions of wolfSSL 3.13.0 which can be used out of the box. Extract [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) into an Arduino library folder named "wolfssl". **ESPHap ONLY works with the provided patched wolfSSL version.**
 
-### ESPHap library was tested in the following environments:
+### ESPHap was tested in the following environments:
 
 - ESP32 board library version 1.0.4
 - ESP8266 board library version 2.6.3
@@ -47,9 +47,9 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 # Code examples
 ## Simple example
 
-Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle LED status
+EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples for how to handle a simple LED connected to your board.
 
-Before actually compiling your sketch you first need to:
+Before you compile your sketch you first need to:
 
 1. Change your Wifi settings by editing the following lines:
 
