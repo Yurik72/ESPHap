@@ -60,11 +60,9 @@ const char* password = "WLAN password";
 ```c
 const int led_gpio = 4;
 ```
-This example does not implement any of the more sophisticated pairing options (like QR code), instead please choose manual pairing within your Apple Home app using the password 111 11 111.
+This example does not implement any of the more sophisticated pairing options (like QR code), instead please choose manual pairing within your Apple Home app using the password 111 11 111. More detailed instructions on how to pair HomeKit devices with you Home app can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
 
-More detailed instructions on how to pair HomeKit devices with you Home app can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
-
-These examples can be used to handle other device like relays which implement two statuses On/Off.
+These examples can be used to handle other device like relays which implement two statuses on/off.
 
 ## Sonoff example
 
