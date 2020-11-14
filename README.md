@@ -66,10 +66,10 @@ These examples can be used to handle other device like relays which implement tw
 
 ## Sonoff example
 
-The example folders contains 3 sketches for Sonoff devices: 
-- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
-- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device with built-in web portal and file manager 
-- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) sonoff B1 lamp , wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
+The example folder contains 3 sketches for Sonoff devices: 
+- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple Sonoff basic device 
+- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple Sonoff basic device with built-in web portal and file manager 
+- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) Sonoff B1 lamp, see wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
 As mentioned ESP8266 in the process of testing (Sonoff is ESP8265)
 But example already works quite fine. Small problem detected during the pairing. But after that works well
