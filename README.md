@@ -250,7 +250,7 @@ Every callback has the following parameters
  - value 
  - context (callback parameters)
  
-This callback function is invoked when the accessory's state is changed from within the Apple Home app. Based on the returned values, you may manage your device accordingly. Please check carefully which type (bool, int, float) must be used for the different characteristics.
+The callback function is invoked whenever the accessory's state is changed from within the Apple Home app. Based on the returned values, you may manage your device accordingly. Please check carefully which type (bool, int, float) must be used for the different characteristics.
 ```c
 void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context) {
     Serial.println("led_callback");
