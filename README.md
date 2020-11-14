@@ -236,7 +236,7 @@ Then you need to define all accessories, the services they provide and the chara
 
 The full list of all services and their characteristic can be found in the header file [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). This header file is well documented and descibes all service types and their characteristics.
 
-The API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
+The API to add services and accessories is documented in the header file  [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
 
 Once all accessories, services and characteristics are defined, we need to call
 ```c
