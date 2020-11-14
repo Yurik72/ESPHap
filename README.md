@@ -214,22 +214,22 @@ Set at least one base accessory type:
 ```c
  hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
 ```
-The full list of availbale accessory types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t). 
+The full list of availbale device types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
 
-Set base information HostName, Manufacture, Serial number, Model,Firmware version , like this
+Set the base information for your device like hostname, manufacturer, serial number, model, firmware version:
 ```c
   hap_initbase_accessory_service(HOSTNAME,"Yurik72","0","EspHapLed","1.0");
 ```
 
-Than you need a setup all accessories and their services and characteristic. Do not forgot that you already have one base accessory, therefore first we need a setup it. For instance for the lighBulb
+Then you need to define asll accessories, the services they provide and the characteristics of these services. Do not forgot that you already have one base accessory, therefore you need to define a setup for this one, too. For example for a lightbulb you would need
 ```c
   hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
 - "LED" is the name of accessory 
-- led_callback is callback function called from the Apple Home app when changes 
-- `(void*)&led_gpio` is callback parameter
+- led_callback is the name of the callback function which is called from  Apple Home app whenever a change occurs
+- `(void*)&led_gpio` is the callback parameter
  
- After that we can add more accessories like this
+ After that you can add more accessories like this
  ```c
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
