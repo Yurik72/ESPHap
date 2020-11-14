@@ -100,7 +100,7 @@ The [Universal Thermostat sketch](https://github.com/Yurik72/ESPHap/tree/master/
 
 ## Switch example
 
-The example folder contains the sketch [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which implements a simple switch within the Apple Home app. The sketches work both for ESP32 and ESP8266 and could for example be used to control a relay.
+The example folder contains the sketch [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which implements a simple switch within the Apple Home app. The sketch works both for ESP32 and ESP8266 and could for example be used to control a relay.
 
 Those sketch as well includes advanced features: 
 - Web File Manager
