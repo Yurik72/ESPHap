@@ -210,11 +210,11 @@ Initialize the file storage to store pairing information (any filename will do)
 ```
 It is up to you how to store device pairing information, the sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contain code examples to demonstrate custom implementations.
 
-Set base accessory type, means you will have at least one accessory and you need define a type
+Set at least one base accessory type:
 ```c
  hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
 ```
-full list of availbale accessories you can find in the [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) , see enum homekit_accessory_category_t
+The full list of availbale accessory types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
 
 Set base information HostName, Manufacture, Serial number, Model,Firmware version , like this
 ```c
