@@ -238,7 +238,7 @@ A full list of services and their characteristic can be found in the header file
 
 The API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
 
-Once all accessories, services and characteristics are defined we need to call
+Once all accessories, services and characteristics are defined, we need to call
 ```c
 hap_init_homekit_server();
 ```
@@ -281,18 +281,18 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
 ### Advanced features
 
 #### Built-in web server
-Since version 1.0.2, library contains submodule for built-in web server. To use it you need include header
+Since version 1.0.2, the ESPHap library contains a submodule for a built-in web server. To use it, you need include the corresponding header file
 ```c
 #include <hapweb/hap_webserver.hpp>
 ``` 
-call 
+Within the setup section, include  
 ```c
 set_indexhml(FPSTR(INDEX_HTML)); // optional if you want to have your own root page
 hap_webserver_begin();
 ``` 
-in the setup function
 
-set_indexhml(FPSTR(INDEX_HTML)); allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+
+``set_indexhml(FPSTR(INDEX_HTML))`` allows to define your root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
 
 #### Setup by QR Code
 If you use built-in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://\<IP address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
