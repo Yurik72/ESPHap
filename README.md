@@ -214,7 +214,7 @@ Set at least one base accessory type:
 ```c
  hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
 ```
-The full list of availbale device types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
+The full list of availbale device types can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
 
 Set the base information for your device like hostname, manufacturer, serial number, model, firmware version:
 ```c
@@ -234,15 +234,16 @@ Then you need to define all accessories, the services they provide and the chara
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
 
-Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). Header is well documented and descibes service types and their characteristics).
-The list of API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names.
+A full list of services and their characteristic can be found in the header file [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). This header file is well documented and descibes all service types and their characteristics.
 
-When accessories, services and characteristic is defined we need to finally call
+The API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
+
+Once all accessories, services and characteristics are defined we need to call
 ```c
 hap_init_homekit_server();
 ```
 
-3. Implement callback and notify function
+3. Implement callback and notify functions
 
 Every callback has the same signature and parameters
 
