@@ -214,7 +214,7 @@ Set at least one base accessory type:
 ```c
  hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
 ```
-The full list of availbale accessory types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
+The full list of availbale accessory types you can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t). 
 
 Set base information HostName, Manufacture, Serial number, Model,Firmware version , like this
 ```c
