@@ -45,7 +45,7 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - Arduino version 1.8.12
 
 # Code examples
-## Simple example
+## Simple LED example
 
 The sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples for how to handle (switching on/off) a simple LED connected to your board.
 
@@ -71,9 +71,7 @@ The example folder contains 3 sketches for Sonoff devices:
 - [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) Sonoff basic device with built-in web portal and file manager 
 - [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) Sonoff B1 lamp, see wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
-Sonoff is based on ESP8265 and the examples already work quite well. But still there some known problems especially during pairing phase.  
-
-Please have a look at the [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic).
+Sonoff is based on ESP8265 and the examples already work quite well. But still there some known problems especially during pairing phase. For more informations, please have a look at the [extended instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic).
 
 ## Advanced LED example (simple switch and dimmable)
 
@@ -90,12 +88,14 @@ This is basic demonstration of powerfull IOT device, which contains such feature
 
 ## Thermostat example
 
-Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
-[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which shows on Apple Home two icons Temperature and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, as well any other hardware can be easily implemented
-Hovewer any sensor can be used with simple code changes...
-Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site. For the [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
+The example folder contains the two sketches [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) and  
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work for ESP32 and ESP8266. The sketch uses Adafruits DHT sensor library and works with DHT sensors like BME28 or Dallas.
 
-Build instruction the same as for sketches above.
+The thermostat sketch also implement some more advanced features: 
+- Web File Manager
+- OTA
+- Simple web site 
+The [Universal Thermostat sktech](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) also sends historical data to [thingSpeak](https://thingspeak.com/).
 
 ## Switch example
 
