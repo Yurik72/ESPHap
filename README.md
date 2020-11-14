@@ -141,15 +141,15 @@ Build instructions are the same as for the sketches above.
 
 ## Air Quality Sensor example
 
-The example folders contains the sketch [Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which implements an Air Quality Sensor within Apple Home app.
+The example folder contains the sketch [Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which implements an Air Quality Sensor within Apple Home app.
 This sketch uses a MQ135 sensor and works both for ESP32 and ESP8266. The built-in web site displays historic data of the CO2 concentration. 
-You need to enter the appropriate calibrattion data for your sensor, for this purpose following line should be changed
+You need to enter the appropriate calibrattion data for your sensor, for this purpose the following line should be changed
 
 ```c
 const float factor=14.0; //to be calibrated with your MQ135
 ```
 
-Those sketch as well includes advanced features: 
+This sketch also implements some advanced features: 
 - Web File Manager
 - OTA
 - Simple web site
@@ -157,20 +157,20 @@ Those sketch as well includes advanced features:
 
 Build instructiona are the same as for the sketches above.
 
-## Fan servicer example
+## Fan Servicer example
 
-Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple fan icon. You are able to control fan characteristics such as 
+The example folder contains the sketch  [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which implements a fan within Apple Home app. You are able to control fan characteristics such as 
 
 - On/Off
 - Speed
 - Direction
 
-Those sketch as well includes advanced features: 
+This sketch also implements some advanced features: 
 - Web File Manager
 - OTA
-- Built-in web site
+- Simple web site
 
-Build instruction the same as for sketches above.
+Build instructions are the same as for the sketches above.
 
 # Library API and how to build your own sketch 
 
