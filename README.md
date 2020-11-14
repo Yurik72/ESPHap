@@ -89,14 +89,14 @@ This is basic demonstration of powerfull IOT device, which contains such feature
 ## Thermostat example
 
 The example folder contains the two sketches [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) and  
-[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work for ESP32 and ESP8266 and use Adafruit's DHT sensor library which works with DHT sensors like BME28 or Dallas.
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work for ESP32 and ESP8266 and use Adafruit's DHT and BME280 sensor libraries which work with many common DHT sensors.
 
 The thermostat sketch also implement some more advanced features: 
 - Web File Manager
 - OTA
 - Simple web site
 
-The [Universal Thermostat sktech](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) also sends historical data to [thingSpeak](https://thingspeak.com/).
+The [Universal Thermostat sketch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) also sends historical data to [thingSpeak](https://thingspeak.com/).
 
 ## Switch example
 
@@ -145,7 +145,7 @@ Build instruction the same as for sketches above.
 
 ## Fan servicer example
 
-Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple fan icon. You are able to control fan characteristic such as 
+Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple fan icon. You are able to control fan characteristics such as 
 
 - On/Off
 - Speed
