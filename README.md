@@ -122,11 +122,11 @@ The web site allows to demonstrate the bidirectional capabilities of Apple HomeK
 
 Any motion sensor can be used, the sketch simply checks for changes of the HIGH value of the predefined GPIO pin.
 
-The sketch drives a WS2812 RGB strip but other types should work in a similier way but you would have to figure our how to process color and brightness values received from the Home app or the built-in web site.
+The sketch drives a WS2812 RGB strip but other types should work in a similier way, but you would have to figure out how to process color and brightness values received from the Home app or the built-in web site with your specific RGB strip.
 
-The combination of a motion sensor along with a RGB strip (or a switch) is suited to demonstrate Apple Home Automation capabilities, based on the motion state the RGB strip can be configured to be switched on or off.
+The combination of a motion sensor along with a RGB strip (or a switch) is suited to demonstrate Apple Home Automation capabilities; based on the motion state, the RGB strip can be configured to be switched on or off.
 
-Build instructions the same as for sketches above.
+Build instructions are the same as for sketches above.
 
 ## Button example
 
