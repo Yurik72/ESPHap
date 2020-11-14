@@ -208,7 +208,7 @@ Initialize the file storage to store pairing information (any filename will do)
 ```c
  init_hap_storage("/pair.dat");
 ```
-Hovewer you can handle your function how to keep your pairing information examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contains code to show custom implementation.
+It is up to you how to store device pairing information, the sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contain code examples to demonstrate custom implementations.
 
 Set base accessory type, means you will have at least one accessory and you need define a type
 ```c
