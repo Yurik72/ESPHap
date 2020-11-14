@@ -257,10 +257,10 @@ void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *con
     digitalWrite(led_gpio, value.bool_value?HIGH:LOW);
 }
 ```
-Optionally, you may also implement notify functions which are used to inform the Apple Home app about device state changes. This is must for accessories like thermostat and for a lightbulb we could notify the app about power state (on/off, represented in the bool value true/false).
+Optionally, you may also implement notify functions which are used to inform the Apple Home app about device state changes. This is a must for accessories like thermostat and for a lightbulb we could notify the app about power state (on/off, represented in the bool value true/false).
 
-To retrieve characteristic, the API function ``homekit_service_characteristic_by_type`` should be used. 
-First parameter is pointer to the hapservice (from the setup), second is characteristic type. 
+To retrieve characteristics, the API function ``homekit_service_characteristic_by_type`` should be used. 
+The first parameter is a pointer to the hapservice (from the setup), the second parameter is the characteristic type. 
 
 ```c
 void notify_hap(){
@@ -291,7 +291,6 @@ Within the setup section, include
 set_indexhml(FPSTR(INDEX_HTML)); // optional if you want to have your own root page
 hap_webserver_begin();
 ``` 
-
 
 ``set_indexhml(FPSTR(INDEX_HTML))`` allows to define your own root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed).
 
