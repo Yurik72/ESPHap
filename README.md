@@ -126,21 +126,24 @@ The sketch drives a WS2812 RGB strip but other types should work in a similier w
 
 The combination of a motion sensor along with a RGB strip (or a switch) is suited to demonstrate Apple Home Automation capabilities; based on the motion state, the RGB strip can be configured to be switched on or off.
 
-Build instructions are the same as for sketches above.
+Build instructions are the same as for the sketches above.
 
 ## Button example
 
-Example folders contains sketch for [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which shows on Apple simple Button icon. There is universal sketch applicable for ESP32 and ESP8266 (Testing in progress on ESP8266) and any Button scenarios on Apple can be used to manage automation.
+The example folder contains the sketch [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which implements a button within the Apple Home app. This is a universal sketch applicable for ESP32 and ESP8266 (still in beta) and can be used to create Apple Home Automation scenarios within your Apple Home app.
 
-Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site.
+This sketch also implements some advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
 
-Build instruction the same as for sketches above.
+Build instructions are the same as for the sketches above.
 
-## Air Quality sensor example
+## Air Quality Sensor example
 
-Example folders contains sketch for [ Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which shows on Apple Air quality Sensor icon.
-Sketch is designed with usage for MQ135 sensor. There is universal sketch applicable for ESP32 and ESP8266. Main advantage that build-in web site shows history trends of PPM level of dioxide. 
-Code is contains comments and one of the important thing for this sketch is calibration based on your real sensor, for this purpose following line should be changed
+The example folders contains the sketch [Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which implements an Air Quality Sensor within Apple Home app.
+The Sketch uses a MQ135 sensor. This is universal sketch for ESP32 and ESP8266. The built-in web site displays historic data of the CO2 concentration. 
+You need to enter the appropriate calibrattion data for your sensor, for this purpose following line should be changed
 
 ```c
 const float factor=14.0; //to be calibrated with your MQ135
@@ -149,10 +152,10 @@ const float factor=14.0; //to be calibrated with your MQ135
 Those sketch as well includes advanced features: 
 - Web File Manager
 - OTA
-- Built-in web site
+- Simple web site
 - Sending data to ThingSpeak
 
-Build instruction the same as for sketches above.
+Build instructiona are the same as for the sketches above.
 
 ## Fan servicer example
 
