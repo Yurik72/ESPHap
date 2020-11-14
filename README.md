@@ -157,7 +157,7 @@ This sketch also implements some advanced features:
 
 Build instructiona are the same as for the sketches above.
 
-## Fan Servicer example
+## Fan example
 
 The example folder contains the sketch  [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which implements a fan within Apple Home app. You are able to control fan characteristics such as 
 
