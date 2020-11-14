@@ -89,7 +89,7 @@ This is basic demonstration of powerfull IOT device, which contains such feature
 ## Thermostat example
 
 The example folder contains the two sketches [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) and  
-[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work for ESP32 and ESP8266. The sketch uses Adafruits DHT sensor library and works with DHT sensors like BME28 or Dallas.
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work for ESP32 and ESP8266 and use Adafruit's DHT sensor library which works with DHT sensors like BME28 or Dallas.
 
 The thermostat sketch also implement some more advanced features: 
 - Web File Manager
