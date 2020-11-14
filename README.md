@@ -142,7 +142,7 @@ Build instructions are the same as for the sketches above.
 ## Air Quality Sensor example
 
 The example folders contains the sketch [Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which implements an Air Quality Sensor within Apple Home app.
-The Sketch uses a MQ135 sensor. This is universal sketch for ESP32 and ESP8266. The built-in web site displays historic data of the CO2 concentration. 
+This sketch uses a MQ135 sensor and works both for ESP32 and ESP8266. The built-in web site displays historic data of the CO2 concentration. 
 You need to enter the appropriate calibrattion data for your sensor, for this purpose following line should be changed
 
 ```c
