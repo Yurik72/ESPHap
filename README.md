@@ -109,24 +109,24 @@ This sketch also implements some advanced features:
 
 Build instructions are the same as for sketches above.
 
-## RGB Strip (WS2812) & motion example
+## RGB Strip (WS2812) & motion sensor example
 
-The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements both a RGB bulb and a motion sensor within the Apple Home app. The sketch works both for ESP32 and ESP8266 and was used to control a WS2812 LED strip.
+The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements both a RGB bulb and a motion sensor within the Apple Home app. The sketch works both for ESP32 and ESP8266 and was used to control a WS2812 LED strip via an attached motion sensor (HC-SR501 in this example).
 
 This sketch also implements some advanced features: 
 - Web File Manager
 - OTA
 - Simple web site
 
-The web site allows to demonstrate two direction for Apple HomeKit. 
+The web site allows to demonstrate the bidirectional capabilities of Apple HomeKit: whenever color, brightness or state of the RGB strip is changed from the built-in web site, Apple HomeKit refreshes the corresponding values or state within the Apple Home app.
 
-Means when RGB (color, brightness and state ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
-For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
-As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple Home app.
+Any motion sensor can be used, the sketch simply checks for changes of the HIGH value of the predefined GPIO pin.
 
-Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched On/Off...
+The sketch drives a WS2812 RGB strip but other types should work in a similier way but you would have to figure our how to process color and brightness values received from the Home app or the built-in web site.
 
-Build instruction the same as for sketches above.
+The combination of a motion sensor along with a RGB strip (or a switch) is suited to demonstrate Apple Home Automation capabilities, based on the motion state the RGB strip can be configured to be switched on or off.
+
+Build instructions the same as for sketches above.
 
 ## Button example
 

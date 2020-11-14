@@ -29,9 +29,9 @@ WebServer server(80);
 #include "spiffs_webserver.h"
 bool isWebserver_started=false;
 
-const int motion_pin=17;
+const int motion_pin=17;  //GPIO pin where the motion sensor is attached to
 
-#include <WiFiManager.h>        //https://github.com/tzapu/WiFiManager
+#include <WiFiManager.h>  //https://github.com/tzapu/WiFiManager
 #include <WS2812FX.h>  //https://github.com/kitesurfer1404/WS2812FX
 
 #define RGB_LED_COUNT 8 //adopt for your project
@@ -229,6 +229,7 @@ void notifyRGB(){
 void handleGetVal(){
     server.send(200, FPSTR(TEXT_PLAIN), DeviceData.IsOn ?"1":"0");
 }
+
 void handleSetVal(){
   if (server.args() !=2){
     server.send(505, FPSTR(TEXT_PLAIN), "Bad args");
