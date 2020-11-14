@@ -226,7 +226,7 @@ Then you need to define all accessories, the services they provide and the chara
   hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
 - "LED" is the name of accessory 
-- led_callback is the name of the callback function which is called from  Apple Home app whenever a change occurs
+- `led_callback` is the name of the callback function which is called from  Apple Home app whenever a change occurs
 - `(void*)&led_gpio` is the callback parameter
  
  After that you can add more accessories like this
@@ -234,7 +234,7 @@ Then you need to define all accessories, the services they provide and the chara
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
 
-A full list of services and their characteristic can be found in the header file [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). This header file is well documented and descibes all service types and their characteristics.
+The full list of all services and their characteristic can be found in the header file [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). This header file is well documented and descibes all service types and their characteristics.
 
 The API to add services and accessories can be found here [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
 
@@ -245,29 +245,29 @@ hap_init_homekit_server();
 
 3. Implement callback and notify functions
 
-Every callback has the same signature and parameters
-
+Every callback has the following parameters
  - characteristic
  - value 
  - context (callback parameters)
  
-This function is called when accessories state is changed from the Apple. You can manage your devices there, based on the value.
-Please check which type (bool, int, float ) must be used for different characteristic
+This callback function is invoked when the accessorie's state is changed from within the Apple Home app. Based on the returned values, you may manage your device accordingly. Please check which type (bool, int, float) must be used for the different characteristics
 ```c
 void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context) {
     Serial.println("led_callback");
     digitalWrite(led_gpio, value.bool_value?HIGH:LOW);
 }
 ```
-optionally implement notify function, which is neccessary to inform Apple about device state changes. This is must for accessories like termostat, for instance for the LightBulb we can notify about power state On/Off, which is bool value true/false
+Optionally, you may also implement notify functions which are used to inform the Apple Home app about device state changes. This is must for accessories like thermostat and for a lightbulb we could notify the app about power state (on/off, represented in the bool value true/false).
+
+To retrieve characteristic, the API function ``homekit_service_characteristic_by_type`` should be used. 
+First parameter is pointer to the hapservice (from the setup), second is characteristic type. 
+
 ```c
 void notify_hap(){
 homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
  HAP_NOTIFY_CHANGES(bool, ch, <new bool value>, 0)
  }
  ```
-To retrieve characteristic, the API function ``homekit_service_characteristic_by_type`` should be used. 
-First parameter is pointer to the hapservice (from the setup), second is characteristic type. 
  
 4. Main loop function
 
