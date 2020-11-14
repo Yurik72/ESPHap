@@ -77,7 +77,7 @@ Sonoff is based on ESP8265 and the examples already work quite well. But still t
 
 Example folders contains sketch for [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
  and [Advanced dimmable LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
-This is sketch compatible with both ESP32 & ESP8266, handles LED Switching On/Off, LED brightness and contains advanced features:
+This is sketch compatible with both ESP32 & ESP8266, handles LED Switching on/off, LED brightness and contains advanced features:
 
 - Built-in web site
 - Built-in web file manager
@@ -102,7 +102,7 @@ The [Universal Thermostat sketch](https://github.com/Yurik72/ESPHap/tree/master/
 
 The example folder contains the sketch [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which implements a simple switch within the Apple Home app. The sketch works both for ESP32 and ESP8266 and could for example be used to control a relay.
 
-Those sketch as well includes advanced features: 
+This sketch also implements some advanced features: 
 - Web File Manager
 - OTA
 - Simple web site
@@ -111,8 +111,16 @@ Build instructions are the same as for sketches above.
 
 ## RGB Strip (WS2812) & motion example
 
-Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 LED strip.
-Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site and allows to demonstrate two direction for the Apple HomeKit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
+The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements both a RGB bulb and a motion sensor within the Apple Home app. The sketch works both for ESP32 and ESP8266 and was used to control a WS2812 LED strip.
+
+This sketch also implements some advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
+
+The web site allows to demonstrate two direction for Apple HomeKit. 
+
+Means when RGB (color, brightness and state ) is changed from the built-in web site, Apple HomeKit refreshes the RGB bulb state.
 For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
 As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple Home app.
 
