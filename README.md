@@ -94,7 +94,8 @@ The example folder contains the two sketches [Thermostat DHT](https://github.com
 The thermostat sketch also implement some more advanced features: 
 - Web File Manager
 - OTA
-- Simple web site 
+- Simple web site
+
 The [Universal Thermostat sktech](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) also sends historical data to [thingSpeak](https://thingspeak.com/).
 
 ## Switch example
