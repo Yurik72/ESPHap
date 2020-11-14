@@ -298,20 +298,20 @@ hap_webserver_begin();
 If you use the built-in web server, by default it provides access to a setup/pairing page/image by QR code which can be accessed by visiting http://\<Your Device IP Address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed).
 
 # Versions history
- ## v1.0
- - First success version works both with ESP32 and ESP8266
- 
- ## v1.0.1
- - Minor bug fixes and more examples
- 
- ## v1.0.2
- - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
- - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
-- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://\<IPADDRESS\>/setup.html.
- 
 ## v1.0.3
 - small bug fixes
 - new examples
+
+## v1.0.2
+ - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
+ - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
+- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://\<IPADDRESS\>/setup.html.
+
+## v1.0.1
+ - Minor bug fixes and more examples
+
+## v1.0
+ - First success version works both with ESP32 and ESP8266
  
 ## Support this project
 You can support the development of this project by donating to it
