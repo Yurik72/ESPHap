@@ -100,11 +100,14 @@ The [Universal Thermostat sketch](https://github.com/Yurik72/ESPHap/tree/master/
 
 ## Switch example
 
-Example folders contains sketch for [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which shows on Apple simple Switch icon. There is universal sketch applicable for ESP32 and ESP8266 and any relay can be used to manage external devices.
+The example folder contains the sketch [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which implements a simple switch within the Apple Home app. The sketches work both for ESP32 and ESP8266 and could for example be used to control a relay.
 
-Those sketch as well includes advanced features: Web File Manager, OTA, Simple web site.
+Those sketch as well includes advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
 
-Build instruction the same as for sketches above.
+Build instructions are the same as for sketches above.
 
 ## RGB Strip (WS2812) & motion example
 
