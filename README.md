@@ -267,9 +267,10 @@ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice
  }
  ```
 To retrieve characteristic, the API function ``homekit_service_characteristic_by_type`` should be used. 
-First parameter is pointer to the hapservice (from the setup), second is characteristic type
+First parameter is pointer to the hapservice (from the setup), second is characteristic type.
  
 4. Loop function
+
 In the main loop and **only for ESP8266** we have to add
  
 ```c
