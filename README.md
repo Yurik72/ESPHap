@@ -314,7 +314,7 @@ If you use the built-in web server, by default it provides access to a setup/pai
 - new examples
  
 ## Support this project
-You can easilly do that by donating
+You can support the development of this project by donating
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JVZWJ6FSMURSL&currency_code=USD&source=url)
 
