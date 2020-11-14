@@ -221,7 +221,7 @@ Set the base information for your device like hostname, manufacturer, serial num
   hap_initbase_accessory_service(HOSTNAME,"Yurik72","0","EspHapLed","1.0");
 ```
 
-Then you need to define asll accessories, the services they provide and the characteristics of these services. Do not forgot that you already have one base accessory, therefore you need to define a setup for this one, too. For example for a lightbulb you would need
+Then you need to define all accessories, the services they provide and the characteristics of these services. Do not forgot that you already have one base accessory, therefore you need to define a setup for this one, too. For example for a lightbulb you would need
 ```c
   hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
