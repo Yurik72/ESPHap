@@ -111,7 +111,7 @@ Build instructions are the same as for sketches above.
 
 ## RGB Strip (WS2812) & motion sensor example
 
-The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements both a RGB bulb and a motion sensor within the Apple Home app. The sketch works both for ESP32 and ESP8266 and was used to control a WS2812 LED strip via an attached motion sensor (HC-SR501 in this example).
+The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements a RGB bulb and a motion sensor within the Apple Home app. The sketch works for ESP32 and ESP8266 and is used to control a WS2812 LED strip via an attached motion sensor (HC-SR501 in this example).
 
 This sketch also implements some advanced features: 
 - Web File Manager
