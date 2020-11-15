@@ -1,7 +1,4 @@
-
-
 #include <Arduino.h>
-
 
 #ifdef ESP32
 #include <SPIFFS.h>
@@ -33,15 +30,13 @@ bool isWebserver_started=false;
 
 #include "DHT.h"   //https://github.com/adafruit/DHT-sensor-library
 #define DHT11_PIN 4
-DHT DHT(DHT11_PIN,DHT11);
 
+DHT DHT(DHT11_PIN,DHT11);
 
 const char* ssid     = "ssid";
 const char* password = "pwd";
 
 const int identity_led=2;
-
-
 
 extern "C"{
 #include "homeintegration.h"
@@ -50,12 +45,10 @@ extern "C"{
 #include "homekitintegrationcpp.h"
 #endif
 
-
 String pair_file_name="/pair.dat";
 
 homekit_service_t* temperature=NULL;
 homekit_service_t* humidity=NULL;  
-
 
 #define DHT_READ_PERIOD_MS 5000
 
@@ -86,7 +79,6 @@ void setup() {
      }
 #endif
 
-
     Serial.println(ssid);
 #ifdef ESP8266
   WiFi.mode(WIFI_STA);
@@ -113,7 +105,6 @@ DHT.begin();
     Serial.print("Free heap: ");
     Serial.println(system_get_free_heap_size());
 
-  
     init_hap_storage();
   
     set_callback_storage_change(storage_changed);
@@ -123,19 +114,18 @@ DHT.begin();
     hap_setbase_accessorytype(homekit_accessory_category_thermostat);
     /// init base properties
     hap_initbase_accessory_service("ES","Yurik72","0","EspHapLed","1.0");
- 
-    
     // for base accessory registering temperature
     temperature = hap_add_temperature_service("Temperature");
     // Adding second accessory for humidity
-    humidity=hap_add_hum_as_accessory(homekit_accessory_category_thermostat ,"Humidity");
+    humidity = hap_add_hum_as_accessory(homekit_accessory_category_thermostat ,"Humidity");
    
    //and finally init HAP
    
-   
 hap_init_homekit_server();
+
 String strIp=String(WiFi.localIP()[0]) + String(".") + String(WiFi.localIP()[1]) + String(".") +  String(WiFi.localIP()[2]) + String(".") +  String(WiFi.localIP()[3]); 
- //setup web server
+
+//setup web server
 #ifdef ESP8266      
    if(hap_homekit_is_paired()){
 #endif
@@ -155,15 +145,16 @@ String strIp=String(WiFi.localIP()[0]) + String(".") + String(WiFi.localIP()[1])
   }
 #endif   
 }
+
 void handleGetVal(){
   if(server.arg("var") == "temp")
     server.send(200, FPSTR(TEXT_PLAIN),String(DeviceData.temp));
   else if(server.arg("var") == "hum")
      server.send(200, FPSTR(TEXT_PLAIN),String(DeviceData.hum));
   else
-    server.send(505, FPSTR(TEXT_PLAIN),"Bad args");  
-     
+    server.send(505, FPSTR(TEXT_PLAIN),"Bad args");      
 }
+
 void handleSetVal(){
   if (server.args() !=2){
     server.send(505, FPSTR(TEXT_PLAIN), "Bad args");
@@ -171,29 +162,25 @@ void handleSetVal(){
   }
   //to do analyze
   if(server.arg("var") == "ch1"){
-  }
-
-
-     
+  }     
 }
+
 void loop() {
  if(DeviceData.next_read_dht_ms<=millis()){
     readDHT();
     notify_hap();
     DeviceData.next_read_dht_ms=millis()+DHT_READ_PERIOD_MS;
  }
+
 #ifdef ESP8266
   hap_homekit_loop();
 #endif
  if(isWebserver_started)
     server.handleClient();
-
 }
 
 void init_hap_storage(){
-  Serial.print("init_hap_storage");
- 
-    
+  Serial.print("init_hap_storage");  
   File fsDAT=SPIFFS.open(pair_file_name, "r");
  if(!fsDAT){
    Serial.println("Failed to read pair.dat");
@@ -208,12 +195,9 @@ void init_hap_storage(){
   hap_init_storage_ex(buf,size);
   fsDAT.close();
   delete []buf;
-
 }
+
 void storage_changed(char * szstorage,int bufsize){
-
-
-
   SPIFFS.remove(pair_file_name);
   File fsDAT=SPIFFS.open(pair_file_name, "w+");
   if(!fsDAT){
@@ -226,7 +210,6 @@ void storage_changed(char * szstorage,int bufsize){
 }
 
 void notify_hap(){
-
  if(temperature){
   homekit_characteristic_t * ch_temp= homekit_service_characteristic_by_type(temperature, HOMEKIT_CHARACTERISTIC_CURRENT_TEMPERATURE);
   if(ch_temp && !isnan(DeviceData.temp) &&  ch_temp->value.float_value!=DeviceData.temp ){
@@ -243,7 +226,6 @@ if(humidity){
 }
 }
 
-
 void readDHT(){
   DeviceData.temp= DHT.readTemperature();
   DeviceData.hum = DHT.readHumidity();
@@ -256,5 +238,4 @@ void readDHT(){
       Serial.println("Set default hum 50");
      DeviceData.hum=50.0;
   }
-  
 }

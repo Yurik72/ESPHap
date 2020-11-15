@@ -1,4 +1,3 @@
-
 #define ENABLE_OTA  //if OTA need
 #define SENSOR_TYPE_DHT  
 //#define SENSOR_TYPE_BME280
@@ -9,7 +8,6 @@ const char* ssid     = "ssid";
 const char* password = "pwd";
 
 #include <Arduino.h>
-
 
 #ifdef ESP32
 #include <SPIFFS.h>
@@ -62,8 +60,6 @@ Adafruit_BME280 BME;  //I2C
 OneWire  OW(DALLAS_PIN);
 DallasTemperature DALLAS(&OW);
 #endif
-
-
 
 const int identity_led=2;
 

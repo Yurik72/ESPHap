@@ -1,10 +1,5 @@
-
-
 #include <Arduino.h>
 
-
-
-//#include <FS.h>
 #ifdef ESP32
 #include <SPIFFS.h>
 #endif
@@ -19,7 +14,7 @@
 #define ENABLE_OTA  //if OTA need
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
- ESP8266WebServer server(80);
+ESP8266WebServer server(80);
 #endif
 
 #ifdef ESP32
@@ -34,22 +29,15 @@ WebServer server(80);
 #include "spiffs_webserver.h"
 bool isWebserver_started=false;
 
+const int motion_pin=17;  //GPIO pin where the motion sensor is attached to
 
-
-
-const int motion_pin=17;
-
-#include <WiFiManager.h>        //https://github.com/tzapu/WiFiManager
+#include <WiFiManager.h>  //https://github.com/tzapu/WiFiManager
 #include <WS2812FX.h>  //https://github.com/kitesurfer1404/WS2812FX
 
-#define RGB_LED_COUNT 8
-#define RGB_LED_PIN 23
+#define RGB_LED_COUNT 8 //adopt for your project
+#define RGB_LED_PIN 23 //adopt for your project
+
 WS2812FX ws2812fx = WS2812FX(RGB_LED_COUNT, RGB_LED_PIN, NEO_GRB + NEO_KHZ800);
-
-
-
-
-
 
 const char* HOSTNAME="ES";
 const char* ssid     = "ssid";
@@ -66,7 +54,6 @@ extern "C"{
 #define REDVALUE(x) ((x >> 16) & 0xFF)
 #define GREENVALUE(x)  ((x >> 8) & 0xFF)
 #define BLUEVALUE(x) ((x >> 0) & 0xFF)
-
 #define MOTION_CHECK_PERIOD 100
 struct device_data_t{
   bool IsOn=true;
@@ -92,20 +79,17 @@ homekit_characteristic_t * hap_br={0};
 homekit_characteristic_t * hap_hue={0};
 homekit_characteristic_t * hap_saturation={0};
 
-String pair_file_name="/pair.dat";
-
-
+String pair_file_name="/pair.dat"; //store pairing information in this file
 
 void lamp_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context);
+
 //Web server section
 #define ENABLE_OTA  //if OTA need
 
 #include "spiffs_webserver.h"
 
-
 bool getRelayVal(){
   if(hapservice){
-
       homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
       if(ch){
         return ch->value.bool_value;
@@ -120,9 +104,8 @@ void setup() {
  #endif 
   Serial.begin(115200);
     delay(10);
-
     // We start by connecting to a WiFi network
-  set_strip();
+    set_strip();
 #ifdef ESP32
      if (!SPIFFS.begin(true)) {
       // Serial.print("SPIFFS Mount failed");
@@ -133,24 +116,14 @@ void setup() {
       Serial.print("SPIFFS Mount failed");
      }
 #endif
-
-
-
-
-
-
   
 ///setup identity gpio
    
-
-
-    //this is for custom storaage usage
+    //this is for custom storage usage
     // In given example we are using \pair.dat   file in our spiffs system
     //see implementation below
     Serial.print("Free heap: ");
     Serial.println(system_get_free_heap_size());
-
-
 
 /// Setting RGB WS2812
   ws2812fx.init();
@@ -159,7 +132,6 @@ void setup() {
 
 //Setting Motion
     pinMode(motion_pin, INPUT);
-
     
     init_hap_storage();
   
@@ -168,6 +140,7 @@ void setup() {
     /// We will use for this example only one accessory (possible to use a several on the same esp)
     //Our accessory type is light bulb , apple interface will proper show that
     hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
+
     /// init base properties
     hap_initbase_accessory_service(HOSTNAME,"Yurik72","0","EspHapLed","1.0");
    //we will add only one light bulb service and keep pointer for nest using
@@ -182,8 +155,6 @@ void setup() {
     hap_br->value.int_value=DeviceData.get_br_100();   // initial value
 //Adding Motion accessory
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
-
-
    
    startwifimanager();
    /*
@@ -197,24 +168,24 @@ void setup() {
     Serial.println(PSTR("WiFi connected"));
     Serial.println(PSTR("IP address: "));
     Serial.println(WiFi.localIP());
-    
-    hap_init_homekit_server();   
+    hap_init_homekit_server();
+
 #ifdef ESP8266
  if(hap_homekit_is_paired()){
 #endif
   Serial.println(PSTR("Setting web server"));
-    SETUP_FILEHANDLES
-     server.on("/get", handleGetVal);
-      server.on("/set", handleSetVal);   
-     server.begin(); 
-     isWebserver_started=true;
+  SETUP_FILEHANDLES
+  server.on("/get", handleGetVal);
+  server.on("/set", handleSetVal);   
+  server.begin(); 
+  isWebserver_started=true;
 #ifdef ESP8266
 }else
  Serial.println(PSTR("Web server is NOT SET, waiting for pairing"));
 #endif
-
 //notifyRGB();
 }
+
 void checkMotion(){
   bool motion = digitalRead(motion_pin)==HIGH;
  // Serial.println(String("Motion pin")+String(digitalRead(motion_pin)));
@@ -224,6 +195,7 @@ void checkMotion(){
     notifyMotion();
   }
 }
+
 void notifyMotion(){
   homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice_motion, HOMEKIT_CHARACTERISTIC_MOTION_DETECTED);
     if(ch){
@@ -234,6 +206,7 @@ void notifyMotion(){
       }
     }
 }
+
 void notifyRGB(){
   if(hap_on && hap_on->value.bool_value!=DeviceData.IsOn){
       hap_on->value.bool_value=DeviceData.IsOn;
@@ -251,11 +224,12 @@ void notifyRGB(){
       hap_saturation->value.float_value=DeviceData.Saturation;
       homekit_characteristic_notify(hap_saturation,hap_saturation->value);
     }
- 
 }
+
 void handleGetVal(){
     server.send(200, FPSTR(TEXT_PLAIN), DeviceData.IsOn ?"1":"0");
 }
+
 void handleSetVal(){
   if (server.args() !=2){
     server.send(505, FPSTR(TEXT_PLAIN), "Bad args");
@@ -271,7 +245,7 @@ void handleSetVal(){
       notifyRGB();
       isSucess=true;
     }
-     else  if(server.arg("var") == "br"){
+     else if(server.arg("var") == "br"){
       //Serial.println("Web Set Brigthness");
       DeviceData.set_br_100(server.arg("val").toInt());
       
@@ -279,7 +253,7 @@ void handleSetVal(){
       set_strip();
       isSucess=true;
       }
-    else  if(server.arg("var") == "col"){
+    else if(server.arg("var") == "col"){
       // Serial.println("Web Set Color");
       uint32_t color=server.arg("val").toInt();
       double Hue;
@@ -297,7 +271,8 @@ void handleSetVal(){
    else
         server.send(505, FPSTR(TEXT_PLAIN), "Bad args");
 }
-void loop() {
+
+void loop() { //main program loop
 
 #ifdef ESP8266
   hap_homekit_loop();
@@ -307,39 +282,34 @@ if(isWebserver_started)
     server.handleClient();
 
 ws2812fx.service();
- if(DeviceData.NextMotionCheck_ms<=millis()){
-  checkMotion();
+
+if(DeviceData.NextMotionCheck_ms<=millis()){
+    checkMotion();
     DeviceData.NextMotionCheck_ms=millis()+MOTION_CHECK_PERIOD;
  }
 }
 
 void init_hap_storage(){
   Serial.print("init_hap_storage");
- 
-    
   File fsDAT=SPIFFS.open(pair_file_name, "r");
   
  if(!fsDAT){
    Serial.println("Failed to read pair.dat");
    SPIFFS.format(); 
-   
  }
   int size=hap_get_storage_size_ex();
   char* buf=new char[size];
   memset(buf,0xff,size);
   if(fsDAT)
   fsDAT.readBytes(buf,size);
- 
+
   hap_init_storage_ex(buf,size);
   if(fsDAT)
     fsDAT.close();
   delete []buf;
-
 }
+
 void storage_changed(char * szstorage,int bufsize){
-
-
-
   SPIFFS.remove(pair_file_name);
   File fsDAT=SPIFFS.open(pair_file_name, "w+");
   if(!fsDAT){
@@ -347,14 +317,14 @@ void storage_changed(char * szstorage,int bufsize){
     return;
   }
   fsDAT.write((uint8_t*)szstorage, bufsize);
-
   fsDAT.close();
 }
-//can be used for any logic, it will automatically inform Apple about state changes
 
+//can be used for any logic, it will automatically inform Apple about state changes
 void motion_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context){
 //nothing to do
 }
+
 void lamp_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context) {
     Serial.println("lamp_callback");
      bool isSet=false;
@@ -369,7 +339,6 @@ void lamp_callback(homekit_characteristic_t *ch, homekit_value_t value, void *co
     }
     if(ch==hap_hue && ch->value.float_value!=DeviceData.Hue){
       DeviceData.Hue=ch->value.float_value;
-
       isSet=true;
     }
     if(ch==hap_saturation && ch->value.float_value!=DeviceData.Saturation){
@@ -382,15 +351,14 @@ void lamp_callback(homekit_characteristic_t *ch, homekit_value_t value, void *co
 
 void startwifimanager() {
   WiFiManager wifiManager;
-
 //  WiFi.onStationModeDisconnected(onWifiDisconnect);
 //  WiFi.onStationModeConnected(onWifiConnect);
-
   if (!wifiManager.autoConnect(HOSTNAME, NULL)) {
       ESP.restart();
       delay(1000);
    }
 }
+
 void set_strip(){
   if(DeviceData.IsOn){
     uint32_t color = HSVColor(DeviceData.Hue, DeviceData.Saturation/100.0, DeviceData.get_br_100()/100.0);
@@ -400,18 +368,17 @@ void set_strip(){
   else{
      ws2812fx.setBrightness(0);
   }
-  
    ws2812fx.trigger();
 }
 uint32_t Color(uint8_t r, uint8_t g, uint8_t b) {
   return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
 }
+
 // Convert Hue/Saturation/Brightness values to a packed 32-bit RBG color.
 // hue must be a float value between 0 and 360
 // saturation must be a float value between 0 and 1
 // brightness must be a float value between 0 and 1
-uint32_t  HSVColor(float h, float s, float v) {
-  
+uint32_t HSVColor(float h, float s, float v) {
   h = constrain(h, 0.0, 360.0);
   s = constrain(s, 0.0, 1.0);
   v = constrain(v, 0.0, 1.0);
@@ -444,8 +411,7 @@ uint32_t  HSVColor(float h, float s, float v) {
   }
 }
 
-void ColorToHSI(uint32_t rgbcolor, uint32_t brightness,  double &Hue, double &Saturation, double &Intensity)
-{
+void ColorToHSI(uint32_t rgbcolor, uint32_t brightness,  double &Hue, double &Saturation, double &Intensity) {
   uint32_t r = REDVALUE(rgbcolor);
   uint32_t g = GREENVALUE(rgbcolor);
   uint32_t b = BLUEVALUE(rgbcolor);
@@ -510,6 +476,5 @@ void ColorToHSI(uint32_t rgbcolor, uint32_t brightness,  double &Hue, double &Sa
   {
     Hue = -1;
   }
-
   return;
 }

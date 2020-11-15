@@ -1,215 +1,176 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)]
 
-
-
-
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
-This is a library for easily & efficiently integrating arduino projects based on ESP32/ESP8266 with Apple Home Kit by  native protocols 
-and without any additional bridges
+ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports both ESP32 and ESP8266.
 
-At this moment  ESP32 supported and tested well.
-ESP8266 is ported as well and under the testing stage. There are some minor bugs and especially in the pairing process. Not all of them finished smooth. Hovewer it can be maximum 3 attempts (in my experience) and after that everything working fine. I'd say that after pairing (once operation) devices works well and stable
+Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices. Once paired, devices work well and stable though.
 
-Library allows to setup up to the 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/)  on the same ESP32/ESP8266 board
+ESPHap allows to implement up to 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board.
 
-Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing fine libraries for native integration,
-this project uses this as well.
+Many thanks to [maximkulkin](https://github.com/maximkulkin) for providing some fine libraries for native integration and which are part of this project.
 
-Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao)  to give a hint for ESP8266 to stop watchdog and some functions with lower memory usage
+Many thanks to [Mixiaoxiao](https://github.com/Mixiaoxiao) for hinting on how to stop the watchdog on ESP8266 and also on how to implement low memory usage functions. 
 
-# Short Build instruction
+# Build instructions
 
-1. Prepare Arduino enviropment  to works with ESP32 and/or ESP8266.
+1. Prepare the Arduino IDE to work with ESP32 and/or ESP8266 (i.e. install the corresponding boards from within Arduino Board Manager).
+2. Install this libary (EspHap) from the Arduino IDE library manager or clone the sources into an Arduino library folder named "ESPHap".
+3. Extract the content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to a Arduino library folder named "wolfssl".
+4. Open any sketch from the provided examples and compile. Detailed instructions on how to upload and pair with Apple Home app can be found in the [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or on [instructables.com](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
 
-2. Install this libary (EspHap) from the library manager or clone sources to the Arduino library folder named EspHap.
+# Installing and configuring wolfSSL
 
-3. Extract the content of the [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  to the Arduino Libraries folder named "wolfssl"
-
-4. Open any sketch from the examples and compile it. Detailed instruction how to upload and pair with Apple can used from the  [Sonoff example](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic) or [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
-
-#  wolfssl manual preparation
-
-This section is describes more technical details for professional users if they have already wolfssl installed.
-[wolfssl](https://github.com/wolfSSL)    requires some preparation before usage...
-
+This project makes use of [wolfSSL](https://github.com/wolfSSL), an embedded, lightweight SSL library written in ANSI C and targeted for embedded systems like RTOS. wolfSSL needs to be slightly patched and this section describes some technical details for users who had already installed wolfSSL. 
 
 ## For ESP32
 
-ESP32 works well with  wolfssl versions 4.2.0 and 3.13.0
-Full instruction how to prepare, can be found [there](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html)
+ESPHap for ESP32 works well with wolfSSL versions 4.2.0 and 3.13.0. Full instruction on how to configure wolfSSL can be found [here](https://www.wolfssl.com/doxygen/md__Users_alexabrahamson_Work_wolfssl-CLEAN_IDE_ARDUINO_README.html).
 
-For simplify a process you can use  [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar)  or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) archive , which already prepared. You just need to extract this content  into Arduino Libraries folder named "wolfssl"
+To simplify installation, ESPHap comes with pre-configured versions of wolfSSL which can be used out of the box. Extract either [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) or [wolfssl.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL.rar) into an Arduino library folder named "wolfssl".
 
-If you are going to prepare this manually, please reuse/check settings.h and user_settings.h  from the attached archives
- You need copy/replace this files in wolfssl components.
+If you want to configure wolfSSL yourself, please use settings.h and user_settings.h from the provided preconfigured libraries as reference, you will need to edit these files according to your needs.
 
 ## For ESP8266
 
-ESP8266 works only with version 3.13.0.
+ESPHap for ESP8266 only works with wolfSSL 3.13.0.
 
-For preparation you should extract a content of [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) to the Arduino libraries folder named "wolfssl" .  Those version of wolfssl is slightly changed to work with ESP8266 and ONLY this sources must be used.
+To simplify installation, ESPHap comes with a pre-configured and slightly patched versions of wolfSSL 3.13.0 which can be used out of the box. Extract [wolfSSL_3_13_0.rar](https://github.com/Yurik72/ESPHap/blob/master/wolfssl/wolfSSL_3_13_0.rar) into an Arduino library folder named "wolfssl". **ESPHap ONLY works with the provided patched wolfSSL version.**
 
+### ESPHap was tested in the following environments:
 
+- ESP32 board library version 1.0.4
+- ESP8266 board library version 2.6.3
+- Arduino version 1.8.12
 
-### ESPHAP library was tested in the following enviropment:
+# Code examples
+## Simple LED example
 
-ESP32 board library  version 1.0.4
+The sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) are very basic examples for how to handle (switching on/off) a simple LED connected to your board.
 
-ESP8266 board library  version 2.6.3
+Before you compile your sketch you first need to:
 
-Arduino version 1.8.12
-
-# Getting help
-
-
-## Simple example
-
-Examples folder contains very simple examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) how to handle Led status
-
-Before compile you need:
-
-1.  Change your Wifi setting by the editing following lines:
-
+1. Change your Wifi settings by editing these lines:
 ```c
-const char* ssid     = "your ssid";
-const char* password = "pwd to ssid";
+const char* ssid     = "WLAN SSID";
+const char* password = "WLAN password";
 ```
-2. Change your GPIO, where Led is connected
-
+2. Connect a LED to your board and change GPIO data pin
 ```c
 const int led_gpio = 4;
 ```
-.
-At this example QR is not generated, so please use manual pairing by enetering password  11111111
+This example does not implement any of the more sophisticated pairing options (like QR code), instead please choose manual pairing within your Apple Home app using the password 111 11 111. More detailed instructions on how to pair HomeKit devices with you Home app can be found [here](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/).
 
-More detail instruction can be found [there](https://www.instructables.com/id/Arduino-With-ESP32-and-Native-Apple-HomeKit-Integr/)
+These examples can be used to handle other device like relays which implement two statuses on/off.
 
-Those examples can be used to handle other device like relays, which supports two statuses ON/OFF.
+## Sonoff examples
 
+The example folder contains 3 sketches for Sonoff devices: 
+- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) Sonoff basic device 
+- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) Sonoff basic device with built-in web portal and file manager 
+- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web) Sonoff B1 lamp, see wiki [here](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
 
+Sonoff is based on ESP8265 and the examples already work quite well. But still there some known problems especially during pairing phase. For more informations, please have a look at the [extended instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic).
 
+## Advanced LED example (simple switch and dimmable)
 
-## Sonoff example
-
-Example folders contains 3 sketches for the Sonoff devices. 
-
-- [Sonoff_basic](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic) simple sonoff basic device 
-
-- [Sonoff_basic Web](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_basic_web) simple sonoff basic device  with built in web portal and file manager 
-
-- [Sonoff_B1](https://github.com/Yurik72/ESPHap/tree/master/examples/Sonoff_B1_web)  sonoff B1 lamp , wiki [there](https://www.instructables.com/id/Sonoff-B1-With-Native-Apple-Home-Kit-Make-by-Ardui/)
-
-As mentioned ESP8266 in the process of testing (Sonoff is esp8265 )
-But example already works quite fine. Small problem detected during the pairing. But after that works well
-
-Please have a look [instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic)
-
-## Advanced Led example (simple switch and dimmable)
-
-Example folders contains sketch for [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
- and [Advanced dimmable led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
-This is sketch compatible with both ESP32 & ESP8266, handles Led Switching ON/OFF , LED brightness and contains advanced features:
+Example folders contains sketch for [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+ and [Advanced dimmable LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedDimmableLed)
+This is sketch compatible with both ESP32 & ESP8266, handles LED Switching on/off, LED brightness and contains advanced features:
 
 - Built-in web site
-
-- Built in web file manager
-
+- Built-in web file manager
 - OTA
+- Setup/pairing via QR Code (to access QR code you need enter http://\<IP ADDRESS\>/setup.html)
 
-- Setup/pairing via QR Code  (to access QR code you need enter http:// ipaddress /setup.html)
-
-This is basic demonstration of powerfull IOT device, which contains such feathures
+This is basic demonstration of powerfull IOT device, which contains such features
 
 ## Thermostat example
 
-Example folders contains sketch for [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11), 
-[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which shows on Apple Home two icons Temperathure and Humidity. There is universal sketch applicable for ESP32 and ESP8266 and using DHT sensor, BME28 or Dallas, 
-as well any other hardware can be easily implemented
-Hovewer any sensor can be used with simple code changes...
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site. For the [Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) it's example how to send historical data to [thingSpeak](https://thingspeak.com/)
+The example folder contains the two sketches [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) and  
+[Universal Thermostat](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) which will implement temperature and humidity sensing within the Apple Home app. The sketches work both for ESP32 and ESP8266 and use Adafruit's DHT and BME280 sensor libraries which will work for many common DHT sensors. The sketches can easily be adjusted to work with other sensors.
 
-Build instruction the same as for sketches avove.
+The thermostat sketches also implement some more advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
+
+The [Universal Thermostat sketch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Thermostat) also able to send historical data to [thingSpeak](https://thingspeak.com/).
 
 ## Switch example
 
-Example folders contains sketch for [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which shows on Apple simple Switch icon. There is universal sketch applicable for ESP32 and ESP8266 and any relay can be used to manage external devices.
+The example folder contains the sketch [Switch](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Switch), which implements a simple switch within the Apple Home app. The sketch works both for ESP32 and ESP8266 and could for example be used to control a relay.
 
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
+This sketch also implements some advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
 
-Build instruction the same as for sketches above.
+Build instructions are the same as for sketches above.
 
-## RGB Strip (WS2812) & Motion example
+## RGB Strip (WS2812) & motion sensor example
 
-Example folders contains sketch for [RGB & Motion devices](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which shows on Apple Home two icons: RGB Bulb  and Motion Sensor. There is universal sketch applicable for ESP32 and ESP8266 and using WS2812 Led strip.
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site and allows to demonstrate  two direction for the Apple Home Kit. Means when RGB (Brightness , Color ,State ) is changed from the built-in web site, Apple Home Kit refreshes the RGB bulb state.
-For the motion sensor can be used anyone, skecth simples reads HIGH value for the predefined GPIO. For instance HC-SR501 can be used.
-As well for RGB can be used any strip, the question is how to proceed with Brightness and Color values received from the Apple.
+The example folder contains the sketch [RGB & Motion device](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_RGB_Motion), which implements a RGB bulb and a motion sensor within the Apple Home app. The sketch works for ESP32 and ESP8266 and is used to control a WS2812 LED strip via an attached motion sensor (HC-SR501 in this example).
 
-Those combination potentially has good demonstration for Apple Home Automation, based on the Motion state RGB can be switched ON/OFF...
+This sketch also implements some advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
 
-Build instruction the same as for sketches avove.
+The web site allows to demonstrate the bidirectional capabilities of Apple HomeKit: whenever color, brightness or state of the RGB strip is changed from the built-in web site, Apple HomeKit refreshes the corresponding values or state within the Apple Home app.
+
+Any motion sensor can be used, the sketch simply checks for changes of the HIGH value of the predefined GPIO pin.
+
+The sketch drives a WS2812 RGB strip but other types should work in a similier way, but you would have to figure out how to process color and brightness values received from the Home app or the built-in web site with your specific RGB strip.
+
+The combination of a motion sensor along with a RGB strip (or a switch) is suited to demonstrate Apple Home Automation capabilities; based on the motion state, the RGB strip can be configured to be switched on or off.
+
+Build instructions are the same as for the sketches above.
 
 ## Button example
 
-Example folders contains sketch for [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which shows on Apple simple Button icon. There is universal sketch applicable for ESP32 and ESP8266 (Testing in progress on ESP8266) and any Button scenarios on Appllle  can be used to manage automation.
+The example folder contains the sketch [Button](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_Button), which implements a button within the Apple Home app. This is a universal sketch applicable for ESP32 and ESP8266 (still in beta) and can be used to create Apple Home Automation scenarios within your Apple Home app.
 
-Those sketch as well includes advanced feathures: Web File Manager, OTA, Simple web site.
-
-Build instruction the same as for sketches avove.
-
-## Air Quality sensor example
-
-Example folders contains sketch for [ Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which shows on Apple Air quality Sensor icon.
-Sketch is designed with usage for MQ135 sensor. There is universal sketch applicable for ESP32 and ESP8266. Main advantage that build-in web site shows history trends of PPM level of dioxide.  
-Code is contains comments and one of the important thing for this sketch is calibration based on your real sensor, for this purpose following line should be changed 
-
-const float factor=14.0;//to be calibrated with your MQ135
-
-
-Those sketch as well includes advanced feathures: 
--  Web File Manager
+This sketch also implements some advanced features: 
+- Web File Manager
 - OTA
-- Built-in web site
+- Simple web site
+
+Build instructions are the same as for the sketches above.
+
+## Air Quality Sensor example
+
+The example folder contains the sketch [Air Quality sensor](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_AirQuality_MQ135), which implements an Air Quality Sensor within Apple Home app.
+This sketch uses a MQ135 sensor and works both for ESP32 and ESP8266. The built-in web site displays historic data of the CO2 concentration. 
+You need to enter the appropriate calibrattion data for your sensor, for this purpose the following line should be changed
+
+```c
+const float factor=14.0; //to be calibrated with your MQ135
+```
+
+This sketch also implements some advanced features: 
+- Web File Manager
+- OTA
+- Simple web site
 - Sending data to ThingSpeak
 
-Build instruction the same as for sketches avove.
+Build instructiona are the same as for the sketches above.
 
-## FAN servicer example
+## Fan example
 
-Example folders contains sketch for [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which shows on Apple FAN  icon. You are able to control FAN characteristic such as 
+The example folder contains the sketch  [FAN](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_FAN), which implements a fan within Apple Home app. You are able to control fan characteristics such as 
 
-- ON/OFF
-
+- On/Off
 - Speed
-
 - Direction
 
-
-Those sketch as well includes advanced feathures: 
--  Web File Manager
+This sketch also implements some advanced features: 
+- Web File Manager
 - OTA
-- Built-in web site
+- Simple web site
 
-Build instruction the same as for sketches avove.
-
-## Sonoff RF plus Sonoff PIR2
-
-Example folders contains sketch for [EspHapSonoff_RFBridge](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapSonoff_RFBridge).
-
-
-This is firmware for Sonoff RF switch, which provides two accessories: Switch And Motion. Main idea to reuse Sonoff RF module to accept signal from Sonoff PIR2 and notify Apple 
-about motion detection. Any other scenario can be defined on the Apple, what should happens when motion detected.
-Due to the Sonof RF has RF module assigned to button, sketch lost functionality on button press reaction. Button press (directly or from RF signal) threated as Motion detection.
- This is good example hot to use Sonoff PIR without addiotnal bridges.
-
-Those sketch as well includes advanced feathures: 
--  Web File Manager
-- OTA
-- Built-in web site
-
-Build instruction the same as for sketches avove.
+Build instructions are the same as for the sketches above.
 
 # Library API and how to build your own sketch 
 
@@ -219,168 +180,142 @@ Build instruction the same as for sketches avove.
 #ifdef ESP32
 #include <SPIFFS.h>
 #endif
+
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
-
 #include <ESP8266mDNS.h>
 #include "coredecls.h"
 #endif
+
 extern "C"{
 #include "homeintegration.h"
 }
+
 #ifdef ESP8266
 #include "homekitintegrationcpp.h"
 #endif
-#include <hapfilestorage\hapfilestorage.hpp>
+
+#include <hapfilestorage/hapfilestorage.hpp>
 ```
 
-
-2. In the setup you have to do following, instead of other 
-
-Small adujstment for the ESP8266
+2. If you are using ESP8266, add the following to the setup section 
 ```c
  #ifdef ESP8266 
   disable_extra4k_at_link_time();
  #endif 
 ```
-Initialize file storage to keep pairing information (you can put any file name as you want)
+Initialize the file storage to store pairing information (any filename will do)
 ```c
  init_hap_storage("/pair.dat");
 ```
-Hovewer you can hahdle your function how to keep your  pairing information  examples EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contains code to show custom implementation
+It is up to you how to store device pairing information, the sketches EspHapLed (for ESP32) and EspHapLed8266 (for ESP8266) contain code examples to demonstrate custom implementations.
 
-
-Set base accessory type, means you will have at least one accessory and you need define a type
+Set at least one base accessory type:
 ```c
  hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
 ```
-full list of availbale accessories you can find in the [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) , see enum homekit_accessory_category_t
+The full list of availbale device types can be found in the header file [types.h](https://github.com/Yurik72/ESPHap/blob/master/types.h) (section enum homekit_accessory_category_t).
 
-Set base information HostName, Manufacture, Serial number, Model,Firmware version , like this
+Set the base information for your device like hostname, manufacturer, serial number, model, firmware version:
 ```c
   hap_initbase_accessory_service(HOSTNAME,"Yurik72","0","EspHapLed","1.0");
 ```
-  
-Than you need a setup all accessories and their services and  characteristic. Do not forgot that you already have one base accessory,
-therefore first we need a setup it. For instance for the lighBulb
+
+Then you need to define all accessories, the services they provide and the characteristics of these services. Do not forgot that you already have one base accessory, therefore you need to define a setup for this one, too. For example for a lightbulb you would need
 ```c
-  hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
+  hapservice= hap_add_lightbulb_service("LED",led_callback,(void*)&led_gpio);
 ```
- "Led" is the name of accessory 
+- "LED" is the name of accessory 
+- `led_callback` is the name of the callback function which is called from  Apple Home app whenever a change occurs
+- `(void*)&led_gpio` is the callback parameter
  
- led_callback is callback function called from the apple when changes 
- 
- (void*)&led_gpio  is callback parameter
- 
- After that we can add more accessories like this
+ After that you can add more accessories like this
  ```c
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
 ```
 
-Full list of services and their characteristic can be found in the [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h) . Header is well documented and descibes services types and their characteristic)
-The list of Api to add services and accessories can be found there [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h). It's quite transparent based on the function names
+The full list of all services and their characteristic can be found in the header file [characteristic.h](https://github.com/Yurik72/ESPHap/blob/master/characteristics.h). This header file is well documented and descibes all service types and their characteristics.
 
-When accessories, services and characteristic is defined  we need to finally call
-  ```c
+The API to add services and accessories is documented in the header file  [homeintegration.h](https://github.com/Yurik72/ESPHap/blob/master/homeintegration.h), its funtions are self-explanatory.
+
+Once all accessories, services and characteristics are defined, we need to call
+```c
 hap_init_homekit_server();
 ```
 
-That is all for setup
+3. Implement callback and notify functions
 
-3. Implement callback and notify function
-
-Every callback has the same signature and parameters
-
+Every callback has the following parameters
  - characteristic
- 
  - value 
- 
  - context (callback parameters)
  
- This function is called when accessories state is changed from the Apple. You  can manage your devices there, based on the value.
- Please check which type (bool, int, float ) must be used for different characteristic
-  ```c
+The callback function is invoked whenever the accessory's state is changed from within the Apple Home app. Based on the returned values, you may manage your device accordingly. Please check carefully which type (bool, int, float) must be used for the different characteristics.
+```c
 void led_callback(homekit_characteristic_t *ch, homekit_value_t value, void *context) {
     Serial.println("led_callback");
     digitalWrite(led_gpio, value.bool_value?HIGH:LOW);
 }
 ```
-optionally implement notify function, which is neccessary to inform Apple about device state changes . This is must for accessories like termostat , for instance for the LightBulb we can notify about power state On/Off , which is bool value true/false
-  ```c
+Optionally, you may also implement notify functions which are used to inform the Apple Home app about device state changes. This is a must for accessories like thermostat and for a lightbulb we could notify the app about power state (on/off, represented in the bool value true/false).
+
+To retrieve characteristics, the API function ``homekit_service_characteristic_by_type`` should be used. 
+The first parameter is a pointer to the hapservice (from the setup), the second parameter is the characteristic type. 
+
+```c
 void notify_hap(){
 homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
  HAP_NOTIFY_CHANGES(bool, ch, <new bool value>, 0)
  }
  ```
- To get characteristic , API function homekit_service_characteristic_by_type should be used. 
- First parameter is pointer to the hapservice (from the setup), second is characteristic type
  
- 4. Loop function
- In the loop we have to add only one lines and only for ESP8266
+4. Main loop function
+
+In the main loop function and **only for ESP8266** we have to add
  
-   ```c
+```c
  #ifdef ESP8266
   hap_homekit_loop();
 #endif
 ``` 
 
-Advanced feathures
+### Advanced features
 
-- Built in web server
-
-Since version 1.0.2, library contains submodule for built in web server. To use it you need
-
-Include header
+#### Built-in web server
+Since version 1.0.2, the ESPHap library contains a submodule for a built-in web server. To use it, you need include the corresponding header file
 ```c
-#include <hapweb\hap_webserver.hpp>
+#include <hapweb/hap_webserver.hpp>
 ``` 
-call 
+Within the setup section, include  
 ```c
-set_indexhml(FPSTR(INDEX_HTML));  // optional if you want to have your own root page
+set_indexhml(FPSTR(INDEX_HTML)); // optional if you want to have your own root page
 hap_webserver_begin();
 ``` 
-in the setup function
 
-set_indexhml(FPSTR(INDEX_HTML));   allows to define your root page content , see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+``set_indexhml(FPSTR(INDEX_HTML))`` allows to define your own root page content, see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed).
 
-
-- Setup by QR Code
-
-If you use built in web server, by default it provides access to setup/pairing page/image by QR code, you just need enter http://<ip address>/setup.html ,see example [Advanced Led](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
+#### Setup by QR Code
+If you use the built-in web server, by default it provides access to a setup/pairing page/image by QR code which can be accessed by visiting http://\<Your Device IP Address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed).
 
 # Versions history
+## v1.0.3
+- small bug fixes
+- new examples
 
- ## v1.0  
- 
- -  First success version works both with ESP32 and ESP8266
- 
- ## v1.0.1
- 
- - Minor bug fixes and more examples
- 
- ## v1.0.2
- 
+## v1.0.2
  - implement submodule for file storage of pairing data [hapfilestorage.hpp](https://github.com/Yurik72/ESPHap/blob/master/hapfilestorage/hapfilestorage.hpp) which allows to reuse basic function for store pairing data on SPIFFs file system. 
- 
  - implement submodules for internal web server [hapweb](https://github.com/Yurik72/ESPHap/tree/master/hapweb). Now Web server can be easily setup and handle file browser and your own portal for device. Plus handling of OTA.
- 
-- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http:// ip address  /  setup.html .
- 
- ## v1.0.3
- 
-  - small bug fixes
-  
-  -  new examples
- 
-## Are you interesting to support this project ?
+- implement submodules for pairing by QR code [hapqr.hpp](https://github.com/Yurik72/ESPHap/blob/master/qr/hapqr.hpp).Together with web server you can got on your browser QR image, which can be easily scan for pairing purpose. To access QR code you need enter http://\<IPADDRESS\>/setup.html.
 
-You can easilly do that by donations
+## v1.0.1
+ - Minor bug fixes and more examples
+
+## v1.0
+ - First success version works both with ESP32 and ESP8266
+ 
+## Support this project
+You can support the development of this project by donating to it
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JVZWJ6FSMURSL&currency_code=USD&source=url)
-
-
-
-
-
 
 *TODO* - 

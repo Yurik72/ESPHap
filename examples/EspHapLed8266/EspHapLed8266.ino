@@ -1,13 +1,18 @@
+/*
+  ESPHap example EspHapLed for ESP8266
 
+  This example for ESPHap shows how to control a LED
+  with Apple Home app. It implements accessory type "light bulb".
+
+  This example code is part of the public domain
+*/
 
 #include <Arduino.h>
-
 
 #ifdef ESP32
 #include <SPIFFS.h>
 #endif
 #include <ESP8266WiFi.h>
-//#include <WiFi.h>
 #include <ESP8266mDNS.h>
 
 #include "coredecls.h"
@@ -16,7 +21,6 @@ const char* password = "pwd";
 
 const int identity_led=2;
 const int led_gpio = 4;
-
 
 extern "C"{
 #include "homeintegration.h"
@@ -45,7 +49,6 @@ void setup() {
       Serial.print("SPIFFS Mount failed");
      }
 #endif
-
 
     Serial.println(ssid);
 #ifdef ESP8266
@@ -76,24 +79,23 @@ void setup() {
     Serial.print("Free heap: ");
     Serial.println(system_get_free_heap_size());
 
-  
     init_hap_storage();
   
     set_callback_storage_change(storage_changed);
 
     /// We will use for this example only one accessory (possible to use a several on the same esp)
-    //Our accessory type is light bulb , apple interface will proper show that
+    //Our accessory type is light bulb, Apple interface will proper show that
     hap_setbase_accessorytype(homekit_accessory_category_lightbulb);
+
     /// init base properties
     hap_initbase_accessory_service("ES","Yurik72","0","EspHapLed","1.0");
+
    //we will add only one light bulb service and keep pointer for nest using
     hapservice= hap_add_lightbulb_service("Led",led_callback,(void*)&led_gpio);
-
    
    //and finally init HAP
    
-    hap_init_homekit_server();   
-  
+    hap_init_homekit_server();
 }
 
 void loop() {
@@ -101,7 +103,6 @@ void loop() {
   hap_homekit_loop();
   //delay(2);
   return;
-
 }
 
 void init_hap_storage(){
@@ -122,11 +123,9 @@ void init_hap_storage(){
   hap_init_storage_ex(buf,size);
   fsDAT.close();
   delete []buf;
-
 }
+
 void storage_changed(char * szstorage,int bufsize){
-
-
 
   SPIFFS.remove(pair_file_name);
   File fsDAT=SPIFFS.open(pair_file_name, "w+");
