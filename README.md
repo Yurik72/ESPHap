@@ -73,6 +73,13 @@ The example folder contains 3 sketches for Sonoff devices:
 
 Sonoff is based on ESP8265 and the examples already work quite well. But still there some known problems especially during pairing phase. For more informations, please have a look at the [extended instructions](https://github.com/Yurik72/ESPHap/wiki/Build-Sonoff-Basic).
 
+## Sonoff RF plus Sonoff PIR2 example
+
+The example folder also contains a more advanced sketch for [EspHapSonoff_RFBridge](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapSonoff_RFBridge).
+
+This is an alternative firmware for the Sonoff RF switch, which provides two accessories: switch and motion detection. The main idea of this sketch is to re-use the Sonoff RF module to accept signals from Sonoff PIR2 motion detection module and notify Apple Home app. This gives you the opportunity to define new scenarios within the Apple Home app (i.e. to define what should happen once a motion is detected). 
+The Sonof RF has a RF module assigned to button in the original firmware, with this sketch you will loose this functionality. The sketch now interprets and treats a button press (directly or from RF signal) as a motion detection.
+
 ## Advanced LED example (simple switch and dimmable)
 
 Example folders contains sketch for [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed)
@@ -84,7 +91,7 @@ This is sketch compatible with both ESP32 & ESP8266, handles LED Switching on/of
 - OTA
 - Setup/pairing via QR Code (to access QR code you need enter http://\<IP ADDRESS\>/setup.html)
 
-This is basic demonstration of powerfull IOT device, which contains such features
+This is a basic demonstration of an advanced IOT device, which features such functionalities.
 
 ## Thermostat example
 
@@ -171,16 +178,6 @@ This sketch also implements some advanced features:
 - Simple web site
 
 Build instructions are the same as for the sketches above.
-
-## Sonoff RF plus Sonoff PIR2
-Example folders contains sketch for [](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapSonoff_RFBridge) 
-
-Example folders contains sketch for [EspHapSonoff_RFBridge](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapSonoff_RFBridge).
-
-
-This is firmware for Sonoff RF switch, which provides two accessories: Switch And Motion. Main idea to reuse Sonoff RF module to accept signal from Sonoff PIR2 and notify Apple 
-about motion detection. Any other scenario can be defined on the Apple, what should happens when motion detected.
-Due to the Sonof RF has RF module assigned to button, sketch lost functionality on button press reaction. Button press (directly or from RF signal) threated as Motion detection.
 
 # Library API and how to build your own sketch 
 
