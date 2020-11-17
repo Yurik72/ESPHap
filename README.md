@@ -45,7 +45,12 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - Arduino version 1.8.12
 
 ### About the included webserver
+## 
 ![webserver](docs/browse.png)
+
+![webserver](docs/index.png)
+
+![webserver](docs/log.png)
 
 # Code examples
 ## Simple LED example
