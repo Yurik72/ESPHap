@@ -1,8 +1,4 @@
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)]
-
-[![Gitter](/docs/browse.png)]
-
-
+![Gitter](https://badges.gitter.im/Join%20Chat.svg)
 
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
@@ -49,7 +45,7 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - Arduino version 1.8.12
 
 ### About the included webserver
-[![webserver](docs/browse.png)]
+![webserver](docs/browse.png)
 
 # Code examples
 ## Simple LED example
