@@ -1,5 +1,9 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)]
 
+[![Gitter](/docs/browse.png)]
+
+
+
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
@@ -43,6 +47,9 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - ESP32 board library version 1.0.4
 - ESP8266 board library version 2.6.3
 - Arduino version 1.8.12
+
+### About the included webserver
+[![webserver](docs/browse.png)]
 
 # Code examples
 ## Simple LED example
