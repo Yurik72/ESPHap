@@ -45,16 +45,14 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - Arduino version 1.8.12 and above
 
 ### About the included webserver
-Some of the more advanced code examples below come with an integrated webserver which features a SPIFFS (Serial Peripheral Interface Flash File System,) backend. The webserver is often used to display sensor data, control devices, configure device WiFi settings or to store data like Homekit binding credentials or historical sensor data. Once you've connected your device to your WLAN, it will be available under ``http://IPADDRESS/``. Your IP address is displayed within Arduino's serial monitor window during the boot sequence, so the IP is 172.16.0.169 in this case:
+Some of the more advanced code examples below come with an integrated webserver which features a SPIFFS (Serial Peripheral Interface Flash File System) backend. The webserver is often used to display sensor data, control devices, configure device WiFi settings or to store data like Homekit binding credentials or historical sensor data. Once you've connected your device to your WLAN, it will be available under ``http://IPADDRESS/``. Your IP address is displayed within Arduino's serial monitor window during the boot sequence, so the IP is 172.16.0.169 in this case:
 
 ![terminal](docs/log.png)
 Also, the list of available website pages for your device is displayed, so ``http://IPADDRESS/``, ``http://IPADDRESS/browse`` and ``http://IPADDRESS/update`` in the above case.
 
-
-
 ### Default, index or root page
 
-Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity 
+Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity in the [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11): 
 
 ![index](docs/index.png)
 
