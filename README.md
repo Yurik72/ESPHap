@@ -50,22 +50,17 @@ Some of the more advanced code examples below come with an integrated webserver 
 ![terminal](docs/log.png)
 Also, the list of available website pages for your device is displayed, so ``http://IPADDRESS/``, ``http://IPADDRESS/browse`` and ``http://IPADDRESS/update`` in the above case.
 
-### Default, index or root page
+### Default, index or root page ``http://IPADDRESS/``
 
-Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity in the [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) example: 
+Your device's root page located under ``http://IPADDRESS/`` is usually configured to display sensor data, like temperature and humidity in the [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) example: 
 
 ![index](docs/index.png)
 
-``http://IPADDRESS/setup``
-
-``http://IPADDRESS/browse``
+### The file browser ``http://IPADDRESS/browse``
+The file browser gives you the opportunity to browse the files stored on your device. More importantly, you are able to upload or delete files to or from your device. 
+For instance, if you want to delete the Homekit pairing data stored in ``pair.dat``, you may simply do so by clicking the correspondin Delete button.
+After any file operation you need to restart your device by clicking on "Press to restart" button.
 ![filemanager](docs/browse.png)
-
-
-
-
-
-
 
 # Code examples
 ## Simple LED example
