@@ -57,8 +57,8 @@ Your device's root page located under ``http://IPADDRESS/`` is usually configure
 ![index](docs/index.png)
 
 ### The file browser ``http://IPADDRESS/browse``
-The file browser gives you the opportunity to browse the files stored on your device. More importantly, you are able to upload or delete files to or from your device. 
-For instance, if you want to delete the Homekit pairing data stored in ``pair.dat``, you may simply do so by clicking the correspondin Delete button.
+The file browser enables you to access the files stored on your device. More importantly, you are able to upload or delete files to or from your device. 
+For instance, if you want to delete the Homekit pairing data stored in ``pair.dat``, you may simply do so by clicking the correspondin delete button.
 After any file operation you need to restart your device by clicking on "Press to restart" button.
 ![filemanager](docs/browse.png)
 
