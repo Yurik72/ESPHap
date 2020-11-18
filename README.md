@@ -52,7 +52,7 @@ Also, the list of available website pages for your device is displayed, so ``htt
 
 ### Default, index or root page
 
-Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity in the [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11): 
+Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity in the [Thermostat DHT](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHap_DHT11) example: 
 
 ![index](docs/index.png)
 
