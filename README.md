@@ -42,15 +42,32 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 
 - ESP32 board library version 1.0.4
 - ESP8266 board library version 2.6.3
-- Arduino version 1.8.12
+- Arduino version 1.8.12 and above
 
 ### About the included webserver
-## 
-![webserver](docs/browse.png)
+Some of the more advanced code examples below come with an integrated webserver which features a SPIFFS (Serial Peripheral Interface Flash File System,) backend. The webserver is often used to display sensor data, control devices, configure device WiFi settings or to store data like Homekit binding credentials or historical sensor data. Once you've connected your device to your WLAN, it will be available under ``http://IPADDRESS/``. Your IP address is displayed within Arduino's serial monitor window during the boot sequence, so the IP is 172.16.0.169 in this case:
 
-![webserver](docs/index.png)
+![terminal](docs/log.png)
+Also, the list of available website pages for your device is displayed, so ``http://IPADDRESS/``, ``http://IPADDRESS/browse`` and ``http://IPADDRESS/update`` in the above case.
 
-![webserver](docs/log.png)
+
+
+### Default, index or root page
+
+Your device's root page located under ``http://IPADDRESS/`` usually displays the sensor data, like temperature and humidity 
+
+![index](docs/index.png)
+
+``http://IPADDRESS/setup``
+
+``http://IPADDRESS/browse``
+![filemanager](docs/browse.png)
+
+
+
+
+
+
 
 # Code examples
 ## Simple LED example
