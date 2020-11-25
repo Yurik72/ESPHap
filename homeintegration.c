@@ -438,6 +438,69 @@ homekit_service_t* hap_add_temperature_service(const char* szname){
 	        });
 	return hap_add_service(service);
 }
+homekit_service_t* hap_add_thermostat_service(const char* szname, hap_callback cb, void* context) {
+
+	homekit_service_t*service = hap_new_thermostat_service(szname, cb, context);
+
+	return hap_add_service(service);
+}
+homekit_service_t* hap_add_htermostat_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context)
+{
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* thermoservice = hap_new_thermostat_service(szname, cb, context);
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = thermoservice;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+}
+homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback cb, void* context) {
+
+	return NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, true,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TARGET_TEMPERATURE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TEMPERATURE_DISPLAY_UNITS, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_HEATING_COOLING_STATE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TARGET_HEATING_COOLING_STATE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(COOLING_THRESHOLD_TEMPERATURE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(HEATING_THRESHOLD_TEMPERATURE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NULL
+	});
+
+}
 homekit_service_t* hap_add_humidity_service(const char* szname){
 
 	homekit_service_t*service=NEW_HOMEKIT_SERVICE(HUMIDITY_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
@@ -803,3 +866,10 @@ int hap_get_setup_uri( char *buffer, size_t buffer_size) {
 }
 
 #endif
+
+homekit_value_t HOMEKIT_UINT8_VALUE(uint8_t value) {
+	homekit_value_t homekit_value;
+	homekit_value.format = homekit_format_uint8;
+	homekit_value.int_value = value;
+	return homekit_value;
+}

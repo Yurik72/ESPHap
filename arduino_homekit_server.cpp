@@ -3907,7 +3907,7 @@ bool arduino_homekit_preinit(homekit_server_t *server) {
 
 
 void arduino_homekit_setup(homekit_server_config_t *config) {
-	if(system_get_cpu_freq() != SYS_CPU_160MHZ){
+	if(!arduino_homekit_is_paired() && system_get_cpu_freq() != SYS_CPU_160MHZ){
 		system_update_cpu_freq(SYS_CPU_160MHZ);
 		INFO("Update the CPU to run at 160MHz");
 	}

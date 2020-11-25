@@ -61,6 +61,11 @@ type name() { \
 	homekit_service_t* hap_add_rgbstrip_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_relaydim_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_temperature_service(const char* szname);
+
+	homekit_service_t* hap_add_thermostat_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_thermostat_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback cb, void* context);
+
 	homekit_service_t* hap_add_humidity_service(const char* szname);
 	homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype, const char* szname, homekit_service_t** pp_temp, homekit_service_t** pp_hum);
 	homekit_service_t*  hap_add_hum_as_accessory(int acctype, const char* szname);
@@ -116,3 +121,5 @@ type name() { \
 #ifndef ARDUINO8266_SERVER_CPP
 	int hap_get_setup_uri(char *buffer, size_t buffer_size);
 #endif
+
+	homekit_value_t HOMEKIT_UINT8_VALUE(uint8_t value);
