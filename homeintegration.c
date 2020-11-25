@@ -462,7 +462,7 @@ homekit_service_t* hap_add_htermostat_service_as_accessory(int acctype, const ch
 }
 homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback cb, void* context) {
 
-	return NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics = (homekit_characteristic_t*[]) {
+	return NEW_HOMEKIT_SERVICE(THERMOSTAT, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
 			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, true,
