@@ -465,22 +465,11 @@ homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback c
 	return NEW_HOMEKIT_SERVICE(THERMOSTAT															, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
-			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, true,
+			NEW_HOMEKIT_CHARACTERISTIC(TARGET_TEMPERATURE,22,
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
 					cb, .context = context
 				)),
-			NEW_HOMEKIT_CHARACTERISTIC(TARGET_TEMPERATURE, 0,
-				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
-					cb, .context = context
-				)),
-			NEW_HOMEKIT_CHARACTERISTIC(TEMPERATURE_DISPLAY_UNITS, 0,
-				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
-					cb, .context = context
-				)),
-			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_HEATING_COOLING_STATE, 0,
-				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
-					cb, .context = context
-				)),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_HEATING_COOLING_STATE, 0),
 			NEW_HOMEKIT_CHARACTERISTIC(TARGET_HEATING_COOLING_STATE, 0,
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
 					cb, .context = context
@@ -489,14 +478,12 @@ homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback c
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
 					cb, .context = context
 				)),
-			NEW_HOMEKIT_CHARACTERISTIC(HEATING_THRESHOLD_TEMPERATURE, 0,
+			NEW_HOMEKIT_CHARACTERISTIC(HEATING_THRESHOLD_TEMPERATURE, 15,
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
 					cb, .context = context
 				)),
-			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0,
-				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
-					cb, .context = context
-				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TEMPERATURE_DISPLAY_UNITS, 0),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0),
 			NULL
 	});
 
