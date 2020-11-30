@@ -355,40 +355,61 @@ return lbservice;
 }
 homekit_service_t* hap_add_rgbstrip_service(const char* szname,hap_callback cb,void* context){
 
-	homekit_service_t*service=NEW_HOMEKIT_SERVICE(LIGHTBULB,.primary = true, .characteristics=(homekit_characteristic_t*[]) {
-	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-	            NEW_HOMEKIT_CHARACTERISTIC(
-	                ON, true,
-	                .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(
-	                		cb, .context=context
-	                	)
-					),
-
-					NEW_HOMEKIT_CHARACTERISTIC(
-					  BRIGHTNESS, 100,
-					  .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(
-					  	cb, .context=context
-					  	)
-					),
-
-					NEW_HOMEKIT_CHARACTERISTIC(
-		                HUE, 0,
-						  .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(
-						  	cb, .context=context
-						  )
-		             ),
-					 NEW_HOMEKIT_CHARACTERISTIC(
-			                SATURATION, 0,
-
-							  .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(
-							  	cb, .context=context
-						  )
-			          ),
-
-
-	            NULL
-	        });
+	homekit_service_t*service = hap_new_rgbstrip_service(szname, cb, context);
 	return hap_add_service(service);
+}
+homekit_service_t*  hap_add_rgbstrip_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
+
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* rgbservice = hap_new_rgbstrip_service(szname, cb, context);
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;//hap_new_homekit_accessory_service(szname,"0");
+	svc[1] = rgbservice;//hap_new_lightbulb_service(szname,cb,context);
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = (homekit_accessory_category_t)acctype,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+	//   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
+	return lbservice;
+}
+homekit_service_t* hap_new_rgbstrip_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(LIGHTBULB, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(
+				ON, true,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)
+			),
+
+			NEW_HOMEKIT_CHARACTERISTIC(
+				BRIGHTNESS, 100,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)
+			),
+
+			NEW_HOMEKIT_CHARACTERISTIC(
+				HUE, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)
+			),
+			NEW_HOMEKIT_CHARACTERISTIC(
+				SATURATION, 0,
+
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)
+			),
+
+
+			NULL
+	});
 }
 homekit_service_t* hap_add_relaydim_service(const char* szname,hap_callback cb,void* context){
 
