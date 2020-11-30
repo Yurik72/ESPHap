@@ -59,7 +59,7 @@ type name() { \
 	homekit_service_t*  hap_add_lightbulb_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 
 	homekit_service_t* hap_add_rgbstrip_service(const char* szname, hap_callback cb, void* context);
-	homekit_service_t*  hap_add_rgbstrip_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context)æ
+	homekit_service_t*  hap_add_rgbstrip_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_rgbstrip_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_relaydim_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_temperature_service(const char* szname);
