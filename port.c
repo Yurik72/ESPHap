@@ -170,6 +170,7 @@ void homekit_overclock_end() {
 }
 
 void homekit_mdns_init() {
+//	printf("homekit_mdns_init()\r\n");
 	mdns_init();
 }
 void homekit_mdns_add_txt_ex(const char *key, const char *val) {

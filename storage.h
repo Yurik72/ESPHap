@@ -44,6 +44,7 @@ extern "C" {
 
 	void set_callback_storage(callback_function val);
 	void on_storage_change();
+	
 #endif
 
 

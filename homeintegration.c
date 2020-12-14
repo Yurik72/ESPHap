@@ -36,7 +36,7 @@
 #define MAX_SERVICES 20
 
 
-static callback_storagechanged callbackstorage=NULL;
+static callback_storagechanged callbackstorage_integration=NULL;
 static int led_gpio = -1;
 
 
@@ -129,7 +129,7 @@ homekit_server_config_t config = {
 */
 
 #define MAX_HAP_SERVICES 7
-#define MAX_HAP_ACCESSORIES 4
+#define MAX_HAP_ACCESSORIES 7
 homekit_accessory_t *hap_accessories[MAX_HAP_ACCESSORIES + 1] = { 0 };
 homekit_service_t* hap_services[MAX_HAP_SERVICES + 1] = { 0 };
 homekit_server_config_t hap_config = {
@@ -138,9 +138,11 @@ homekit_server_config_t hap_config = {
 	.setupId = "YK72"
 };
 void on_storage_changed(){
-
-	if(callbackstorage)
-		callbackstorage(get_ex_storage(),get_ex_storage_size());
+	//INFO("on_storage_change");
+	if(callbackstorage_integration)
+		callbackstorage_integration(get_ex_storage(),get_ex_storage_size());
+//	else
+	//	INFO("on_storage_change pointer 0x%x", callbackstorage_integration);
 }
 #ifndef ARDUINO8266_SERVER_CPP
 void init_homekit_server() {
@@ -155,9 +157,14 @@ void on_wifi_ready() {
 */
 //storage handling
 
-
+callback_storagechanged get_callback_storage_change() {
+	return callbackstorage_integration;
+		
+}
 void set_callback_storage_change(callback_storagechanged fn){
-	callbackstorage=fn;
+	
+	callbackstorage_integration =fn;
+	//INFO("set_callback_storage_change %d ", (long)callbackstorage_integration);
 }
 
 
@@ -185,10 +192,14 @@ static bool paired = false;
 
 #ifndef ARDUINO8266_SERVER_CPP
 void hap_init_homekit_server() {
+//	INFO("callbackstorage_integration 0x%x ", callbackstorage_integration);
+	set_wifi_max_power();
 	if(hap_mainservices_current>1){
 		set_callback_storage(on_storage_changed);
 		 paired = homekit_is_paired();
 		 INFO("homekit_is_paired %d",paired);
+		// INFO("callbackstorage_integration 0x%x ", callbackstorage_integration);
+		 
 		 if(base_accessory_index==-1){
 			 hap_init_homekit_base_accessory();
 		 }else{
@@ -374,7 +385,7 @@ homekit_service_t*  hap_add_rgbstrip_service_as_accessory(int acctype, const cha
 	hap_mainaccesories_current++;
 	hap_accessories[hap_mainaccesories_current] = NULL;
 	//   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
-	return lbservice;
+	return rgbservice;
 }
 homekit_service_t* hap_new_rgbstrip_service(const char* szname, hap_callback cb, void* context) {
 	return NEW_HOMEKIT_SERVICE(LIGHTBULB, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
@@ -612,7 +623,7 @@ homekit_service_t*  hap_add_hum_as_accessory(int acctype, const char* szname) {
 homekit_service_t* hap_new_light_service(const char* szname, hap_callback cb, void* context){
 	return NEW_HOMEKIT_SERVICE(LIGHT_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
 		            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-		            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 5.0, .min_value = (float[]) { 0.0 }, .max_value = (float[]) { 100.0 }),
+		            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_AMBIENT_LIGHT_LEVEL, 5.0),
 		            NULL
 		        });
 }
@@ -886,4 +897,52 @@ homekit_value_t HOMEKIT_UINT8_VALUE(uint8_t value) {
 	homekit_value.format = homekit_format_uint8;
 	homekit_value.int_value = value;
 	return homekit_value;
+}
+
+int set_wifi_max_power() {
+#ifdef ESP32
+	esp_err_t res;
+	if (res = esp_wifi_set_ps(WIFI_PS_NONE) != ESP_OK) {
+		INFO("error esp_wifi_set_ps %d", res);
+		return res;
+	};
+	int8_t power;
+	if (res = esp_wifi_get_max_tx_power(&power) != ESP_OK) {
+		INFO("error esp_wifi_get_max_tx_power %d", res);
+	};
+	if (power < 78) {
+		if (res = esp_wifi_set_max_tx_power(78) != ESP_OK) {
+			INFO("error esp_wifi_set_max_tx_power %d", res);
+		};
+	}
+	return res;
+#else
+	return -1;
+#endif
+
+}
+int set_wifi_save_power_middle(void) {
+	return set_wifi_save_power(52);
+}
+int set_wifi_save_power(int8_t level) {
+#ifdef ESP32
+	esp_err_t res;
+	if (res = esp_wifi_set_ps(WIFI_PS_MAX_MODEM) != ESP_OK) {
+		INFO("error esp_wifi_set_ps %d", res);
+		return res;
+	};
+	int8_t power;
+	if (res = esp_wifi_get_max_tx_power(&power) != ESP_OK) {
+		INFO("error esp_wifi_get_max_tx_power %d", res);
+	};
+	if (level != power) {
+		if (res = esp_wifi_set_max_tx_power(level) != ESP_OK) {
+			INFO("error esp_wifi_set_max_tx_power %d", res);
+		};
+	}
+	return res;
+#else
+	return -1;
+#endif
+
 }

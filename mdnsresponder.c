@@ -960,11 +960,12 @@ static void mdns_check_network() {
 // If we are in station mode and have an IP address, start a multicast UDP receive
 void mdns_init()
 {
+	
     sdk_os_timer_setfn(&announce_timer, mdns_announce, NULL);
     sdk_os_timer_setfn(&network_monitor_timer, mdns_check_network, NULL);
 
     err_t err;
-
+	
     struct netif *netif = sdk_system_get_netif(STATION_IF);
     if (netif == NULL) {
         printf(">>> mDNS_init: wifi opmode not station\n");

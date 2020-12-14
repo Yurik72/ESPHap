@@ -16,10 +16,20 @@
 
 #define INFO(message, ...) printf(">>> Home Integration: " message "\n", ##__VA_ARGS__)
 
+#define hap_constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+
 #ifndef HAP_NOTIFY_CHANGES
 #define HAP_NOTIFY_CHANGES(name,home_characteristic,val,tollerance) \
 	if (home_characteristic && abs(home_characteristic->value.name ##_value - val)>tollerance){ \
 		home_characteristic->value.name ##_value = val ;\
+		homekit_characteristic_notify(home_characteristic, home_characteristic->value); \
+	};
+#endif
+#ifndef HAP_NOTIFY_CHANGES_WITHCONSTRAIN
+#define HAP_NOTIFY_CHANGES_WITHCONSTRAIN(name,home_characteristic,val,tollerance) \
+    name cval=hap_constrain(val,*home_characteristic->min_value,*home_characteristic->max_value); \
+	if (home_characteristic && abs(home_characteristic->value.name ##_value - cval)>tollerance){ \
+		home_characteristic->value.name ##_value = cval ;\
 		homekit_characteristic_notify(home_characteristic, home_characteristic->value); \
 	};
 #endif
@@ -40,6 +50,7 @@ type name() { \
 
 	typedef void(*callback_storagechanged)(char * szstorage, int size);
 	void set_callback_storage_change(callback_storagechanged fn);
+	callback_storagechanged get_callback_storage_change();
 
 	int hap_init_storage_ex(char* szdata, int size);
 	int hap_get_storage_size_ex();
@@ -125,3 +136,6 @@ type name() { \
 #endif
 
 	homekit_value_t HOMEKIT_UINT8_VALUE(uint8_t value);
+	int set_wifi_max_power();
+	int set_wifi_save_power_middle(void);
+	int set_wifi_save_power(int8_t level);
