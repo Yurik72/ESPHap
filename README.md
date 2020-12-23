@@ -197,6 +197,33 @@ This sketch also implements some advanced features:
 
 Build instructions are the same as for the sketches above.
 
+## ESP32 Camera with motion detection
+
+This is one of the experimental scenario for ESP32 camera module. Sketch based on well known [example] (https://robotzero.one/esp32-face-door-entry/) with additional feathures.
+First of all it can works as simple motion detector and notify Apple that motion occurs.
+
+Additionally :
+ - it keeps functionality for face recognition and internal web site for camera setting and live video streaming.
+ 
+ - Allow to handle servo (if that attached) for camera position
+ 
+ - If face recognized it's able to send RF signal. So any receiver can validate signal and apply any action for instance open a door lock
+ 
+ 
+ All of that is experimental. But main achievemnts is to find a way how to detect motion, due to the lot of bug's and limitation in  camera API's.
+ I found a fastest way (in my opinion). Main algorith is traditional: comparing two camera snapshots and based on the sensitivity level
+ and pixels changed detect motion.
+ This looks abnormally but fastest way is:
+  - Take camera snapshot in JPEG format. Fast because it's related to camera communication 
+  - Convert JPEG to raw data (RGB565) 
+  - Compare to raw data snapshot
+  
+  To achieve this, PSRAM memory is used and it's enought for two snapshots less than 1280x1024.
+  
+ *Additionally, due to specific SPIFFS usage this is a good example how to keep pairing data in the EEPROM
+
+
+
 # Library API and how to build your own sketch 
 
 1. Prepare include section
