@@ -44,7 +44,7 @@ extern "C" {
 
 	void set_callback_storage(callback_function val);
 	void on_storage_change();
-	
+	void set_max_pairing(byte val);
 #endif
 
 

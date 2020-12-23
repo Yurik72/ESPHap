@@ -51,7 +51,7 @@ type name() { \
 	typedef void(*callback_storagechanged)(char * szstorage, int size);
 	void set_callback_storage_change(callback_storagechanged fn);
 	callback_storagechanged get_callback_storage_change();
-
+	void hap_set_max_pairing(byte val);
 	int hap_init_storage_ex(char* szdata, int size);
 	int hap_get_storage_size_ex();
 	void hap_set_identity_gpio(int gpio);

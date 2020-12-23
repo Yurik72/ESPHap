@@ -144,6 +144,9 @@ void on_storage_changed(){
 //	else
 	//	INFO("on_storage_change pointer 0x%x", callbackstorage_integration);
 }
+void hap_set_max_pairing(byte val) {
+	set_max_pairing(val);
+}
 #ifndef ARDUINO8266_SERVER_CPP
 void init_homekit_server() {
 	set_callback_storage(on_storage_changed);

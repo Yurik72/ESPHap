@@ -27,7 +27,7 @@
 #ifndef MAX_PAIRINGS
 #define MAX_PAIRINGS 16
 #endif
-
+byte max_pairing = MAX_PAIRINGS;
 #ifndef ACCESSORY_ID_SIZE
 #define ACCESSORY_ID_SIZE   17
 #endif
@@ -61,10 +61,13 @@ int init_storage_ex(char* szdata, int size) {
 	return actualsize;
 }
 char * get_ex_storage() {
-	return ex_storage;
+	return ex_storage; 
 }
 int get_ex_storage_size() {
-	return sizeof(ex_storage);
+	if (max_pairing == MAX_PAIRINGS) {
+		return sizeof(ex_storage);
+	}
+	return PAIRINGS_OFFSET + max_pairing * sizeof(pairing_data_t) + 1;
 }
 typedef void(*callback_function)(void);
 
@@ -79,6 +82,9 @@ void on_storage_change() {
 		callbackstorage();
 
 	}
+}
+void set_max_pairing(byte val) {
+	max_pairing = val;
 }
 #endif
 
@@ -243,7 +249,7 @@ ed25519_key *homekit_storage_load_accessory_key() {
 
 bool homekit_storage_can_add_pairing() {
 	pairing_data_t data;
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 #ifdef EX_STORAGE_CHAR
 		memcpy((byte *)&data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*i], sizeof(data));
 #else
@@ -267,7 +273,7 @@ static int compact_data() {
 	}
 #endif
 	int next_pairing_idx = 0;
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 		pairing_data_t *pairing_data = (pairing_data_t *)&data[PAIRINGS_OFFSET + sizeof(pairing_data_t)*i];
 		if (!strncmp(pairing_data->magic, magic1, sizeof(magic1))) {
 			if (i != next_pairing_idx) {
@@ -278,7 +284,7 @@ static int compact_data() {
 		}
 	}
 
-	if (next_pairing_idx == MAX_PAIRINGS) {
+	if (next_pairing_idx == max_pairing) {
 		// We are full, no compaction possible, do not waste flash erase cycle
 		return 0;
 	}
@@ -307,7 +313,7 @@ static int compact_data() {
 static int find_empty_block() {
 	byte data[sizeof(pairing_data_t)];
 
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 
 #ifdef EX_STORAGE_CHAR
 		memcpy(data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*i], sizeof(data));
@@ -369,7 +375,7 @@ int homekit_storage_add_pairing(const char *device_id, const ed25519_key *device
 
 int homekit_storage_update_pairing(const char *device_id, byte permissions) {
 	pairing_data_t data;
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 #ifdef EX_STORAGE_CHAR
 		memcpy((byte *)&data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*i], sizeof(data));
 #else
@@ -414,7 +420,7 @@ int homekit_storage_update_pairing(const char *device_id, byte permissions) {
 
 int homekit_storage_remove_pairing(const char *device_id) {
 	pairing_data_t data;
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 #ifdef EX_STORAGE_CHAR
 		memcpy((byte *)&data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*i], sizeof(data));
 #else
@@ -443,7 +449,7 @@ int homekit_storage_remove_pairing(const char *device_id) {
 
 pairing_t *homekit_storage_find_pairing(const char *device_id) {
 	pairing_data_t data;
-	for (int i = 0; i < MAX_PAIRINGS; i++) {
+	for (int i = 0; i < max_pairing; i++) {
 #ifdef EX_STORAGE_CHAR
 		memcpy((byte *)&data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*i], sizeof(data));
 #else
@@ -493,7 +499,7 @@ void homekit_storage_pairing_iterator_free(pairing_iterator_t *iterator) {
 
 pairing_t *homekit_storage_next_pairing(pairing_iterator_t *it) {
 	pairing_data_t data;
-	while (it->idx < MAX_PAIRINGS) {
+	while (it->idx < max_pairing) {
 		int id = it->idx++;
 #ifdef EX_STORAGE_CHAR
 		memcpy((byte *)&data, (void*)&ex_storage[PAIRINGS_ADDR_EX + sizeof(data)*id], sizeof(data));
