@@ -151,8 +151,13 @@ void hap_set_max_pairing(byte val) {
 void init_homekit_server() {
 	set_callback_storage(on_storage_changed);
     homekit_server_init(&hap_config);
+
+}
+void hap_setstopflag() {
+	setstopflag();
 }
 #endif
+
 /*
 void on_wifi_ready() {
     homekit_server_init(&config);

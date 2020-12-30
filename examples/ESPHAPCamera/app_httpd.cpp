@@ -755,3 +755,12 @@ httpd_uri_t user_uri = {
 #endif
   Serial.println("Camera started -> done");
 }
+
+void stop_httpserver() {
+	httpd_stop(stream_httpd);
+}
+
+void start_httpserver() {
+	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+	httpd_start(&camera_httpd, &config);
+}

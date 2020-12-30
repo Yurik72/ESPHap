@@ -50,7 +50,7 @@
 #ifndef HOMEKIT_MAX_CLIENTS
 #define HOMEKIT_MAX_CLIENTS 16
 #endif
-
+bool stop_flag = 0;
 struct _client_context_t;
 typedef struct _client_context_t client_context_t;
 
@@ -157,6 +157,9 @@ typedef struct {
 void client_context_free(client_context_t *c);
 void pairing_context_free(pairing_context_t *context);
 
+void setstopflag() {
+	stop_flag = 1;
+}
 
 homekit_server_t *server_new() {
     homekit_server_t *server = malloc(sizeof(homekit_server_t));
@@ -3225,6 +3228,8 @@ static void homekit_run_server(homekit_server_t *server)
     server->nfds = 1;
 
     for (;;) {
+		if (stop_flag)
+			break;
         fd_set read_fds;
         memcpy(&read_fds, &server->fds, sizeof(read_fds));
 
@@ -3244,7 +3249,8 @@ static void homekit_run_server(homekit_server_t *server)
                     homekit_client_process(context);
                     triggered_nfds--;
                 }
-
+				if (stop_flag)
+					break;
                 context = context->next;
             }
 			//INFO("homekit_server_close_clients");
@@ -3371,7 +3377,7 @@ ed25519_key *homekit_accessory_key_generate() {
 void homekit_server_task(void *args) {
     homekit_server_t *server = args;
     INFO("Starting server");
-
+	stop_flag = 0;
     int r = homekit_storage_init();
 
     if (r == 0) {

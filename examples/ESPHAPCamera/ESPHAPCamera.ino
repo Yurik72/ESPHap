@@ -1,8 +1,14 @@
 
+//  CONFIGURATION
+#include "config.h"  //OPEN AND CHANGE
+
+
+
+
+
 #include "esp_camera.h"
 #include <WiFi.h>
 
-#define ENABLE_HAP
 
 #ifdef ENABLE_HAP
 extern "C"{
@@ -40,7 +46,7 @@ homekit_service_t* hapservice={0};
 
 #include "camera_pins.h"
 
-#include "config.h"
+
 #include "app_httpd.h"
 #include "users_http.h" 
 #include "Motion.h"

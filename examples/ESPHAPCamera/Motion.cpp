@@ -2,15 +2,23 @@
 #include "Arduino.h"
 #include "config.h"
 #include "JPEGDecoder.h"
+#include "EMailSender.h"
+#include "app_httpd.h"
+#ifdef ENABLE_HAP
+extern "C" {
+#include "homeintegration.h"
+}
+#endif
 static callback_motiondetected_t callback_motiondetected = NULL;
 
 int8_t motion_detection_enabled = 1;
+int8_t motion_emailsend_enabled = 1;
 
 uint16_t *buf1 = NULL;
 size_t len1=0;
 uint16_t *buf2 = NULL;
 size_t len2=0;
-size_t level_sensitivity = 30;
+size_t level_sensitivity = 20;
 size_t motion_sensitivity = 300;
 uint16_t probe_height=0;
 uint16_t probe_width = 0;
@@ -36,6 +44,8 @@ long last_motion_ms = 0;
 
 uint8_t check_motion_grayscale();
 uint8_t check_motion_decoded();
+uint8_t send_capture_email();
+uint8_t send_email(uint8_t* jpegbuff, size_t jpegbufflen);
 void set_motioncallback(callback_motiondetected_t f) {
 	callback_motiondetected = f;
 }
@@ -50,7 +60,7 @@ bool read_fromdecoder(uint16_t **buf, size_t *len) {
 	*len = max_x* max_y * sizeof(**buf);
 	*buf = (uint16_t*)ps_malloc(*len);
 	if (!(*buf)) {
-		Serial.println("can't allocate memory");
+		Serial.println(F("can't allocate memory"));
 		return false;
 	}
 	while (JpegDec.read()) {
@@ -72,12 +82,12 @@ bool read_fromdecoder(uint16_t **buf, size_t *len) {
 }
 bool grab_probe( uint16_t **buf, size_t *len) {
 	if (!psramFound()) {
-		Serial.println("grab_probe not possible without psram");
+		Serial.println(F("grab_probe not possible without psram"));
 		return false;
 	}
 	camera_fb_t *frame_buffer = esp_camera_fb_get();    // capture frame from camera
 	if (!(frame_buffer)) {
-		Serial.println("grab_probe error");
+		Serial.println(F("grab_probe error"));
 		return false;
 	}
 	JpegDec.abort();
@@ -141,7 +151,7 @@ uint8_t run_motion_detection() {
 
 	if (!buf1) {
 		if (!grab_probe(&buf1,&len1)) {
-			Serial.println("grab_probe 1");
+			Serial.println(F("grab_probe 1"));
 			return 0;
 		}
 
@@ -149,20 +159,23 @@ uint8_t run_motion_detection() {
 	}
 	if (!buf2 && (last_probe_ms + PROBE_PERIOD_MS) < millis()) {
 		if (!grab_probe(&buf2, &len2)) {
-			Serial.println("grab_probe 2");
+			Serial.println(F("grab_probe 2"));
 			return 0;
 		}
 	}
+	uint8_t ismotion = 0;
 	if (buf1 && buf2) {
 		//Serial.println("Start motion detection");
 		//check_motion_grayscale();
-		check_motion_decoded();
+		ismotion=check_motion_decoded();
 	}
 	if (buf1 && buf2) {
 		free(buf1);
 		free(buf2);
 		buf1 = NULL;
 		buf2 = NULL;
+		if (ismotion && motion_emailsend_enabled)
+			send_capture_email();
 	}
 
 
@@ -181,7 +194,7 @@ uint8_t check_motion_decoded() {
 	int xmax = 0;
 	int ymin = probe_height;
 	int ymax = 0;
-
+	uint8_t res = 0;
 	for (int y = 0; y < probe_height; y++)
 	{
 		for (int x = 0; x < probe_width; x++) {
@@ -208,8 +221,9 @@ uint8_t check_motion_decoded() {
 	
 	if (motion_level > motion_sensitivity) {
 		Serial.printf("Motion detected %d:\r\n", motion_level);
-		Serial.printf("RECT %d,%d,%d,%d:\r\n", xmin, ymin, xmax, ymax);
+		//Serial.printf("RECT %d,%d,%d,%d:\r\n", xmin, ymin, xmax, ymax);
 		last_motion_ms = millis();
+		res = 1;
 		if (callback_motiondetected)
 			callback_motiondetected(1,motion_level);
 	}
@@ -220,6 +234,7 @@ uint8_t check_motion_decoded() {
 			last_motion_ms = 0;
 		}
 	}
+	return res;
 }
 uint8_t check_motion_grayscale() {
 	if (!buf1 || !buf2)  {
@@ -253,4 +268,67 @@ uint8_t check_motion_grayscale() {
 		if (callback_motiondetected)
 			callback_motiondetected(1,motion_level);
 	}
+}
+uint8_t send_capture_email() {
+	Serial.println(ESP.getFreeHeap());
+	sensor_t *s = esp_camera_sensor_get();
+	if (!s)
+		return false;
+	framesize_t oldframe = s->status.framesize;
+	s->set_framesize(s, FRAMESIZE_XGA);
+	
+	camera_fb_t *frame_buffer = NULL;
+	for (int i = 0; i < 10; i++) {
+		frame_buffer = esp_camera_fb_get();    // capture frame from camera
+		delay(10);
+		if (!(frame_buffer)) {
+			Serial.println(F("capture email error"));
+			return false;
+		}
+		esp_camera_fb_return(frame_buffer);
+	}
+	
+	frame_buffer = esp_camera_fb_get();
+	s->set_framesize(s, oldframe);
+	if (!(frame_buffer)) {
+		
+		return false;
+	}
+	send_email(frame_buffer->buf, frame_buffer->len);
+	esp_camera_fb_return(frame_buffer);
+}
+uint8_t send_email(uint8_t* jpegbuff, size_t jpegbufflen) {
+	EMailSender emailSend(EMAIL_SERVER_USER, EMAIL_SERVER_PWD, EMAIL_FROM, EMAIL_SERVER, EMAIL_SERVER_PORT);
+	stop_httpserver();
+#ifdef ENABLE_HAP
+	hap_setstopflag();
+	delay(2000);
+#endif
+	EMailSender::EMailMessage message;
+	message.subject = "Motion detected";
+	message.message = "See capture";
+	Serial.println(ESP.getFreeHeap());
+	EMailSender::FileDescriptior fileDescriptor[1];
+
+	fileDescriptor[0].filename = F("motion.jpg");
+	fileDescriptor[0].url = F("/motion.jpg");
+	fileDescriptor[0].mime = "image/jpg";
+	fileDescriptor[0].encode64 = true;
+	fileDescriptor[0].filedata = jpegbuff;
+	fileDescriptor[0].filedatalen = jpegbufflen;
+	fileDescriptor[0].storageType = EMailSender::EMAIL_STORAGE_TYPE_ARRAY;
+
+	EMailSender::Attachments attachs = { 1, fileDescriptor };
+
+	EMailSender::Response resp = emailSend.send(EMAIL_TO, message, attachs);
+
+	Serial.println("Sending status: ");
+
+	Serial.println(resp.status);
+	Serial.println(resp.code);
+	Serial.println(resp.desc);
+#ifdef ENABLE_HAP
+	hap_init_homekit_server();
+	start_httpserver();
+#endif
 }

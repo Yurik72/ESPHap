@@ -133,9 +133,11 @@ type name() { \
 	bool hap_setup_final_step();
 #ifndef ARDUINO8266_SERVER_CPP
 	int hap_get_setup_uri(char *buffer, size_t buffer_size);
+	void hap_setstopflag();
 #endif
 
 	homekit_value_t HOMEKIT_UINT8_VALUE(uint8_t value);
 	int set_wifi_max_power();
 	int set_wifi_save_power_middle(void);
 	int set_wifi_save_power(int8_t level);
+	

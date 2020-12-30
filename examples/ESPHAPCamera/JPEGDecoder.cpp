@@ -443,13 +443,14 @@ int JPEGDecoder::decodeCommon(void) {
 	row_pitch = image_info.m_MCUWidth;
 	imageSize = image_info.m_MCUWidth * image_info.m_MCUHeight;
 	bufferLen = image_info.m_MCUWidth * image_info.m_MCUHeight * sizeof(*pImage);
-//	if (!psramFound()) {
+	if (!psramFound()) {
 		pImage = new uint16_t[imageSize];
 		memset(pImage, 0, image_info.m_MCUWidth * image_info.m_MCUHeight * sizeof(*pImage));
-//	}
-//	else {
-//		pImage =( uint16_t*) ps_malloc(bufferLen);
-//	}
+	}
+	else {
+		pImage =( uint16_t*) ps_malloc(bufferLen);
+		memset(pImage, 0, image_info.m_MCUWidth * image_info.m_MCUHeight * sizeof(*pImage));
+	}
 
 	//memset(pImage , 0 , image_info.m_MCUWidth * image_info.m_MCUHeight * sizeof(*pImage));
 
@@ -475,7 +476,14 @@ void JPEGDecoder::abort(void) {
 	mcu_x = 0 ;
 	mcu_y = 0 ;
 	is_available = 0;
-	if(pImage) delete[] pImage;
+	if (pImage) {
+		if (!psramFound()) {
+			if (pImage) delete[] pImage;
+		}
+		else {
+			free(pImage);
+		}
+	}
 	pImage = NULL;
 	
 #ifdef LOAD_SPIFFS
