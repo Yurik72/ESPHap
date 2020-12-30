@@ -209,6 +209,8 @@ Additionally :
  
  - If face recognized it's able to send RF signal. So any receiver can validate signal and apply any action for instance open a door lock
  
+ - Possibility to send e-mail with capture, when motion detected
+ 
  
  All of that is experimental. But main achievemnts is to find a way how to detect motion, due to the lot of bug's and limitation in  camera API's.
  I found a fastest way (in my opinion). Main algorith is traditional: comparing two camera snapshots and based on the sensitivity level
