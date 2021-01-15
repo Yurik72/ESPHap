@@ -115,7 +115,20 @@ type name() { \
 	homekit_service_t* hap_new_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
 	homekit_service_t* hap_add_air_quality_service(const char* szname/*, hap_callback cb, void* context*/);
 	homekit_service_t*  hap_add_air_quality_service_as_accessory(int acctype, const char* szname/*, hap_callback cb, void* context*/);
+	//garage door
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_OPEN 0
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_CLOSED 1
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_OPENING 2
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_CLOSING 3
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_STOPPED 4
+	#define HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_UNKNOWN 255
 
+	#define HOMEKIT_CHARACTERISTIC_TARGET_DOOR_STATE_OPEN 0
+	#define HOMEKIT_CHARACTERISTIC_TARGET_DOOR_STATE_CLOSED 1
+	#define HOMEKIT_CHARACTERISTIC_TARGET_DOOR_STATE_UNKNOWN 255
+	homekit_service_t* hap_new_garagedoor_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_garagedoor_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_garagedoor_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 

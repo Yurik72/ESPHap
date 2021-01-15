@@ -766,7 +766,49 @@ homekit_service_t* hap_add_fan2_service(const char* szname, hap_callback cb, voi
 	INFO("hap_add_fan2_service");
 	return hap_add_service(hap_new_fan2_service(szname, cb, context));
 }
+//garage door
+homekit_service_t* hap_new_garagedoor_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(GARAGE_DOOR_OPENER, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_DOOR_STATE, HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_CLOSED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TARGET_DOOR_STATE, HOMEKIT_CHARACTERISTIC_TARGET_DOOR_STATE_CLOSED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(OBSTRUCTION_DETECTED, HOMEKIT_CHARACTERISTIC_TARGET_DOOR_STATE_CLOSED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NULL
+	});
+}
+homekit_service_t* hap_add_garagedoor_service(const char* szname, hap_callback cb, void* context) {
 
+	return hap_add_service(hap_new_garagedoor_service(szname, cb, context));
+}
+homekit_service_t* hap_add_garagedoor_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
+	INFO("add hap_add_garagedoor_as_accessory ");
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* garagedoor_service = hap_new_garagedoor_service(szname, cb, context);
+
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = garagedoor_service;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = homekit_accessory_category_switch,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+
+	return garagedoor_service;
+}
+//switch
 homekit_service_t* hap_new_switch_service(const char* szname,hap_callback cb,void* context){
 
 	return NEW_HOMEKIT_SERVICE(SWITCH, .primary = true,.characteristics=(homekit_characteristic_t*[]) {
