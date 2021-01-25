@@ -1,8 +1,10 @@
 #ifndef __HOMEKIT_CHARACTERISTICS__
 #define __HOMEKIT_CHARACTERISTICS__
 
+
 #include "types.h"
 #include "port_x.h"
+
 // MARK: - Apple UUID
 
 #ifdef HOMEKIT_SHORT_APPLE_UUIDS

@@ -996,3 +996,30 @@ int set_wifi_save_power(int8_t level) {
 #endif
 
 }
+
+/// EVE ELGATO SUPPORTS
+homekit_service_t* hap_add_elgatosupport_service(const char* szname, hap_callback cb, void* context) {
+
+	homekit_service_t*service = NEW_HOMEKIT_SERVICE(ELGATO_HISTORY, .characteristics = (homekit_characteristic_t*[]) {
+		    NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(ELGATO_SET_TIME, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+				cb, .context = context)
+			),
+			NEW_HOMEKIT_CHARACTERISTIC(ELGATO_HISTORY_REQUEST,0, 
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+				cb, .context = context),
+				),
+			NEW_HOMEKIT_CHARACTERISTIC(ELGATO_HISTORY_STATUS, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+				cb, .context = context)
+				),
+			NEW_HOMEKIT_CHARACTERISTIC(ELGATO_HISTORY_ENTRIES, 0,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+				cb, .context = context)
+				),
+			NULL
+	});
+
+	return hap_add_service(service);
+}

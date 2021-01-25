@@ -599,7 +599,25 @@ void write_characteristic_json(json_stream *json, client_context_t *client, cons
                     break;
                 }
                 case homekit_format_data:
-                    // TODO:
+					json_string(json, "value");
+					if (!v.data_value || v.data_size == 0) {
+						json_string(json, "");
+					}
+					else {
+						size_t encoded_data_size = base64_encoded_size(v.data_value, v.data_size);
+						byte *encoded_data = malloc(encoded_data_size + 1);
+						if (!encoded_data) {
+							CLIENT_ERROR(client, "Failed to allocate %d bytes for encoding characteristic data", encoded_data_size + 1);
+							json_string(json, "");
+							break;
+						}
+						base64_encode(v.data_value, v.data_size, encoded_data);
+						encoded_data[encoded_data_size] = 0;
+
+						json_string(json, (char*)encoded_data);
+
+						free(encoded_data);
+					}
                     break;
             }
         }
@@ -2176,6 +2194,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
     DEBUG_HEAP();
 
     char *data1 = strndup((char *)data, size);
+	//CLIENT_INFO(context, "Update Characteristics %s",data);
     cJSON *json = cJSON_Parse(data1);
     free(data1);
 
@@ -2465,8 +2484,43 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
                     break;
                 }
                 case homekit_format_data: {
-                    // TODO:
-                    break;
+					if (j_value->type != cJSON_String) {
+						CLIENT_ERROR(context, "Failed to update %d.%d: value is not a string", aid, iid);
+						return HAPStatus_InvalidValue;
+					}
+
+					// Default max data len = 2,097,152 but that does not make sense
+					// for this accessory
+					int max_len = (ch->max_data_len) ? *ch->max_data_len : 4096;
+
+					char *value = j_value->valuestring;
+					size_t value_len = strlen(value);
+					if (value_len > max_len) {
+						CLIENT_ERROR(context, "Failed to update %d.%d: value is too long", aid, iid);
+						return HAPStatus_InvalidValue;
+					}
+
+					size_t data_size = base64_decoded_size((unsigned char*)value, value_len);
+					byte *data = malloc(data_size);
+					if (!data) {
+						CLIENT_ERROR(context,
+							"Failed to update %d.%d: "
+							"error allocating %d bytes for Base64 decoding",
+							aid, iid, data_size);
+						return HAPStatus_InvalidValue;
+					}
+
+					if (base64_decode((byte*)value, value_len, data) < 0) {
+						free(data);
+						CLIENT_ERROR(context, "Failed to update %d.%d: error Base64 decoding", aid, iid);
+						return HAPStatus_InvalidValue;
+					}
+
+					CLIENT_INFO(context, "Updating characteristic %d.%d (\"%s\") with Data:", aid, iid, ch->description);
+
+					h_value = HOMEKIT_DATA(data, data_size);
+
+					break;
                 }
             }
 

@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "elgato.h"
 #include "homekit.h"
 #include "characteristics.h"
 #include "storage.h"
@@ -133,6 +134,9 @@ type name() { \
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 
 	void hap_setbase_accessorytype(int val);
+	//elgato
+	homekit_service_t* hap_add_elgatosupport_service(const char* szname, hap_callback cb, void* context);
+
 #ifndef ARDUINO8266_SERVER_CPP
 	void hap_init_homekit_server();
 	bool hap_homekit_is_paired();
