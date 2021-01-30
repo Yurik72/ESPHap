@@ -353,6 +353,10 @@ hap_webserver_begin();
 If you use the built-in web server, by default it provides access to a setup/pairing page/image by QR code which can be accessed by visiting http://\<Your Device IP Address\>/setup.html, see example [Advanced LED](https://github.com/Yurik72/ESPHap/tree/master/examples/EspHapAdvancedLed).
 
 # Versions history
+## v1.0.7
+   
+   Fixed issue with for stable pairing process on ESP8266
+   
 ## v1.0.3
 - small bug fixes
 - new examples
