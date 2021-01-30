@@ -1565,7 +1565,8 @@ void homekit_server_on_pair_setup(client_context_t *context, const byte *data, s
 		context->server->pairing_context = NULL;
 
 		context->server->paired = 1;
-		homekit_mdns_init(context->server);
+		//#37  Works wit appple without full restart. Apple will ignore some times paired flag, until paired is not finished !
+		//homekit_mdns_init(context->server);
 
 		CLIENT_INFO(context, "Successfully paired");
 
