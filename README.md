@@ -5,7 +5,8 @@ ESPHap - Arduino HomeKit ESP32/ESP8266
 
 ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports both ESP32 and ESP8266.
 
-Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices. Once paired, devices work well and stable though.
+Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices. Once paired, devices work well and stable though. 
+! Since version v1.0.6 and usage IOS >14 the pairing process is stable for ESP8266, therefore known bugs are fixed and library can be easilly used for ESP8266
 
 ESPHap allows to implement up to 16 different [accessories](https://www.apple.com/ae/ios/home/accessories/) on the same ESP32/ESP8266 board.
 
