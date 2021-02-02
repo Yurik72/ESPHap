@@ -768,7 +768,7 @@ homekit_service_t* hap_add_fan2_service(const char* szname, hap_callback cb, voi
 }
 //garage door
 homekit_service_t* hap_new_garagedoor_service(const char* szname, hap_callback cb, void* context) {
-	return NEW_HOMEKIT_SERVICE(GARAGE_DOOR_OPENER, .characteristics = (homekit_characteristic_t*[]) {
+	return NEW_HOMEKIT_SERVICE(GARAGE_DOOR_OPENER, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_DOOR_STATE, HOMEKIT_CHARACTERISTIC_CURRENT_DOOR_STATE_CLOSED,
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
@@ -799,7 +799,7 @@ homekit_service_t* hap_add_garagedoor_as_accessory(int acctype, const char* szna
 	svc[1] = garagedoor_service;
 	svc[2] = NULL;
 	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
-		.category = homekit_accessory_category_switch,
+		.category = homekit_accessory_category_garage,
 		.services = svc
 	);
 
@@ -807,6 +807,57 @@ homekit_service_t* hap_add_garagedoor_as_accessory(int acctype, const char* szna
 	hap_accessories[hap_mainaccesories_current] = NULL;
 
 	return garagedoor_service;
+}
+//Window covering
+homekit_service_t* hap_new_windowcovering_service(const char* szname, hap_callback cb, void* context) {
+	return NEW_HOMEKIT_SERVICE(WINDOW_COVERING, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_POSITION, WINDOWCOVERING_POSITION_CLOSED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(TARGET_POSITION, WINDOWCOVERING_POSITION_CLOSED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NEW_HOMEKIT_CHARACTERISTIC(POSITION_STATE, WINDOWCOVERING_POSITION_STATE_STOPPED,
+				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+					cb, .context = context
+				)),
+			NULL
+	});
+}
+homekit_service_t* hap_add_windowcovering_service(const char* szname, hap_callback cb, void* context) {
+
+	return hap_add_service(hap_new_windowcovering_service(szname, cb, context));
+}
+homekit_service_t* hap_add_windowcovering_as_accessory(int acctype, const char* szname, hap_callback cb, void* context) {
+	INFO("add hap_add_windowcovering_as_accessory ");
+	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
+	homekit_service_t* windowcovering_service = hap_new_windowcovering_service(szname, cb, context);
+
+	homekit_service_t* svc[3];
+	svc[0] = baseservice;
+	svc[1] = windowcovering_service;
+	svc[2] = NULL;
+	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
+		.category = homekit_accessory_category_window_covering,
+		.services = svc
+	);
+
+	hap_mainaccesories_current++;
+	hap_accessories[hap_mainaccesories_current] = NULL;
+
+	return windowcovering_service;
+}
+homekit_characteristic_t* hap_add_hold_characteristik_to_windowcovering(homekit_service_t* s, hap_callback cb, void* context) {
+	
+	return homekit_add_characteristic_to_service(s, 
+		NEW_HOMEKIT_CHARACTERISTIC(HOLD_POSITION, false,
+			.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
+				cb, .context = context
+			))
+		);
 }
 //switch
 homekit_service_t* hap_new_switch_service(const char* szname,hap_callback cb,void* context){
@@ -932,7 +983,37 @@ homekit_service_t* hap_add_service(homekit_service_t* service ){
 
 	return service;
 }
+void hap_setinitial_characteristic_int_value(homekit_service_t* s, const char *type,int val ) {
+	hap_set_initial_characteristic_int_value(homekit_service_characteristic_by_type(s, type), val);
+}
+void hap_setinitial_characteristic_bool_value(homekit_service_t* s, const char *type, bool val) {
+	hap_set_initial_characteristic_int_value(homekit_service_characteristic_by_type(s, type), val);
+}
 
+void hap_set_initial_characteristic_int_value(homekit_characteristic_t* ch, int val) {
+	if (!ch
+		||
+		(ch->format != homekit_format_uint8 && ch->format != homekit_format_uint16
+			&& ch->format != homekit_format_uint32 && ch->format != homekit_format_int)
+		)
+	{
+		ERROR("Wrong default value\n");
+		return;
+	}
+	ch->value.int_value = hap_constrain(val, *ch->min_value, *ch->max_value);
+	if (ch->value.int_value != val) {
+		ERROR("Default value is out of range, Set %d instead", ch->value.int_value);
+	}
+}
+void hap_set_initial_characteristic_bool_value(homekit_characteristic_t* ch, bool bval) {
+	if (!ch	||	(ch->format != homekit_format_bool))
+	{
+		ERROR("Wrong default value\n");
+		return;
+	}
+	ch->value.bool_value = bval;
+
+}
 #ifndef ARDUINO8266_SERVER_CPP
 int hap_get_setup_uri( char *buffer, size_t buffer_size) {
 	int res=homekit_get_setup_uri(hap_get_server_config(), buffer, buffer_size);

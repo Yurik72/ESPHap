@@ -15,6 +15,7 @@
 //#include "arduino_homekit_server.h"
 #endif
 
+
 #define INFO(message, ...) printf(">>> Home Integration: " message "\n", ##__VA_ARGS__)
 
 #define hap_constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
@@ -131,9 +132,33 @@ type name() { \
 	homekit_service_t* hap_add_garagedoor_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_garagedoor_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 
+
+	//Window Covering
+#define WINDOWCOVERING_POSITION_OPEN 100
+#define WINDOWCOVERING_POSITION_CLOSED 0
+#define WINDOWCOVERING_POSITION_STATE_CLOSING 0
+#define WINDOWCOVERING_POSITION_STATE_OPENING 1
+#define WINDOWCOVERING_POSITION_STATE_STOPPED 2
+
+	homekit_service_t* hap_new_windowcovering_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_windowcovering_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_windowcovering_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+	homekit_characteristic_t* hap_add_hold_characteristik_to_windowcovering(homekit_service_t* s, hap_callback cb, void* context);
+
+
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 
 	void hap_setbase_accessorytype(int val);
+
+	//initial value
+#define INIT_CHARACHTERISTIC_VAL(type,ch,val) \
+		hap_set_initial_characteristic_##type##_value(ch,val);
+
+	void hap_setinitial_characteristic_int_value(homekit_service_t* s, const char *type, int val);
+	void hap_setinitial_characteristic_bool_value(homekit_service_t* s, const char *type, bool val);
+
+	void hap_set_initial_characteristic_int_value(homekit_characteristic_t* ch, int val);
+	void hap_set_initial_characteristic_bool_value(homekit_characteristic_t* ch, bool bval);
 	//elgato
 	homekit_service_t* hap_add_elgatosupport_service(const char* szname, hap_callback cb, void* context);
 

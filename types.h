@@ -296,7 +296,8 @@ extern "C" {
 	homekit_service_t *homekit_service_clone(homekit_service_t *service);
 	// Allocate memory and copy given characteristic.
 	homekit_characteristic_t *homekit_characteristic_clone(homekit_characteristic_t *characteristic);
-
+	///Adding new characheristic to service
+	homekit_characteristic_t* homekit_add_characteristic_to_service(homekit_service_t* service, homekit_characteristic_t* ch);
 
 	// Macro to define an accessory in dynamic memory.
 	// Used to aid creating accessories definitions in runtime.

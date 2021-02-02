@@ -146,7 +146,30 @@ void *align_pointer(void *ptr) {
     }
     return (void*) p;
 }
-
+// to be checked
+homekit_characteristic_t* homekit_add_characteristic_to_service(homekit_service_t* service, homekit_characteristic_t* ch) {
+	if (service->characteristics) {
+		int i = 0;
+		size_t size;
+		while (service->characteristics[i])
+			i++;
+		
+		size += sizeof(homekit_characteristic_t*) * (i + 2);
+		
+		homekit_characteristic_t** old = service->characteristics;
+		service->characteristics =calloc(1, size);
+		
+		int n = 0;
+		while (old[n]) {
+			service->characteristics[n] = old[n];
+			n++;
+		}
+		//free(old);
+		service->characteristics[i] = ch;
+		service->characteristics[i+1] = NULL;
+	}
+	return ch;
+}
 
 homekit_characteristic_t* homekit_characteristic_clone(homekit_characteristic_t* ch) {
     size_t type_len = strlen(ch->type) + 1;
