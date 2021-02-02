@@ -284,6 +284,13 @@ Then you need to define all accessories, the services they provide and the chara
 - `led_callback` is the name of the callback function which is called from  Apple Home app whenever a change occurs
 - `(void*)&led_gpio` is the callback parameter
  
+Optinally you can set a default (initial) value to be informed Apple about initial state
+```c
+ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
+ INIT_CHARACHTERISTIC_VAL(bool,ch,false);   //  will inform apple that lights is OFF
+```
+
+
  After that you can add more accessories like this
  ```c
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
