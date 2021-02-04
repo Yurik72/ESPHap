@@ -3,6 +3,9 @@
 ESPHap - Arduino HomeKit ESP32/ESP8266
 ===========
 
+**!!! HINT !! Due to the large improvements and testing, please be aware that latest version can contains bugs. 
+You can use [v1.0.7](https://github.com/Yurik72/ESPHap/releases/tag/v1.0.7), which is quite stable**
+
 ESPHap is an Arduino library which natively implements Apple's HomeKit protocol for your ESP32/ESP8266 based projects without the need for additional bridges. ESPHap currently supports both ESP32 and ESP8266.
 
 Please note: There are some minor known bugs within the ESP8266 implementation, especially during device pairing. Not all pairing attempts succeed, it can take up to 3 attempts to pair devices. Once paired, devices work well and stable though. 
@@ -284,6 +287,13 @@ Then you need to define all accessories, the services they provide and the chara
 - `led_callback` is the name of the callback function which is called from  Apple Home app whenever a change occurs
 - `(void*)&led_gpio` is the callback parameter
  
+Optinally you can set a default (initial) value to be informed Apple about initial state
+```c
+ homekit_characteristic_t * ch= homekit_service_characteristic_by_type(hapservice, HOMEKIT_CHARACTERISTIC_ON);
+ INIT_CHARACHTERISTIC_VAL(bool,ch,false);   //  will inform apple that lights is OFF
+```
+
+
  After that you can add more accessories like this
  ```c
  hapservice_motion= hap_add_motion_service_as_accessory(homekit_accessory_category_security_system,"Motion",motion_callback,NULL);
