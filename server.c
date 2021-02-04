@@ -50,7 +50,13 @@
 #ifndef HOMEKIT_MAX_CLIENTS
 #define HOMEKIT_MAX_CLIENTS 16
 #endif
+
+#define CLIENT_CONTEXT_CACHE_SIZE 4
+
+
+
 bool stop_flag = 0;
+bool is_initialized=false;
 struct _client_context_t;
 typedef struct _client_context_t client_context_t;
 
@@ -103,11 +109,21 @@ typedef struct {
 
     bool paired;
     pairing_context_t *pairing_context;
+	byte data[1024 + 18];
+	byte output_buffer[1024];
 
     int listen_fd;
     fd_set fds;
     int max_fd;
     int nfds;
+
+
+	http_parser parser;
+	json_stream json;
+
+
+	bool request_completed;
+
 
     client_context_t *clients;
 } homekit_server_t;
@@ -119,13 +135,13 @@ struct _client_context_t {
     homekit_endpoint_t endpoint;
     query_param_t *endpoint_params;
 
-    byte *data;
-    size_t data_size;
-    size_t data_available;
+    //byte *data;
+   // size_t data_size;
+   // size_t data_available;
 
     char *body;
     size_t body_length;
-    http_parser *parser;
+//    http_parser *parser;
 
     int pairing_id;
     byte permissions;
@@ -136,17 +152,19 @@ struct _client_context_t {
     homekit_value_t *current_value;
 
     bool encrypted;
-    byte *read_key;
-    byte *write_key;
+    byte read_key[32];
+    byte write_key[32];
     int count_reads;
     int count_writes;
 
     QueueHandle_t event_queue;
     pair_verify_context_t *verify_context;
-
+	bool is_static;
+	bool is_used;
     struct _client_context_t *next;
 };
 
+static client_context_t cache_client_contexts[CLIENT_CONTEXT_CACHE_SIZE];
 //#if !defined(ARDUINO) && !defined(ESP8266)
 typedef struct {
     homekit_characteristic_t *characteristic;
@@ -156,7 +174,7 @@ typedef struct {
 
 void client_context_free(client_context_t *c);
 void pairing_context_free(pairing_context_t *context);
-
+void client_send_chunk(byte *data, size_t size, void *arg);
 void setstopflag() {
 	stop_flag = 1;
 }
@@ -164,6 +182,10 @@ void setstopflag() {
 homekit_server_t *server_new() {
     homekit_server_t *server = malloc(sizeof(homekit_server_t));
     FD_ZERO(&server->fds);
+	http_parser_init(&server->parser, HTTP_REQUEST);
+	json_init(&server->json, server->output_buffer, sizeof(server->output_buffer),
+		client_send_chunk, NULL);
+
     server->max_fd = 0;
     server->nfds = 0;
     server->accessory_id = NULL;
@@ -327,65 +349,89 @@ void pair_verify_context_free(pair_verify_context_t *context) {
     free(context);
 }
 
+void init_client_context(client_context_t *c) {
+	c->server = NULL;
+	c->endpoint_params = NULL;
 
+	c->body = NULL;
+	c->body_length = 0;
+
+	c->pairing_id = -1;
+	c->encrypted = false;
+
+
+	c->count_reads = 0;
+	c->count_writes = 0;
+
+	c->disconnect = false;
+
+	c->event_queue = xQueueCreate(20, sizeof(characteristic_event_t*));
+	c->verify_context = NULL;
+
+	c->next = NULL;
+
+	
+}
+void server_static_init() {
+	if (is_initialized)
+		return;
+	for (int i = 0; i < CLIENT_CONTEXT_CACHE_SIZE; i++) {
+		client_context_t*c= &(cache_client_contexts[i]);
+		init_client_context(c);
+		c->is_static = true;
+		c->is_used = false;
+	}
+	is_initialized = true;
+}
 client_context_t *client_context_new() {
+	for (int i = 0; i < CLIENT_CONTEXT_CACHE_SIZE; i++) {
+		client_context_t*c = &(cache_client_contexts[i]);
+		if (!c->is_used) {
+			c->is_used = true;
+			return c;
+		}
+	}
     client_context_t *c = malloc(sizeof(client_context_t));
-    c->server = NULL;
-    c->endpoint_params = NULL;
-
-    c->data_size = 1024 + 18;
-    c->data_available = 0;
-    c->data = malloc(c->data_size);
-
-    c->body = NULL;
-    c->body_length = 0;
-    c->parser = malloc(sizeof(*c->parser));
-    http_parser_init(c->parser, HTTP_REQUEST);
-    c->parser->data = c;
-
-    c->pairing_id = -1;
-    c->encrypted = false;
-    c->read_key = NULL;
-    c->write_key = NULL;
-    c->count_reads = 0;
-    c->count_writes = 0;
-
-    c->disconnect = false;
-
-    c->event_queue = xQueueCreate(20, sizeof(characteristic_event_t*));
-    c->verify_context = NULL;
-
-    c->next = NULL;
-
-    return c;
+	init_client_context(c);
+	return c;
 }
 
 
 void client_context_free(client_context_t *c) {
-    if (c->read_key)
-        free(c->read_key);
 
-    if (c->write_key)
-        free(c->write_key);
+	c->pairing_id = -1;
+	c->encrypted = false;
+	c->server = NULL;
+	
+
+	c->count_reads = 0;
+	c->count_writes = 0;
+
+	c->disconnect = false;
 
     if (c->verify_context)
         pair_verify_context_free(c->verify_context);
-
-    if (c->event_queue)
-        vQueueDelete(c->event_queue);
+	c->verify_context = NULL;
+;
 
     if (c->endpoint_params)
         query_params_free(c->endpoint_params);
+	c->endpoint_params = NULL;
 
-    if (c->parser)
-        free(c->parser);
-
-    if (c->data)
-        free(c->data);
+//    if (c->data)
+//        free(c->data);
 
     if (c->body)
         free(c->body);
-
+	c->body = NULL;
+	if (c->is_static) {
+		c->is_used = false;
+		if(c->event_queue)
+			xQueueReset(c->event_queue);
+		return;
+	}
+	if (c->event_queue)
+		vQueueDelete(c->event_queue);
     free(c);
 }
 
@@ -634,7 +680,7 @@ int client_send_encrypted(
     client_context_t *context,
     byte *payload, size_t size
 ) {
-    if (!context || !context->encrypted || !context->read_key)
+    if (!context || !context->encrypted )
         return -1;
 
     byte nonce[12];
@@ -684,7 +730,7 @@ int client_decrypt(
     byte *payload, size_t payload_size,
     byte *decrypted, size_t *decrypted_size
 ) {
-    if (!context || !context->encrypted || !context->write_key)
+    if (!context || !context->encrypted )
         return -1;
 
     const size_t block_size = 1024 + 16 + 2;
@@ -1920,8 +1966,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
             const byte salt[] = "Control-Salt";
 
-            size_t read_key_size = 32;
-            context->read_key = malloc(read_key_size);
+            size_t read_key_size = sizeof(context->read_key);
+           
             const byte read_info[] = "Control-Read-Encryption-Key";
             r = crypto_hkdf(
                 context->verify_context->secret, context->verify_context->secret_size,
@@ -1933,8 +1979,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
             if (r) {
                 CLIENT_ERROR(context, "Failed to derive read encryption key (code %d)", r);
 
-                free(context->read_key);
-                context->read_key = NULL;
+                
+                
                 pair_verify_context_free(context->verify_context);
                 context->verify_context = NULL;
 
@@ -1942,8 +1988,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
                 break;
             }
 
-            size_t write_key_size = 32;
-            context->write_key = malloc(write_key_size);
+            size_t write_key_size = sizeof(context->write_key);
+            
             const byte write_info[] = "Control-Write-Encryption-Key";
             r = crypto_hkdf(
                 context->verify_context->secret, context->verify_context->secret_size,
@@ -1957,11 +2003,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
             if (r) {
                 CLIENT_ERROR(context, "Failed to derive write encryption key (code %d)", r);
-
-                free(context->write_key);
-                context->write_key = NULL;
-                free(context->read_key);
-                context->read_key = NULL;
+                
 
                 send_tlv_error_response(context, 4, TLVError_Unknown);
                 break;
@@ -2002,7 +2044,10 @@ void homekit_server_on_get_accessories(client_context_t *context) {
 
     client_send(context, json_200_response_headers, sizeof(json_200_response_headers)-1);
 
-    json_stream *json = json_new(1024, client_send_chunk, context);
+	json_stream *json = &context->server->json;
+	json_set_context(json, context);
+	json_reset(json);
+
     json_object_start(json);
     json_string(json, "accessories"); json_array_start(json);
 
@@ -2060,7 +2105,7 @@ void homekit_server_on_get_accessories(client_context_t *context) {
     json_object_end(json); // response
 
     json_flush(json);
-    json_free(json);
+    
 
     client_send_chunk(NULL, 0, context);
 }
@@ -2139,7 +2184,10 @@ void homekit_server_on_get_characteristics(client_context_t *context) {
         client_send(context, json_207_response_headers, sizeof(json_207_response_headers)-1);
     }
 
-    json_stream *json = json_new(256, client_send_chunk, context);
+	json_stream *json = &context->server->json;
+	json_set_context(json, context);
+	json_reset(json);
+
     json_object_start(json);
     json_string(json, "characteristics"); json_array_start(json);
 
@@ -2182,7 +2230,7 @@ void homekit_server_on_get_characteristics(client_context_t *context) {
     json_object_end(json); // response
 
     json_flush(json);
-    json_free(json);
+    
 
     client_send_chunk(NULL, 0, context);
 
@@ -2581,9 +2629,9 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
         CLIENT_DEBUG(context, "There were processing errors, sending Multi-Status response");
         client_send(context, json_207_response_headers, sizeof(json_207_response_headers)-1);
 
-        json_stream *json1 = json_new(1024, client_send_chunk, context);
-        json_object_start(json1);
-        json_string(json1, "characteristics"); json_array_start(json1);
+		json_stream *json1 = &context->server->json;
+		json_set_context(json1, context);
+		json_reset(json1);
 
         for (int i=0; i < cJSON_GetArraySize(characteristics); i++) {
             cJSON *j_ch = cJSON_GetArrayItem(characteristics, i);
@@ -2599,7 +2647,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
         json_object_end(json1); // response
 
         json_flush(json1);
-        json_free(json1);
+      
 
         client_send_chunk(NULL, 0, context);
     }
@@ -2958,7 +3006,12 @@ int homekit_server_on_body(http_parser *parser, const char *data, size_t length)
 
     return 0;
 }
+int homekit_server_on_message_begin(http_parser *parser) {
+	client_context_t *context = parser->data;
+	context->server->request_completed = false;
 
+	return 0;
+}
 int homekit_server_on_message_complete(http_parser *parser) {
     client_context_t *context = parser->data;
 
@@ -3016,6 +3069,8 @@ int homekit_server_on_message_complete(http_parser *parser) {
         context->body = NULL;
         context->body_length = 0;
     }
+	
+	context->server->request_completed = true;
 
     return 0;
 }
@@ -3024,76 +3079,80 @@ int homekit_server_on_message_complete(http_parser *parser) {
 static http_parser_settings homekit_http_parser_settings = {
     .on_url = homekit_server_on_url,
     .on_body = homekit_server_on_body,
+	.on_message_begin = homekit_server_on_message_begin,
     .on_message_complete = homekit_server_on_message_complete,
 };
 
 
 static void homekit_client_process(client_context_t *context) {
-    int data_len = read(
-        context->socket,
-        context->data+context->data_available,
-        context->data_size-context->data_available
-    );
-    if (data_len == 0) {
-        context->disconnect = true;
-        return;
-    }
+	context->server->parser.data = context;
 
-    if (data_len < 0) {
-        if (errno != EAGAIN) {
-            CLIENT_ERROR(context, "Error reading data from socket (code %d). Disconnecting", errno);
-            context->disconnect = true;
-        }
-        return;
-    }
+	size_t data_available = 0;
 
-    CLIENT_DEBUG(context, "Got %d incomming data", data_len);
-    byte *payload = (byte *)context->data;
-    size_t payload_size = (size_t)data_len;
+	do {
+		int data_len = read(
+			context->socket,
+			context->server->data + data_available,
+			sizeof(context->server->data) - data_available
+		);
+		if (data_len == 0) {
+			context->disconnect = true;
+			return;
+		}
 
-    byte *decrypted = NULL;
-    size_t decrypted_size = 0;
 
-    if (context->encrypted) {
-        CLIENT_DEBUG(context, "Decrypting data");
+		if (data_len < 0) {
+			if (errno != EAGAIN) {
+				CLIENT_ERROR(context, "Error reading data from socket (code %d). Disconnecting", errno);
+				context->disconnect = true;
+			}
+			return;
+		}
 
-        client_decrypt(context, context->data, data_len, NULL, &decrypted_size);
+		CLIENT_DEBUG(context, "Got %d incomming data", data_len);
+		byte *payload = (byte *)context->server->data;
+		size_t payload_size = (size_t)data_len;
 
-        decrypted = malloc(decrypted_size);
-        int r = client_decrypt(context, context->data, data_len, decrypted, &decrypted_size);
-        if (r < 0) {
-            CLIENT_ERROR(context, "Invalid client data");
-            free(decrypted);
-            return;
-        }
-        context->data_available = data_len - r;
-        if (r && context->data_available) {
-            memmove(context->data, &context->data[r], context->data_available);
-        }
-        CLIENT_DEBUG(context, "Decrypted %d bytes, available %d", decrypted_size, context->data_available);
+		
+		size_t decrypted_size = sizeof(context->server->data) - 2 - 18;
 
-        payload = decrypted;
-        payload_size = decrypted_size;
-        if (payload_size)
-            print_binary("Decrypted data", payload, payload_size);
-    } else {
-        context->data_available = 0;
-    }
+		if (context->encrypted) {
+			CLIENT_DEBUG(context, "Decrypting data");
 
-    current_client_context = context;
+			int r = client_decrypt(context, context->server->data, data_len, context->server->data + 2, &decrypted_size);
+			if (r < 0) {
+				CLIENT_ERROR(context, "Invalid client data");
+				return;
+			}
+			data_available = data_len - r;
+			if (r && data_available) {
+				memmove(context->server->data, &context->server->data[r], data_available);
+			}
+			CLIENT_DEBUG(context, "Decrypted %d bytes, available %d", decrypted_size, data_available);
 
-    http_parser_execute(
-        context->parser, &homekit_http_parser_settings,
-        (char *)payload, payload_size
-    );
+			payload = context->server->data + 2;
+			payload_size = decrypted_size;
+			if (payload_size)
+				print_binary("Decrypted data", payload, payload_size);
+		} else {
+			data_available = 0;
+		}
+
+		current_client_context = context;
+		context->server->request_completed = false;
+		http_parser_execute(
+			&context->server->parser, &homekit_http_parser_settings,
+			(char *)payload, payload_size
+		);
+		
+	} while (data_available && !context->server->request_completed);
 
     current_client_context = NULL;
+	context->server->parser.data = NULL;
 
     CLIENT_DEBUG(context, "Finished processing");
+	
 
-    if (decrypted) {
-        free(decrypted);
-    }
 }
 
 
@@ -3478,6 +3537,7 @@ void homekit_server_task(void *args) {
 #define ISBASE36(x) (isdigit((unsigned char)(x)) || (x >= 'A' && x <= 'Z'))
 
 void homekit_server_init(homekit_server_config_t *config) {
+	server_static_init();
     if (!config->accessories) {
         ERROR("Error initializing HomeKit accessory server: "
               "accessories are not specified");
@@ -3528,6 +3588,7 @@ void homekit_server_init(homekit_server_config_t *config) {
     homekit_server_t *server = server_new();
     server->config = config;
 
+	
     xTaskCreate(homekit_server_task, "HomeKit Server", SERVER_TASK_STACK, server, 1, NULL);
 }
 void homekit_server_restart() {

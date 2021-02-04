@@ -57,6 +57,14 @@ void vQueueDelete(QueueHandle_t q) {
 
 	free(q);
 }
+void xQueueReset(QueueHandle_t q) {
+	while (!STAILQ_EMPTY(q)) {
+		q_data_t* datap = STAILQ_FIRST(q);
+		STAILQ_REMOVE_HEAD(q, entries);
+		free(datap);
+	}
+
+}
 static void local_task(os_event_t* ev) {
 	for (unsigned int i = 0; i < t_num; i++)
 		if (loc_tasks[i].state==1 && loc_tasks[i].fn) {

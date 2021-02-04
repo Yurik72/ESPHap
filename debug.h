@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 	typedef unsigned char byte;
-	//#define HOMEKIT_DEBUG
+//	#define HOMEKIT_DEBUG
 #ifdef HOMEKIT_DEBUG
 #if defined(ARDUINO) && defined(ESP8266)
 #define DEBUG(message, ...) printf_P(PSTR(">>> %s: " message "\n"), __func__, ##__VA_ARGS__)

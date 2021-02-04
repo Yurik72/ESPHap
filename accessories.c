@@ -301,7 +301,61 @@ homekit_characteristic_t* homekit_characteristic_clone(homekit_characteristic_t*
 
     return clone;
 }
+homekit_service_t* homekit_service_clone_preserve_characteristic(homekit_service_t* service) {
+	size_t type_len = strlen(service->type) + 1;
+	size_t size = align_size(sizeof(homekit_service_t) + type_len);
 
+	if (service->linked) {
+		int i = 0;
+		while (service->linked[i])
+			i++;
+
+		size += sizeof(homekit_service_t*) * (i + 1);
+	}
+	if (service->characteristics) {
+		int i = 0;
+		while (service->characteristics[i])
+			i++;
+
+		size += sizeof(homekit_characteristic_t*) * (i + 1);
+	}
+
+	uint8_t *p = calloc(1, size);
+	homekit_service_t *clone = (homekit_service_t*)p;
+	p += sizeof(homekit_service_t);
+	clone->accessory = service->accessory;
+	clone->id = service->id;
+	clone->type = strncpy((char*)p, service->type, type_len);
+	p[type_len - 1] = 0;
+	p += align_size(type_len);
+
+	clone->hidden = service->hidden;
+	clone->primary = service->primary;
+
+	if (service->linked) {
+		clone->linked = (homekit_service_t**)p;
+		int i = 0;
+		while (service->linked[i]) {
+			clone->linked[i] = service->linked[i];
+			i++;
+		}
+		clone->linked[i] = NULL;
+		p += (i + 1) * sizeof(homekit_service_t*);
+	}
+
+	if (service->characteristics) {
+		clone->characteristics = (homekit_characteristic_t**)p;
+		int i = 0;
+		while (service->characteristics[i]) {
+			clone->characteristics[i] = service->characteristics[i];
+			i++;
+		}
+		clone->characteristics[i] = NULL;
+		p += (i + 1) * sizeof(homekit_characteristic_t*);
+	}
+
+	return clone;
+}
 homekit_service_t* homekit_service_clone(homekit_service_t* service) {
     size_t type_len = strlen(service->type) + 1;
     size_t size = align_size(sizeof(homekit_service_t) + type_len);

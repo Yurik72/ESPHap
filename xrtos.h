@@ -29,4 +29,5 @@ int xQueueSendToBack(QueueHandle_t xQueue, const void * pvItemToQueue, unsigned 
 bool xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, unsigned int xTicksToWait);
 
 void vQueueDelete(QueueHandle_t q);
+void xQueueReset(QueueHandle_t q);
 #endif
