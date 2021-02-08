@@ -28,6 +28,7 @@
 
 #include "http_parser.h"
 #include "cJSON.h"
+#include "cJSON_memory.h"
 #include <wolfssl/wolfcrypt/hash.h>
 #include <wolfssl/wolfcrypt/coding.h>
 
@@ -1629,26 +1630,33 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
-            curve25519_key *device_key = crypto_curve25519_new();
+			curve25519_key *device_key = crypto_curve25519_getcached(0);
+			r = crypto_curve25519_init(device_key);
+			if (r) {
+				CLIENT_ERROR(context, "Failed to initialize device Curve25519 public key (code %d)", r);
+				send_tlv_error_response(context, 2, TLVError_Unknown);
+				break;
+			}
             r = crypto_curve25519_import_public(
                 device_key,
                 tlv_device_public_key->value, tlv_device_public_key->size
             );
             if (r) {
                 CLIENT_ERROR(context, "Failed to import device Curve25519 public key (code %d)", r);
-                crypto_curve25519_free(device_key);
+                crypto_curve25519_done(device_key);
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
 
             CLIENT_DEBUG(context, "Generating accessory Curve25519 key");
-            curve25519_key *my_key = crypto_curve25519_generate();
-            if (!my_key) {
-                CLIENT_ERROR(context, "Failed to generate accessory Curve25519 key");
-                crypto_curve25519_free(device_key);
-                send_tlv_error_response(context, 2, TLVError_Unknown);
-                break;
-            }
+			curve25519_key *my_key = crypto_curve25519_getcached(1);
+			r = crypto_curve25519_generate(my_key);
+			if (r) {
+				CLIENT_ERROR(context, "Failed to generate accessory Curve25519 key");
+				crypto_curve25519_done(device_key);
+				send_tlv_error_response(context, 2, TLVError_Unknown);
+				break;
+			}
 
             CLIENT_DEBUG(context, "Exporting accessory Curve25519 public key");
             size_t my_key_public_size = 0;
@@ -1659,8 +1667,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
             if (r) {
                 CLIENT_ERROR(context, "Failed to export accessory Curve25519 public key (code %d)", r);
                 free(my_key_public);
-                crypto_curve25519_free(my_key);
-                crypto_curve25519_free(device_key);
+                crypto_curve25519_done(my_key);
+                crypto_curve25519_done(device_key);
                 send_tlv_error_response(context, 2, TLVError_Unknown);
                 break;
             }
@@ -1671,8 +1679,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
             byte *shared_secret = malloc(shared_secret_size);
             r = crypto_curve25519_shared_secret(my_key, device_key, shared_secret, &shared_secret_size);
-            crypto_curve25519_free(my_key);
-            crypto_curve25519_free(device_key);
+            crypto_curve25519_done(my_key);
+            crypto_curve25519_done(device_key);
 
             if (r) {
                 CLIENT_ERROR(context, "Failed to generate Curve25519 shared secret (code %d)", r);
@@ -2236,9 +2244,17 @@ void homekit_server_on_get_characteristics(client_context_t *context) {
 
     free(id);
 }
-
+#ifdef HOMEKIT_DEBUG
+#define JSON_ALLOCATE_SIZE 1280
+#else
+#define JSON_ALLOCATE_SIZE 1024
+#endif
 void homekit_server_on_update_characteristics(client_context_t *context, const byte *data, size_t size) {
     CLIENT_INFO(context, "Update Characteristics");
+#ifdef CJSON_USE_PREALLOCATED_BUFFER
+	char al_buf[JSON_ALLOCATE_SIZE];
+	set_allocator_buffer(al_buf, JSON_ALLOCATE_SIZE)
+#endif
     DEBUG_HEAP();
 
     char *data1 = strndup((char *)data, size);
@@ -2265,8 +2281,9 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
         send_json_error_response(context, 400, HAPStatus_InvalidValue);
         return;
     }
-
+	
     HAPStatus process_characteristics_update(const cJSON *j_ch) {
+		
         cJSON *j_aid = cJSON_GetObjectItem(j_ch, "aid");
         if (!j_aid) {
             CLIENT_ERROR(context, "Failed to process request: no \"aid\" field");
@@ -2605,16 +2622,19 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 
         return HAPStatus_Success;
     }
-
+	
     HAPStatus *statuses = malloc(sizeof(HAPStatus) * cJSON_GetArraySize(characteristics));
     bool has_errors = false;
     for (int i=0; i < cJSON_GetArraySize(characteristics); i++) {
         cJSON *j_ch = cJSON_GetArrayItem(characteristics, i);
 
+#ifdef HOMEKIT_DEBUG
         char *s = cJSON_Print(j_ch);
         CLIENT_DEBUG(context, "Processing element %s", s);
-        free(s);
-
+	
+        //free(s);
+		cJSON_free(s);
+#endif
         statuses[i] = process_characteristics_update(j_ch);
 
         if (statuses[i] != HAPStatus_Success)
@@ -2653,6 +2673,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
     }
 
     free(statuses);
+	
     cJSON_Delete(json);
 }
 

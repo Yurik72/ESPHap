@@ -16,7 +16,8 @@
 #include "port_x.h"
 #include "port.h"
 #include "debug.h"
-
+#define CACHE_CURVE25519_KEY_SIZE 2
+const curve25519_key cache_curve25519_key[CACHE_CURVE25519_KEY_SIZE];
 #ifndef ARDUINO8266_SERVER_X
 // 3072-bit group N (per RFC5054, Appendix A)
 const byte N[] = {
@@ -57,6 +58,8 @@ const byte N[] = {
 
 // 3072-bit group generator (per RFC5054, Appendix A)
 const byte g[] = {0x05};
+
+
 #else
 //1024 - bit Group
 const byte N[] = {
@@ -476,6 +479,11 @@ int crypto_ed25519_verify(
     return !r && !verified;
 }
 
+curve25519_key *crypto_curve25519_getcached(int idx) {
+	if (idx >= CACHE_CURVE25519_KEY_SIZE)
+		return NULL;
+	return &cache_curve25519_key[idx];
+}
 
 curve25519_key *crypto_curve25519_new() {
     curve25519_key *key = malloc(sizeof(curve25519_key));
@@ -495,21 +503,34 @@ void crypto_curve25519_free(curve25519_key *key) {
     wc_curve25519_free(key);
     free(key);
 }
+int crypto_curve25519_init(curve25519_key *key) {
+	int r = wc_curve25519_init(key);
+	if (r) {
+		return r;
+	}
+	return 0;
+}
+void crypto_curve25519_done(curve25519_key *key) {
+	if (!key)
+		return;
 
+	wc_curve25519_free(key);
+}
+int crypto_curve25519_generate(curve25519_key *key) {
+	int r;
+	r = crypto_curve25519_init(key);
+	if (r) {
+		return r;
+	}
 
-curve25519_key *crypto_curve25519_generate() {
-    curve25519_key *key = crypto_curve25519_new();
-    if (!key)
-        return NULL;
+	WC_RNG rng;
+	r = wc_curve25519_make_key(&rng, 32, key);
+	if (r) {
+		crypto_curve25519_done(key);
+		return -1;
+	}
 
-    WC_RNG rng;
-    int r = wc_curve25519_make_key(&rng, 32, key);
-    if (r) {
-        crypto_curve25519_free(key);
-        return NULL;
-    }
-
-    return key;
+	return 0;
 }
 
 

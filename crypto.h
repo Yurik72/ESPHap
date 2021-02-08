@@ -3,11 +3,14 @@
 
 #include <stdlib.h>
 #include "port_x.h"
+
+
 #ifdef ARDUINO8266_SERVER_CPP
 #ifdef __cplusplus
 extern "C" {
 #endif
 #endif
+
 	typedef unsigned char byte;
 
 #define HKDF_HASH_SIZE 32  // CHACHA20_POLY1305_AEAD_KEYSIZE
@@ -99,9 +102,11 @@ extern "C" {
 	// CURVE25519
 	struct _curve25519_key;
 	typedef struct _curve25519_key curve25519_key;
-
+	curve25519_key *crypto_curve25519_getcached(int idx);
+	int crypto_curve25519_init(curve25519_key *key);
 	curve25519_key *crypto_curve25519_new();
-	curve25519_key *crypto_curve25519_generate();
+	void crypto_curve25519_done(curve25519_key *key);
+	int crypto_curve25519_generate(curve25519_key *key);
 	void crypto_curve25519_free(curve25519_key *key);
 	int crypto_curve25519_import_public(
 		curve25519_key *key,

@@ -23,6 +23,7 @@
 #include "storage.h"
 #include "query_params.h"
 #include "cJSON.h"
+#include "cJSON_memory.h"
 #include "json.h"
 #include "debug.h"
 #include "port.h"
@@ -1682,23 +1683,30 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
-		curve25519_key *device_key = crypto_curve25519_new();
+		curve25519_key *device_key = crypto_curve25519_getcached(0);
+		r = crypto_curve25519_init(device_key);
+		if (r) {
+			CLIENT_ERROR(context, "Failed to initialize device Curve25519 public key (code %d)", r);
+			send_tlv_error_response(context, 2, TLVError_Unknown);
+			break;
+		}
 		r = crypto_curve25519_import_public(
 			device_key,
 			tlv_device_public_key->value, tlv_device_public_key->size
 		);
 		if (r) {
 			CLIENT_ERROR(context, "Failed to import device Curve25519 public key (code %d)", r);
-			crypto_curve25519_free(device_key);
+			crypto_curve25519_done(device_key);
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
 
 		CLIENT_DEBUG(context, "Generating accessory Curve25519 key");
-		curve25519_key *my_key = crypto_curve25519_generate();
-		if (!my_key) {
+		curve25519_key *my_key = crypto_curve25519_getcached(1);
+		r = crypto_curve25519_generate(my_key);
+		if (r) {
 			CLIENT_ERROR(context, "Failed to generate accessory Curve25519 key");
-			crypto_curve25519_free(device_key);
+			crypto_curve25519_done(device_key);
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
@@ -1712,8 +1720,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		if (r) {
 			CLIENT_ERROR(context, "Failed to export accessory Curve25519 public key (code %d)", r);
 			free(my_key_public);
-			crypto_curve25519_free(my_key);
-			crypto_curve25519_free(device_key);
+			crypto_curve25519_done(my_key);
+			crypto_curve25519_done(device_key);
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
@@ -1724,8 +1732,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
 		byte *shared_secret = (byte*)malloc(shared_secret_size);
 		r = crypto_curve25519_shared_secret(my_key, device_key, shared_secret, &shared_secret_size);
-		crypto_curve25519_free(my_key);
-		crypto_curve25519_free(device_key);
+		crypto_curve25519_done(my_key);
+		crypto_curve25519_done(device_key);
 
 		if (r) {
 			CLIENT_ERROR(context, "Failed to generate Curve25519 shared secret (code %d)", r);
@@ -2647,13 +2655,25 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 
 	return HAPStatus_Success;
 }
+#ifdef HOMEKIT_DEBUG
+#define JSON_ALLOCATE_SIZE 1280
+#else
+#define JSON_ALLOCATE_SIZE 780
+#endif
 
 void homekit_server_on_update_characteristics(client_context_t *context, const byte *data,
 	size_t size) {
 	//DEBUG_TIME_BEGIN();
-	CLIENT_INFO(context, "Update Characteristics"); DEBUG_HEAP();
-
+	CLIENT_INFO(context, "Update Characteristics");
+	DEBUG_HEAP();
+#ifdef CJSON_USE_PREALLOCATED_BUFFER
+	
+	char al_buf[JSON_ALLOCATE_SIZE];
+	
+	set_allocator_buffer(al_buf, JSON_ALLOCATE_SIZE);
+#endif
 	char *data1 = strndup((char*)data, size);
+	
 	cJSON *json = cJSON_Parse(data1);
 	free(data1);
 
@@ -2684,11 +2704,12 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 	for (int i = 0; i < cJSON_GetArraySize(characteristics); i++) {
 
 		cJSON *j_ch = cJSON_GetArrayItem(characteristics, i);
-
+#ifdef HOMEKIT_DEBUG
 		char *s = cJSON_Print(j_ch);
 		CLIENT_DEBUG(context, "Processing element %s", s);
-		free(s);
-
+		//free(s);
+		cJSON_free(s);
+#endif
 		statuses[i] = process_characteristics_update(j_ch, context);
 
 		if (statuses[i] != HAPStatus_Success)
@@ -2739,6 +2760,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 	}
 
 	free(statuses);
+	
 	cJSON_Delete(json);
 	//DEBUG_TIME_END("update_characteristics");
 }

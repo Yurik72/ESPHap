@@ -341,7 +341,7 @@ void ICACHE_FLASH_ATTR homekit_mdns_configure_finalize() {
 
 	void homekit_overclock_end() {
 		//sdk_system_restoreclock();
-		system_update_cpu_freq(80);
+		system_update_cpu_freq(SYS_CPU_80MHZ);
 		//ets_intr_unlock();
 	}
 

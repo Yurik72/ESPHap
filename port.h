@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 #endif
+#define	HOMEKIT_OVERCLOCK_PAIR_VERIFY
 	uint32_t homekit_random();
 	void homekit_random_fill(uint8_t *data, size_t size);
 

@@ -1,5 +1,6 @@
 #pragma once
 //#define HOMEKIT_DEBUG
+#define CJSON_USE_PREALLOCATED_BUFFER
 #if defined(ARDUINO) && defined(ESP8266)
 #define ARDUINO8266_SERVER
 
