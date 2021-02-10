@@ -7,6 +7,9 @@
 #include <WiFiClient.h>
 #include <string.h> //size_t
 
+#if TCP_MSS <1460
+#warning "You have selected lower memory for lwIP Variant, this can cause a problem, Please seelct v2 Higher Bandwidth with TCP_MSS =1460 "
+#endif 
 
 #ifdef __cplusplus
 extern "C" {

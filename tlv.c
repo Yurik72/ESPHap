@@ -2,10 +2,62 @@
 #include <string.h>
 
 #include "tlv.h"
+typedef struct {
+	void*  root;
+	void*  buffer;
+	int buffer_size;
+	int offset;
+} tlv_allocator_t __attribute__((aligned(4)));
+size_t align_tlv_memory_size(size_t size) {
+	if (size % sizeof(void*)) {
+		size += sizeof(void*) - size % sizeof(void*);
+	}
+	return size;
+}
+static tlv_allocator_t  tlv_allocator = { NULL,NULL,0,0 };
+void set_tlv_allocator_buffer(void* b, size_t size) {
+#ifdef TLV_USE_PREALLOCATED_BUFFER
+	
+	tlv_allocator.buffer_size = size;
+	tlv_allocator.buffer = b;
+	tlv_allocator.root = NULL;
+#endif
+}
+void reset_tlv_allocator_buffer() {
+	tlv_allocator.buffer_size = 0;
+	tlv_allocator.buffer = NULL;
+	tlv_allocator.root = NULL;
 
+}
+
+static void* tlv_malloc(size_t size) {
+#ifdef TLV_USE_PREALLOCATED_BUFFER
+	size = align_tlv_memory_size(size);
+	if (tlv_allocator.buffer && (size + tlv_allocator.offset) < tlv_allocator.buffer_size) {
+		void *b = (void*)(tlv_allocator.buffer + tlv_allocator.offset);
+		if (tlv_allocator.offset == 0) {
+			tlv_allocator.root = b;
+		}
+		tlv_allocator.offset += size;
+		return b;
+	}
+#endif
+	return malloc(size);
+}
+static void tlv_free_malloc(void* pointer) {
+#ifdef TLV_USE_PREALLOCATED_BUFFER
+	if (pointer >= tlv_allocator.buffer && pointer <= (tlv_allocator.buffer + tlv_allocator.buffer_size)) {
+		if (pointer == tlv_allocator.root) {
+			reset_tlv_allocator_buffer();
+		}
+		return;
+	}
+#endif
+	free(pointer);
+}
 
 tlv_values_t *tlv_new() {
-    tlv_values_t *values = malloc(sizeof(tlv_values_t));
+    tlv_values_t *values = tlv_malloc(sizeof(tlv_values_t));
     values->head = NULL;
     return values;
 }
@@ -17,15 +69,15 @@ void tlv_free(tlv_values_t *values) {
         tlv_t *t2 = t;
         t = t->next;
         if (t2->value)
-            free(t2->value);
-        free(t2);
+			tlv_free_malloc(t2->value);
+		tlv_free_malloc(t2);
     }
-    free(values);
+	tlv_free_malloc(values);
 }
 
 
 int tlv_add_value_(tlv_values_t *values, byte type, byte *value, size_t size) {
-    tlv_t *tlv = malloc(sizeof(tlv_t));
+    tlv_t *tlv = tlv_malloc(sizeof(tlv_t));
     tlv->type = type;
     tlv->size = size;
     tlv->value = value;
@@ -47,7 +99,7 @@ int tlv_add_value_(tlv_values_t *values, byte type, byte *value, size_t size) {
 int tlv_add_value(tlv_values_t *values, byte type, const byte *value, size_t size) {
     byte *data = NULL;
     if (size) {
-        data = malloc(size);
+        data = tlv_malloc(size);
         memcpy(data, value, size);
     }
     return tlv_add_value_(values, type, data, size);
@@ -71,10 +123,10 @@ int tlv_add_integer_value(tlv_values_t *values, byte type, size_t size, int valu
 int tlv_add_tlv_value(tlv_values_t *values, byte type, tlv_values_t *value) {
     size_t tlv_size = 0;
     tlv_format(value, NULL, &tlv_size);
-    byte *tlv_data = malloc(tlv_size);
+    byte *tlv_data = tlv_malloc(tlv_size);
     int r = tlv_format(value, tlv_data, &tlv_size);
     if (r) {
-        free(tlv_data);
+		tlv_free_malloc(tlv_data);
         return r;
     }
 
@@ -128,7 +180,7 @@ tlv_values_t *tlv_get_tlv_value(const tlv_values_t *values, byte type) {
     int r = tlv_parse(t->value, t->size, value);
 
     if (r) {
-        tlv_free(value);
+		tlv_free_malloc(value);
         return NULL;
     }
 
@@ -202,7 +254,7 @@ int tlv_parse(const byte *buffer, size_t length, tlv_values_t *values) {
 
         // allocate memory to hold all pieces of chunked data and copy data there
         if (size != 0) {
-            data = malloc(size);
+            data = tlv_malloc(size);
             byte *p = data;
 
             size_t remaining = size;

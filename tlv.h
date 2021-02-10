@@ -22,7 +22,7 @@ extern "C" {
 		tlv_t *head;
 	} tlv_values_t;
 
-
+	void set_tlv_allocator_buffer(void* b, size_t size);
 	tlv_values_t *tlv_new();
 
 	void tlv_free(tlv_values_t *values);

@@ -1,5 +1,7 @@
 #include "port_x.h"
 #ifdef ARDUINO8266_SERVER_CPP
+
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <WiFiServer.h>
@@ -749,8 +751,32 @@ void write(client_context_t *context, byte *data, int data_size) {
 		CLIENT_ERROR(context, "error_in_write_data is true, abort write data");
 		return;
 	}
-	int write_size = context->socket->write(data, data_size);
 	int availableForWrite = context->socket->availableForWrite();
+	bool isChunked = false;
+	if (availableForWrite < data_size) {
+		CLIENT_INFO(context, "Socket not available to write size:%d,available:%d", data_size, availableForWrite);
+		context->socket->flush();  //???
+		isChunked = true;// TCP_MSS < 1460;
+	}
+	int write_size = 0;
+	
+	if (isChunked) {
+		int writed = 0;
+		int write_oustanding = data_size;
+		while (availableForWrite && writed< data_size) {
+			int chunk_writed = context->socket->write(data+writed, min(write_oustanding,availableForWrite));
+			availableForWrite = context->socket->availableForWrite();
+			writed += chunk_writed;
+			write_oustanding -= chunk_writed;
+			CLIENT_INFO(context, "Socket send chunked :%d,available:%d", writed, availableForWrite);
+			context->socket->flush();  //???
+		}
+		write_size = writed;
+	}
+	else {
+		write_size = context->socket->write(data, data_size);
+	}
+	availableForWrite = context->socket->availableForWrite();
 	CLIENT_DEBUG(context, "socket.write, data_size=%d, write_size=%d, availableForWrite=%d, WriteError=%d",
 		data_size, write_size, availableForWrite, context->socket->getWriteError());
 	//sync=true时，如果write在没有发送成功，会造成内存泄漏
@@ -1667,6 +1693,10 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 	homekit_overclock_start();
 #endif
 
+#ifdef TLV_USE_PREALLOCATED_BUFFER
+	byte tlv_buff[1024];
+	set_tlv_allocator_buffer(tlv_buff, sizeof(tlv_buff));
+#endif
 	tlv_values_t *message = tlv_new();
 	tlv_parse(data, size, message);
 
@@ -2231,6 +2261,7 @@ void homekit_server_on_get_characteristics(client_context_t *context) {
 	}
 	else {
 		client_send(context, json_207_response_headers, sizeof(json_207_response_headers) - 1);
+		CLIENT_INFO(context, "Error sending 207 response"); DEBUG_HEAP();
 	}
 
 	json_stream *json = &context->server->json;
@@ -2447,6 +2478,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			}
 
 			CLIENT_DEBUG(context, "Updating characteristic %d.%d with integer %g", aid, iid, value);
+			CLIENT_INFO(context, "Updating characteristic %d.%d with integer %g", aid, iid, value);
 
 			switch (ch->format) {
 			case homekit_format_uint8:
@@ -2618,7 +2650,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			break;
 		}
 		}
-
+		
 		if (!h_value.is_null) {
 			context->current_characteristic = ch;
 			context->current_value = &h_value;
@@ -2627,6 +2659,9 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 
 			context->current_characteristic = NULL;
 			context->current_value = NULL;
+		}
+		else {
+			CLIENT_INFO(context, "h_value.is_null");
 		}
 	}
 
@@ -2722,7 +2757,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 		send_204_response(context);
 	}
 	else {
-		CLIENT_DEBUG(context, "There were processing errors, sending Multi-Status response");
+		CLIENT_INFO(context, "There were processing errors, sending Multi-Status response");
 		client_send(context, json_207_response_headers, sizeof(json_207_response_headers) - 1);
 
 		json_stream *json1 = &context->server->json;
@@ -3611,11 +3646,11 @@ void homekit_mdns_init(homekit_server_t *server) {
 		//MDNS.announce();
 		//return;
 	}
-
+	char* hostname = unique_name;// name->value.string_value;
 	//homekit_mdns_configure_init(name->value.string_value, PORT);
-	WiFi.hostname(name->value.string_value);
+	WiFi.hostname(hostname);
 	// Must specify the MDNS runs on the IP of STA
-	MDNS.begin(name->value.string_value, staIP);
+	MDNS.begin(hostname, staIP);
 	//MDNS.begin(unique_name, staIP);
 
 	INFO("MDNS.begin: %s, IP: %s", unique_name, staIP.toString().c_str());
