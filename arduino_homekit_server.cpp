@@ -2381,7 +2381,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			CLIENT_ERROR(context, "Failed to update %d.%d: no write permission", aid, iid);
 			return HAPStatus_ReadOnly;
 		}
-		CLIENT_INFO(context, "Updating characteristic %d.%d with type", ch->format);
+		CLIENT_INFO(context, "Updating characteristic %d.%d with type", aid, iid, ch->format);
 		switch (ch->format) {
 		case homekit_format_bool: {
 			bool value = false;
