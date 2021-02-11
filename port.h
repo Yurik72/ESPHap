@@ -15,7 +15,7 @@ extern "C" {
 	void homekit_system_restart();
 	void homekit_overclock_start();
 	void homekit_overclock_end();
-	size_t esp_align_memory_size(size_t size);
+	
 	void esp_increase_alligned_pointer(byte** ppointer, size_t size);
 	void* malloc_buffered(byte** ppointer, size_t size);
 #ifdef ARDUINO8266_SERVER_CPP
@@ -29,6 +29,8 @@ extern "C" {
 #include <spiflash.h>
 #define ESP_OK 0
 #endif
+
+
 
 #ifdef ESP_IDF
 #include <esp_system.h>
@@ -105,7 +107,31 @@ typedef struct {
 #define SERVER_TASK_STACK 2048
 
 #endif
+#if defined(ARDUINO) &&( (defined(ESP8266) && defined(ARDUINO8266_SERVER_CPP)) ||  defined(ESP32))
+#ifdef __cplusplus
+extern "C" {
+#endif
+	void* malloc_from_buffer(void* buffer, size_t buffer_size, size_t size, size_t* buffer_offset);
+	void free_from_buffer(void* buffer, size_t buffer_size, void* pointer);
+#ifdef __cplusplus
+}
+#endif
 
+#ifdef USE_STACK_BUFFER
+#define DECLARE_ALLOCATOR(size) \
+	byte stack_buff[size]; \
+	size_t stack_buff_pos=0;
+
+#define _MALLOC(size) malloc_from_buffer(stack_buff,sizeof(stack_buff),size,&stack_buff_pos)
+#define _FREE(pointer) free_from_buffer(stack_buff, sizeof(stack_buff),pointer)
+
+#else
+#define DECLARE_ALLOCATOR(size)
+#define _MALLOC(size) malloc(size)
+#define _FREE(pointer) free(pointer)
+#endif 
+
+#endif
   
 #ifndef ARDUINO8266_SERVER_CPP
 void homekit_mdns_init();

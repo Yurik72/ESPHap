@@ -1032,30 +1032,13 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 	size_t payload_size = 0;
 	tlv_format(values, NULL, &payload_size);
 	//CLIENT_INFO(context, "Sending TLV payload size:%d", payload_size);
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-	byte *payload = NULL;
-	byte buff[1024];
-	//if (payload_size < sizeof(context->server->output_buffer)) {
-	//	payload = context->server->output_buffer;
-	//}
-	if (payload_size < sizeof(buff)) {
-		payload = buff;
-	}
-	else {
-		payload = (byte*)malloc(payload_size);
-	}
-#else
-	byte *payload = (byte*)malloc(payload_size);
-#endif
+	DECLARE_ALLOCATOR(1024)
+
+	byte* payload =(byte*) _MALLOC(payload_size);
 	int r = tlv_format(values, payload, &payload_size);
 	if (r) {
 		CLIENT_ERROR(context, "Failed to format TLV payload (code %d)", r);
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-		if(payload!= buff)
-			free(payload);
-#else
-		free(payload);
-#endif
+		_FREE(payload);
 
 		return;
 	}
@@ -1068,14 +1051,9 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 		"Connection: keep-alive\r\n\r\n";
 
 	int response_size = strlen(http_headers) + payload_size + 32;
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-	char *response = NULL;
-	if ((payload_size + response_size) < sizeof(buff)) {
-		response = (char*)(buff + payload_size);
-	}
-#else
-	char *response = (char*)malloc(response_size);
-#endif
+
+	char *response =( char *)_MALLOC(response_size);
+
 	
 //	CLIENT_INFO(context, "Sending TLV response size:%d", response_size);
 	int response_len = snprintf(response, response_size, http_headers, payload_size);
@@ -1083,35 +1061,18 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 	if (response_size - response_len < payload_size + 1) {
 		CLIENT_ERROR(context, "Incorrect response buffer size %d: headers took %d, payload size %d",
 			response_size, response_len, payload_size);
-		free(response);
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-		if (payload != buff)
-			free(payload);
-		if((byte*)response<buff || (byte*)response>(buff+sizeof(buff)))
-			free(response);
-#else
-		free(payload);
-#endif
+
+		_FREE(response);
+		_FREE(payload);
 		return;
 	}
 	memcpy(response + response_len, payload, payload_size);
 	response_len += payload_size;
 
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-	if (payload != buff)
-		free(payload);
-
-#else
-	free(payload);
-#endif
+	_FREE(payload);
 
 	client_send(context, (byte*)response, response_len);
-#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
-		if ((byte*)response<buff || (byte*)response>(buff + sizeof(buff)))
-			free(response);
-#else
-			free(response);
-#endif
+	_FREE(response);
 }
 
 byte json_200_response_headers[] = "HTTP/1.1 200 OK\r\n"
