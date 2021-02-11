@@ -93,10 +93,6 @@ extern "C" {
 		bool paired;
 		pairing_context_t *pairing_context;
 
-		char *body;
-		size_t body_length;
-		bool body_static;
-
 		http_parser parser;
 		json_stream json;
 		//int listen_fd;
@@ -119,8 +115,8 @@ extern "C" {
 
 		
 
-		//char *body;
-		//size_t body_length;
+		char *body;
+		size_t body_length;
 		//http_parser parser;
 
 		int pairing_id;
@@ -260,9 +256,6 @@ homekit_server_t* server_new() {
 	server->clients = NULL;
 	server->accessory_id = NULL;
 	server->accessory_key = NULL;
-	server->body = NULL;
-	server->body_length = 0;
-	server->body_static = false;
 	return server;
 }
 
@@ -289,8 +282,7 @@ void server_free(homekit_server_t *server) {
 		delete server->wifi_server;
 		server->wifi_server = nullptr;
 	}DEBUG("homekit_server_t delete WiFiServer at port: d\n", HOMEKIT_ARDUINO_SERVER_PORT);
-	if (server->body)
-		free(server->body);
+
 	if (server == running_server) {
 		running_server = NULL;
 	}
@@ -357,6 +349,8 @@ void homekit_init_client_context(client_context_t *c, WiFiClient *wifiClient) {
 	c->endpoint_params = NULL;
 
 
+	c->body = NULL;
+	c->body_length = 0;
 
 
 	c->pairing_id = -1;
@@ -399,7 +393,7 @@ client_context_t* client_context_new(WiFiClient *wifiClient) {
 }
 
 void client_context_free(client_context_t *c) {
-	
+	c->body_length = 0;
 
 
 	c->pairing_id = -1;
@@ -417,7 +411,9 @@ void client_context_free(client_context_t *c) {
 	if (c->endpoint_params)
 		query_params_free(c->endpoint_params);
 	c->endpoint_params = nullptr;
-
+	if (c->body)
+		free(c->body);
+	c->body = nullptr;
 	if (c->socket) {
 		c->socket->stop();
 		delete c->socket;
@@ -954,9 +950,9 @@ void client_send(client_context_t *context, byte *data, size_t data_size) {
 
 void client_send_chunk(byte *data, size_t size, void *arg) {
 	client_context_t *context = (client_context_t*)arg;
-	DECLARE_ALLOCATOR(1024)
+
 	size_t payload_size = size + 8;
-	byte *payload = (byte*)_MALLOC(payload_size); //(byte*)malloc(payload_size);
+	byte *payload = (byte*)malloc(payload_size);
 	if (!payload) {
 		ERROR("Error malloc payload!! payload_size->%d", payload_size);
 		return;
@@ -971,7 +967,7 @@ void client_send_chunk(byte *data, size_t size, void *arg) {
 	//printf("size HEX is %x\n", size);
 	CLIENT_DEBUG(context, "client_send_chunk, size=%d, offset=%d", size, offset);
 	client_send(context, payload, offset + size + 2);
-	_FREE(payload);// free(payload);
+	free(payload);
 }
 
 void send_204_response(client_context_t *context) {
@@ -2385,7 +2381,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			CLIENT_ERROR(context, "Failed to update %d.%d: no write permission", aid, iid);
 			return HAPStatus_ReadOnly;
 		}
-		CLIENT_INFO(context, "Updating characteristic %d.%d with format %d", aid, iid, ch->format);
+
 		switch (ch->format) {
 		case homekit_format_bool: {
 			bool value = false;
@@ -3141,7 +3137,7 @@ void homekit_server_on_resource(client_context_t *context) {
 		return;
 	}
 
-	context->server->config->on_resource(context->server->body, context->server->body_length);
+	context->server->config->on_resource(context->body, context->body_length);
 }
 //=============================================
 // parse data
@@ -3208,6 +3204,7 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 }
 
 int homekit_server_on_body(http_parser *parser, const char *data, size_t length) {
+<<<<<<< HEAD
 	
 	client_context_t *context = (client_context_t *)parser->data;
 	CLIENT_INFO(context, "homekit_server_on_body %s", data);
@@ -3226,6 +3223,14 @@ int homekit_server_on_body(http_parser *parser, const char *data, size_t length)
 		context->server->body_length += length;
 		context->server->body[context->server->body_length] = 0;
 	}
+=======
+	DEBUG("http_parser lenght=%d", length);
+	client_context_t *context = (client_context_t*)parser->data;
+	context->body = (char*)realloc(context->body, context->body_length + length + 1);
+	memcpy(context->body + context->body_length, data, length);
+	context->body_length += length;
+	context->body[context->body_length] = 0;
+>>>>>>> parent of f337c6f (compilation error on ESP32 fix)
 
 	return 0;
 }
@@ -3237,11 +3242,13 @@ int homekit_server_on_message_complete(http_parser *parser) {
 	if (!context->encrypted) {
 		switch (context->endpoint) {
 		case HOMEKIT_ENDPOINT_PAIR_SETUP: {
-			homekit_server_on_pair_setup(context, (const byte*)context->server->body, context->server->body_length);
+			homekit_server_on_pair_setup(context, (const byte*)context->body,
+				context->body_length);
 			break;
 		}
 		case HOMEKIT_ENDPOINT_PAIR_VERIFY: {
-			homekit_server_on_pair_verify(context, (const byte*)context->server->body, context->server->body_length);
+			homekit_server_on_pair_verify(context, (const byte*)context->body,
+				context->body_length);
 			break;
 		}
 		default: {
@@ -3266,11 +3273,12 @@ int homekit_server_on_message_complete(http_parser *parser) {
 			break;
 		}
 		case HOMEKIT_ENDPOINT_UPDATE_CHARACTERISTICS: {
-			homekit_server_on_update_characteristics(context, (const byte*)context->server->body, context->server->body_length);
+			homekit_server_on_update_characteristics(context, (const byte*)context->body,
+				context->body_length);
 			break;
 		}
 		case HOMEKIT_ENDPOINT_PAIRINGS: {
-			homekit_server_on_pairings(context, (const byte*)context->server->body, context->server->body_length);
+			homekit_server_on_pairings(context, (const byte*)context->body, context->body_length);
 			break;
 		}
 		case HOMEKIT_ENDPOINT_RESOURCE: {
@@ -3290,11 +3298,11 @@ int homekit_server_on_message_complete(http_parser *parser) {
 		context->endpoint_params = NULL;
 	}
 
-	//if (context->body) {
-	//	free(context->body);
-	//	context->body = NULL;
-	//	context->body_length = 0;
-	//}
+	if (context->body) {
+		free(context->body);
+		context->body = NULL;
+		context->body_length = 0;
+	}
 	context->server->request_completed = true;
 	return 0;
 }
