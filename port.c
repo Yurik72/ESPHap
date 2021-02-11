@@ -148,9 +148,6 @@ void homekit_mdns_configure_finalize() {
 #include <mdns.h>
 
 
-void esp_increase_alligned_pointer(byte** ppointer, size_t size) {
-	*pointer = *pointer + esp_align_memory_size(size);
-}
 
 uint32_t homekit_random() {
 	return esp_random();

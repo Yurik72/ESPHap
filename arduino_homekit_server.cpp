@@ -2381,7 +2381,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			CLIENT_ERROR(context, "Failed to update %d.%d: no write permission", aid, iid);
 			return HAPStatus_ReadOnly;
 		}
-
+		CLIENT_INFO(context, "Updating characteristic %d.%d with type", ch->format);
 		switch (ch->format) {
 		case homekit_format_bool: {
 			bool value = false;
@@ -2401,7 +2401,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 				return HAPStatus_InvalidValue;
 			}
 
-			CLIENT_DEBUG(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
+			CLIENT_INFO(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
 
 			h_value = HOMEKIT_BOOL_CPP(value);
 			if (ch->setter_ex) {
@@ -3204,34 +3204,14 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 }
 
 int homekit_server_on_body(http_parser *parser, const char *data, size_t length) {
-<<<<<<< HEAD
-	
+
 	client_context_t *context = (client_context_t *)parser->data;
-	CLIENT_INFO(context, "homekit_server_on_body %s", data);
-	if (!context->server->body && !parser->content_length) {
-		context->server->body = (char *)data;
-		context->server->body_length = length;
-		context->server->body_static = true;
-	}
-	else {
-		if (!context->server->body) {
-			context->server->body = (char *)malloc(length + parser->content_length + 1);
-			context->server->body_length = 0;
-			context->server->body_static = false;
-		}
-		memcpy(context->server->body + context->server->body_length, data, length);
-		context->server->body_length += length;
-		context->server->body[context->server->body_length] = 0;
-	}
-=======
-	DEBUG("http_parser lenght=%d", length);
-	client_context_t *context = (client_context_t*)parser->data;
+
+
 	context->body = (char*)realloc(context->body, context->body_length + length + 1);
 	memcpy(context->body + context->body_length, data, length);
 	context->body_length += length;
 	context->body[context->body_length] = 0;
->>>>>>> parent of f337c6f (compilation error on ESP32 fix)
-
 	return 0;
 }
 
