@@ -117,7 +117,9 @@ typedef struct {
     fd_set fds;
     int max_fd;
     int nfds;
-
+	char *body;
+	size_t body_length;
+	bool body_static;
 
 	http_parser parser;
 	json_stream json;
@@ -140,8 +142,8 @@ struct _client_context_t {
    // size_t data_size;
    // size_t data_available;
 
-    char *body;
-    size_t body_length;
+ //   char *body;
+ //   size_t body_length;
 //    http_parser *parser;
 
     int pairing_id;
@@ -195,6 +197,9 @@ homekit_server_t *server_new() {
     server->paired = false;
     server->pairing_context = NULL;
     server->clients = NULL;
+	server->body = NULL;
+	server->body_length = 0;
+	server->body_static = false;
     return server;
 }
 
@@ -217,7 +222,8 @@ void server_free(homekit_server_t *server) {
             client = next;
         }
     }
-
+	if (server->body)
+		free(server->body);
     free(server);
 }
 
@@ -354,8 +360,7 @@ void init_client_context(client_context_t *c) {
 	c->server = NULL;
 	c->endpoint_params = NULL;
 
-	c->body = NULL;
-	c->body_length = 0;
+
 
 	c->pairing_id = -1;
 	c->encrypted = false;
@@ -422,9 +427,7 @@ void client_context_free(client_context_t *c) {
 //    if (c->data)
 //        free(c->data);
 
-    if (c->body)
-        free(c->body);
-	c->body = NULL;
+
 	if (c->is_static) {
 		c->is_used = false;
 		if(c->event_queue)
@@ -2963,7 +2966,7 @@ void homekit_server_on_resource(client_context_t *context) {
         return;
     }
 
-    context->server->config->on_resource(context->body, context->body_length);
+    context->server->config->on_resource(context->server->body, context->server->body_length);
 }
 
 
@@ -3019,13 +3022,24 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 }
 
 int homekit_server_on_body(http_parser *parser, const char *data, size_t length) {
-    client_context_t *context = parser->data;
-    context->body = realloc(context->body, context->body_length + length + 1);
-    memcpy(context->body + context->body_length, data, length);
-    context->body_length += length;
-    context->body[context->body_length] = 0;
+	client_context_t *context = parser->data;
+	if (!context->server->body && !parser->content_length) {
+		context->server->body = (char *)data;
+		context->server->body_length = length;
+		context->server->body_static = true;
+	}
+	else {
+		if (!context->server->body) {
+			context->server->body = malloc(length + parser->content_length + 1);
+			context->server->body_length = 0;
+			context->server->body_static = false;
+		}
+		memcpy(context->server->body + context->server->body_length, data, length);
+		context->server->body_length += length;
+		context->server->body[context->server->body_length] = 0;
+	}
 
-    return 0;
+	return 0;
 }
 int homekit_server_on_message_begin(http_parser *parser) {
 	client_context_t *context = parser->data;
@@ -3038,11 +3052,11 @@ int homekit_server_on_message_complete(http_parser *parser) {
 
     switch(context->endpoint) {
         case HOMEKIT_ENDPOINT_PAIR_SETUP: {
-            homekit_server_on_pair_setup(context, (const byte *)context->body, context->body_length);
+            homekit_server_on_pair_setup(context, (const byte *)context->server->body, context->server->body_length);
             break;
         }
         case HOMEKIT_ENDPOINT_PAIR_VERIFY: {
-            homekit_server_on_pair_verify(context, (const byte *)context->body, context->body_length);
+            homekit_server_on_pair_verify(context, (const byte *)context->server->body, context->server->body_length);
             break;
         }
         case HOMEKIT_ENDPOINT_IDENTIFY: {
@@ -3058,11 +3072,11 @@ int homekit_server_on_message_complete(http_parser *parser) {
             break;
         }
         case HOMEKIT_ENDPOINT_UPDATE_CHARACTERISTICS: {
-            homekit_server_on_update_characteristics(context, (const byte *)context->body, context->body_length);
+            homekit_server_on_update_characteristics(context, (const byte *)context->server->body, context->server->body_length);
             break;
         }
         case HOMEKIT_ENDPOINT_PAIRINGS: {
-            homekit_server_on_pairings(context, (const byte *)context->body, context->body_length);
+            homekit_server_on_pairings(context, (const byte *)context->server->body, context->server->body_length);
             break;
         }
         case HOMEKIT_ENDPOINT_RESET: {
@@ -3085,11 +3099,7 @@ int homekit_server_on_message_complete(http_parser *parser) {
         context->endpoint_params = NULL;
     }
 
-    if (context->body) {
-        free(context->body);
-        context->body = NULL;
-        context->body_length = 0;
-    }
+
 	
 	context->server->request_completed = true;
 
