@@ -1701,6 +1701,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 	//DEBUG_TIME_BEGIN();
 
 	context->step = HOMEKIT_CLIENT_STEP_NONE;
+	CLIENT_INFO(context, "homekit_server_on_pair_verify %s", data);
+
 
 #ifdef HOMEKIT_OVERCLOCK_PAIR_VERIFY
 	homekit_overclock_start();
@@ -3206,7 +3208,9 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 }
 
 int homekit_server_on_body(http_parser *parser, const char *data, size_t length) {
+	
 	client_context_t *context = (client_context_t *)parser->data;
+	CLIENT_INFO(context, "homekit_server_on_body %s", data);
 	if (!context->server->body && !parser->content_length) {
 		context->server->body = (char *)data;
 		context->server->body_length = length;
