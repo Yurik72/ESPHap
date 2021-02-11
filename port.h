@@ -15,11 +15,16 @@ extern "C" {
 	void homekit_system_restart();
 	void homekit_overclock_start();
 	void homekit_overclock_end();
+	size_t esp_align_memory_size(size_t size);
+	void esp_increase_alligned_pointer(byte** ppointer, size_t size);
+	void* malloc_buffered(byte** ppointer, size_t size);
 #ifdef ARDUINO8266_SERVER_CPP
 #ifdef __cplusplus
 }
 #endif
+
 #endif
+
 #ifdef ESP_OPEN_RTOS
 #include <spiflash.h>
 #define ESP_OK 0

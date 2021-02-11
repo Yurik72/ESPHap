@@ -87,7 +87,9 @@ extern "C" {
 
 		byte data[1024 + 18];
 		byte output_buffer[1024];
-
+#ifdef PAIRVERIFY_USE_MEMORYBUFFER
+		byte data_verify[1024];
+#endif
 		bool paired;
 		pairing_context_t *pairing_context;
 
@@ -1029,12 +1031,32 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 
 	size_t payload_size = 0;
 	tlv_format(values, NULL, &payload_size);
-
+	//CLIENT_INFO(context, "Sending TLV payload size:%d", payload_size);
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+	byte *payload = NULL;
+	byte buff[1024];
+	//if (payload_size < sizeof(context->server->output_buffer)) {
+	//	payload = context->server->output_buffer;
+	//}
+	if (payload_size < sizeof(buff)) {
+		payload = buff;
+	}
+	else {
+		payload = (byte*)malloc(payload_size);
+	}
+#else
 	byte *payload = (byte*)malloc(payload_size);
+#endif
 	int r = tlv_format(values, payload, &payload_size);
 	if (r) {
 		CLIENT_ERROR(context, "Failed to format TLV payload (code %d)", r);
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+		if(payload!= buff)
+			free(payload);
+#else
 		free(payload);
+#endif
+
 		return;
 	}
 
@@ -1046,24 +1068,50 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 		"Connection: keep-alive\r\n\r\n";
 
 	int response_size = strlen(http_headers) + payload_size + 32;
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+	char *response = NULL;
+	if ((payload_size + response_size) < sizeof(buff)) {
+		response = (char*)(buff + payload_size);
+	}
+#else
 	char *response = (char*)malloc(response_size);
+#endif
+	
+//	CLIENT_INFO(context, "Sending TLV response size:%d", response_size);
 	int response_len = snprintf(response, response_size, http_headers, payload_size);
 
 	if (response_size - response_len < payload_size + 1) {
 		CLIENT_ERROR(context, "Incorrect response buffer size %d: headers took %d, payload size %d",
 			response_size, response_len, payload_size);
 		free(response);
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+		if (payload != buff)
+			free(payload);
+		if((byte*)response<buff || (byte*)response>(buff+sizeof(buff)))
+			free(response);
+#else
 		free(payload);
+#endif
 		return;
 	}
 	memcpy(response + response_len, payload, payload_size);
 	response_len += payload_size;
 
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+	if (payload != buff)
+		free(payload);
+
+#else
 	free(payload);
+#endif
 
 	client_send(context, (byte*)response, response_len);
-
-	free(response);
+#ifdef SEND_TLV_RESPONSE_REUSE_OUTPUT_BUFFER
+		if ((byte*)response<buff || (byte*)response>(buff + sizeof(buff)))
+			free(response);
+#else
+			free(response);
+#endif
 }
 
 byte json_200_response_headers[] = "HTTP/1.1 200 OK\r\n"
@@ -1925,7 +1973,9 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			send_tlv_error_response(context, 4, TLVError_Authentication);
 			break;
 		}
-
+#ifdef PAIRVERIFY_USE_MEMORYBUFFER
+		byte* memory_allocator=context->server->data_verify;
+#endif
 		tlv_t *tlv_encrypted_data = tlv_get_value(message, TLVType_EncryptedData);
 		if (!tlv_encrypted_data) {
 			CLIENT_ERROR(context, "Failed to verify: no encrypted data");
@@ -1941,14 +1991,20 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			(byte*) "\x0\x0\x0\x0PV-Msg03", NULL, 0, tlv_encrypted_data->value,
 			tlv_encrypted_data->size,
 			NULL, &decrypted_data_size);
-
+#ifdef PAIRVERIFY_USE_MEMORYBUFFER
+		byte *decrypted_data = (byte *)malloc_buffered(&memory_allocator, decrypted_data_size);
+		
+#else
 		byte *decrypted_data = (byte*)malloc(decrypted_data_size);
+#endif
 		r = crypto_chacha20poly1305_decrypt(context->verify_context->session_key,
 			(byte*) "\x0\x0\x0\x0PV-Msg03", NULL, 0, tlv_encrypted_data->value,
 			tlv_encrypted_data->size, decrypted_data, &decrypted_data_size);
 		if (r) {
 			CLIENT_ERROR(context, "Failed to decrypt data (code %d)", r);
+#ifndef PAIRVERIFY_USE_MEMORYBUFFER
 			free(decrypted_data);
+#endif
 			pair_verify_context_free(context->verify_context);
 			context->verify_context = NULL;
 			send_tlv_error_response(context, 4, TLVError_Authentication);
@@ -1957,7 +2013,9 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
 		tlv_values_t *decrypted_message = tlv_new();
 		r = tlv_parse(decrypted_data, decrypted_data_size, decrypted_message);
+#ifndef PAIRVERIFY_USE_MEMORYBUFFER
 		free(decrypted_data);
+#endif
 
 		if (r) {
 			CLIENT_ERROR(context, "Failed to parse decrypted TLV (code %d)", r);
@@ -2010,7 +2068,12 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 
 		size_t device_info_size = context->verify_context->device_public_key_size
 			+ context->verify_context->accessory_public_key_size + tlv_device_id->size;
+#ifdef PAIRVERIFY_USE_MEMORYBUFFER
+		byte *device_info = (byte *)malloc_buffered(&memory_allocator, device_info_size);
+
+#else
 		byte *device_info = (byte*)malloc(device_info_size);
+#endif
 		memcpy(device_info, context->verify_context->device_public_key,
 			context->verify_context->device_public_key_size);
 		memcpy(device_info + context->verify_context->device_public_key_size, tlv_device_id->value,
@@ -2022,7 +2085,9 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		CLIENT_DEBUG(context, "Verifying device signature");
 		r = crypto_ed25519_verify(pairing->device_key, device_info, device_info_size,
 			tlv_device_signature->value, tlv_device_signature->size);
+#ifndef PAIRVERIFY_USE_MEMORYBUFFER
 		free(device_info);
+#endif
 		tlv_free(decrypted_message);
 
 		if (r) {

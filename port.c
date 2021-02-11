@@ -1,6 +1,8 @@
 #include <stdarg.h>
 #include <port_x.h>
 
+
+
 #ifdef ESP_OPEN_RTOS
 
 #include <string.h>
@@ -145,7 +147,15 @@ void homekit_mdns_configure_finalize() {
 #include <string.h>
 #include <mdns.h>
 
-
+size_t esp_align_memory_size(size_t size) {
+	if (size % sizeof(void*)) {
+		size += sizeof(void*) - size % sizeof(void*);
+	}
+	return size;
+}
+void esp_increase_alligned_pointer(byte** ppointer, size_t size) {
+	*pointer = *pointer + esp_align_memory_size(size);
+}
 
 uint32_t homekit_random() {
 	return esp_random();
@@ -313,6 +323,22 @@ void ICACHE_FLASH_ATTR homekit_mdns_configure_finalize() {
 #ifndef MDNS_TTL
 #define MDNS_TTL 4500
 #endif
+	size_t esp_align_memory_size(size_t size) {
+		if (size % sizeof(void*)) {
+			size += sizeof(void*) - size % sizeof(void*);
+		}
+		return size;
+	};
+	void esp_increase_alligned_pointer(byte** ppointer, size_t size) {
+		//printf("buf size %d\n", size);
+		*ppointer = *ppointer + esp_align_memory_size(size);
+	};
+	void* malloc_buffered(byte** ppointer, size_t size) {
+		//printf("malloc_buffered %d\n", size);
+		void*pointer = *(ppointer);
+		*ppointer = *ppointer + esp_align_memory_size(size);
+		return pointer;
+	}
 	uint32_t homekit_random() {
 		return os_random();
 
