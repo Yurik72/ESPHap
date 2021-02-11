@@ -18,7 +18,7 @@
 #include <wolfssl/wolfcrypt/coding.h>
 
 //#include "constants.h"
-#include "base64.h"
+#include "esphap_base64.h"
 #include "pairing.h"
 #include "storage.h"
 #include "query_params.h"
