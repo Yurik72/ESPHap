@@ -393,6 +393,7 @@ client_context_t* client_context_new(WiFiClient *wifiClient) {
 }
 
 void client_context_free(client_context_t *c) {
+	CLIENT_INFO(c, "client content free");
 	c->body_length = 0;
 
 
@@ -419,6 +420,11 @@ void client_context_free(client_context_t *c) {
 		delete c->socket;
 		c->socket = nullptr;
 	}
+	
+	characteristic_event_t *event = NULL;
+	if (c->event_queue && q_pop(c->event_queue, &event)) {
+		CLIENT_INFO(c, "Client queue is not empty");
+	}
 	if (c->is_static) {
 		c->is_used = false;
 		if (c->event_queue)
@@ -427,6 +433,8 @@ void client_context_free(client_context_t *c) {
 	}
 	if (c->event_queue) {
 		//c->event_queue->clear();
+		characteristic_event_t *event = NULL;
+
 		q_clean(c->event_queue);
 		q_kill(c->event_queue);
 		free(c->event_queue);
@@ -777,6 +785,7 @@ void write(client_context_t *context, byte *data, int data_size) {
 	}
 	else {
 		write_size = context->socket->write(data, data_size);
+		context->socket->flush();
 	}
 	availableForWrite = context->socket->availableForWrite();
 	CLIENT_DEBUG(context, "socket.write, data_size=%d, write_size=%d, availableForWrite=%d, WriteError=%d",
@@ -1036,6 +1045,7 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 
 	byte* payload =(byte*) _MALLOC(payload_size);
 	int r = tlv_format(values, payload, &payload_size);
+	tlv_free(values);
 	if (r) {
 		CLIENT_ERROR(context, "Failed to format TLV payload (code %d)", r);
 		_FREE(payload);
@@ -1043,7 +1053,7 @@ void send_tlv_response(client_context_t *context, tlv_values_t *values) {
 		return;
 	}
 
-	tlv_free(values);
+
 
 	static char *http_headers = "HTTP/1.1 200 OK\r\n"
 		"Content-Type: application/pairing+tlv8\r\n"
@@ -1697,7 +1707,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 	//DEBUG_TIME_BEGIN();
 
 	context->step = HOMEKIT_CLIENT_STEP_NONE;
-	CLIENT_INFO(context, "homekit_server_on_pair_verify %s", data);
+
 
 
 #ifdef HOMEKIT_OVERCLOCK_PAIR_VERIFY
@@ -1756,8 +1766,10 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		size_t my_key_public_size = 0;
 		crypto_curve25519_export_public(my_key, NULL, &my_key_public_size);
 
+		
 		byte *my_key_public = (byte*)malloc(my_key_public_size);
 		r = crypto_curve25519_export_public(my_key, my_key_public, &my_key_public_size);
+
 		if (r) {
 			CLIENT_ERROR(context, "Failed to export accessory Curve25519 public key (code %d)", r);
 			free(my_key_public);
@@ -2372,7 +2384,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			"Failed to process request to update %d.%d: " "no such characteristic", aid, iid);
 		return HAPStatus_NoResource;
 	}
-
+	INFO_HEAP();
 	cJSON *j_value = cJSON_GetObjectItem(j_ch, "value");
 	if (j_value) {
 		homekit_value_t h_value = HOMEKIT_NULL_CPP();
@@ -2381,7 +2393,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 			CLIENT_ERROR(context, "Failed to update %d.%d: no write permission", aid, iid);
 			return HAPStatus_ReadOnly;
 		}
-		CLIENT_INFO(context, "Updating characteristic %d.%d with type", aid, iid, ch->format);
+		//CLIENT_INFO(context, "Updating characteristic %d.%d with type %d", aid, iid, ch->format);
 		switch (ch->format) {
 		case homekit_format_bool: {
 			bool value = false;
@@ -3425,7 +3437,10 @@ void homekit_server_close_client(homekit_server_t *server, client_context_t *con
 		//if(!stop_ok){
 		//CLIENT_ERROR(context, "socket.stop error");
 		//}
-		context->socket->stop();
+		context->socket->flush(100);
+		if (!context->socket->stop(100)) {
+			CLIENT_ERROR(context, "socket.stop error");
+		}
 		CLIENT_DEBUG(context, "The sockect is stoped");
 		delete context->socket;
 		context->socket = nullptr;
