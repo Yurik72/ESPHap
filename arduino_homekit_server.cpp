@@ -51,9 +51,9 @@
 //#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
 //#define TCP_DEFAULT_KEEPALIVE_COUNT             9    // fault after 9 failures
 //const int idle = 180; /* 180 sec idle before start sending probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      180
+#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      20
 //const int interval = 30; /* 30 sec between probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  30
+#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  10
 //const int maxpkt = 4; /* Drop connection after 4 probes without response */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT     4
 // if 180 + 30 * 4 = 300 sec without socket response, disconected it.
@@ -117,6 +117,7 @@ extern "C" {
 
 		char *body;
 		size_t body_length;
+		
 		//http_parser parser;
 
 		int pairing_id;
@@ -157,6 +158,9 @@ bool arduino_homekit_preinit(homekit_server_t *server);
 
 static client_context_t cache_client_contexts[CLIENT_CONTEXT_CACHE_SIZE];
 static bool is_initialized = false;
+#ifdef USE_STATIC_HTTP_BODY
+byte static_http_body[512];
+#endif
 
 homekit_value_t HOMEKIT_DEFAULT_CPP() {
 	homekit_value_t homekit_value;
@@ -412,9 +416,15 @@ void client_context_free(client_context_t *c) {
 	if (c->endpoint_params)
 		query_params_free(c->endpoint_params);
 	c->endpoint_params = nullptr;
+#ifdef USE_STATIC_HTTP_BODY
+	if (c->body &&  c->body ==(char*) static_http_body) {
+		c->body = nullptr;
+	}
+#endif
 	if (c->body)
 		free(c->body);
 	c->body = nullptr;
+	c->body_length = 0;
 	if (c->socket) {
 		c->socket->stop();
 		delete c->socket;
@@ -422,8 +432,13 @@ void client_context_free(client_context_t *c) {
 	}
 	
 	characteristic_event_t *event = NULL;
-	if (c->event_queue && q_pop(c->event_queue, &event)) {
-		CLIENT_INFO(c, "Client queue is not empty");
+	if (c->event_queue ) {
+		while (q_pop(c->event_queue, &event)) {
+			CLIENT_INFO(c, "Client queue is not empty destruct them..");
+			homekit_value_destruct(&event->value);
+			free(event);
+		}
+
 	}
 	if (c->is_static) {
 		c->is_used = false;
@@ -3218,12 +3233,31 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 int homekit_server_on_body(http_parser *parser, const char *data, size_t length) {
 
 	client_context_t *context = (client_context_t *)parser->data;
-
-
-	context->body = (char*)realloc(context->body, context->body_length + length + 1);
+#ifdef USE_STATIC_HTTP_BODY
+	size_t new_length = context->body_length + length + 1;
+	if (new_length > sizeof(static_http_body)) {
+		context->body =(char*)static_http_body;
+	}
+	else {
+		if (context->body == (char*)static_http_body) {
+			char* newbody= (char*)malloc(context->body_length + length + 1);
+			memcpy(newbody,context->body , context->body_length);
+		}
+		else {
+			context->body = (char*)realloc(context->body, context->body_length + length + 1);
+			
+		}
+	}
 	memcpy(context->body + context->body_length, data, length);
 	context->body_length += length;
 	context->body[context->body_length] = 0;
+#else
+	context->body = (char*)realloc(context->body, context->body_length + length + 1);
+	memcpy(context->body + context->body_length, data, length);
+	context->body_length += length;
+#endif
+	context->body[context->body_length] = 0;
+
 	return 0;
 }
 
@@ -3289,12 +3323,18 @@ int homekit_server_on_message_complete(http_parser *parser) {
 		query_params_free(context->endpoint_params);
 		context->endpoint_params = NULL;
 	}
-
+#ifdef USE_STATIC_HTTP_BODY
+	if (context->body && (context->body!=(char*)static_http_body))
+		free(context->body);
+	context->body = NULL;
+	context->body_length = 0;
+#else
 	if (context->body) {
 		free(context->body);
 		context->body = NULL;
 		context->body_length = 0;
 	}
+#endif
 	context->server->request_completed = true;
 	return 0;
 }
@@ -3505,6 +3545,19 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 
 	//    const struct timeval rcvtimeout = { 10, 0 }; /* 10 second timeout */
 	//    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &rcvtimeout, sizeof(rcvtimeout));
+
+	for (int i = 0; i < CLIENT_CONTEXT_CACHE_SIZE; i++) {
+		client_context_t * ct = &(cache_client_contexts[i]);
+		if (ct->is_used && ct->socket && wifiClient->remoteIP()== ct->socket->remoteIP()) {
+			CLIENT_INFO(ct, "It's already pervious connection from %s", wifiClient->remoteIP().toString().c_str());
+			if (CLOSE_DUPLICATED_CONNECTION) {
+				ct->socket->flush();
+				ct->socket->keepAlive(1, 1, 1);
+				CLIENT_INFO(ct, "Trying to close them");
+			}
+		}
+	}
+
 
 	wifiClient->keepAlive(HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC,
 		HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC, HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT);

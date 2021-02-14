@@ -1,9 +1,11 @@
 #pragma once
-//#define HOMEKIT_DEBUG
-#define CJSON_USE_PREALLOCATED_BUFFER
-#define TLV_USE_PREALLOCATED_BUFFER
-#define PAIRVERIFY_USE_MEMORYBUFFER
-#define USE_STACK_BUFFER
+//#define HOMEKIT_DEBUG   // should be defined if we  want to debug Homekit
+#define CJSON_USE_PREALLOCATED_BUFFER   // instruct to use static (on the stack ) buffer for cJSON parsing
+#define TLV_USE_PREALLOCATED_BUFFER     //instruct to  to use static (on the stack )  buffer for TLV values parsing
+#define PAIRVERIFY_USE_MEMORYBUFFER   
+#define USE_STACK_BUFFER               //instruct to use stack buffer on some operation, like sending responce etc
+#define USE_STATIC_HTTP_BODY           //instruct to use static buffer when HTTP parser parsing a body
+#define CLOSE_DUPLICATED_CONNECTION  0  //instruct that previous connection with the same ip should be closed
 #if defined(ARDUINO) && defined(ESP8266)
 #define ARDUINO8266_SERVER
 
