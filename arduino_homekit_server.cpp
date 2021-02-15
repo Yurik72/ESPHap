@@ -51,7 +51,7 @@
 //#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
 //#define TCP_DEFAULT_KEEPALIVE_COUNT             9    // fault after 9 failures
 //const int idle = 180; /* 180 sec idle before start sending probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      20
+#define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      120
 //const int interval = 30; /* 30 sec between probes */
 #define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  10
 //const int maxpkt = 4; /* Drop connection after 4 probes without response */
