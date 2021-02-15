@@ -802,16 +802,12 @@ void write(client_context_t *context, byte *data, int data_size) {
 		write_size = context->socket->write(data, data_size);
 		context->socket->flush();
 	}
-	availableForWrite = context->socket->availableForWrite();
-	CLIENT_DEBUG(context, "socket.write, data_size=%d, write_size=%d, availableForWrite=%d, WriteError=%d",
-		data_size, write_size, availableForWrite, context->socket->getWriteError());
-	//sync=true时，如果write在没有发送成功，会造成内存泄漏
+//	availableForWrite = context->socket->availableForWrite();
+//	CLIENT_DEBUG(context, "socket.write, data_size=%d, write_size=%d, availableForWrite=%d, WriteError=%d",
+//		data_size, write_size, availableForWrite, context->socket->getWriteError());
+	
 	if (write_size != data_size) {
-		//猜测Socket对方已断开，本sockek缓冲区满了，如果这时候断开连接会造成内存泄漏
-		//所以最终的方案是由自身的keepalive来定disconnect
-		//context->socket->stop(); // Causes memory leak if some data has not been sent (eg. the peer client is disconnected)
-		// A workaround to stop the socket and free the internal write_buffer (memory leak)
-		// If just call socket.stop(), the write_buffer will not free
+	
 		context->error_write = true;
 		context->socket->keepAlive(1, 1, 1);		// fast disconnected internally in 1 second.
 		CLIENT_ERROR(context, "socket.write, data_size=%d, write_size=%d", data_size, write_size);
@@ -926,7 +922,7 @@ void client_notify_characteristic(homekit_characteristic_t *ch, homekit_value_t 
 		CLIENT_DEBUG(client, "This value is set by this client, no need to send notification");
 		return;
 	}
-	CLIENT_INFO(client, "Got characteristic %d.%d change event",
+	CLIENT_DEBUG(client, "Got characteristic %d.%d change event",
 		ch->service->accessory->id, ch->id);
 	//DEBUG("Got characteristic %d.%d change event", ch->service->accessory->id, ch->id);
 
@@ -2428,7 +2424,7 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 				return HAPStatus_InvalidValue;
 			}
 
-			CLIENT_INFO(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
+			CLIENT_DEBUG(context, "Updating characteristic %d.%d with boolean %s", aid, iid, value ? "true" : "false");
 
 			h_value = HOMEKIT_BOOL_CPP(value);
 			if (ch->setter_ex) {
@@ -3402,8 +3398,8 @@ void homekit_client_process(client_context_t *context) {
 			}
 			return;
 		}
-		CLIENT_INFO(context, "Got %d incomming data, encrypted is %",
-			data_len, context->encrypted ? "true" : "false");
+		//CLIENT_INFO(context, "Got %d incomming data, encrypted is s%",
+		//	data_len, context->encrypted ? "true" : "false");
 		byte *payload = (byte *)context->server->data;
 		size_t payload_size = (size_t)data_len;
 
@@ -3478,9 +3474,11 @@ void homekit_server_close_client(homekit_server_t *server, client_context_t *con
 		//CLIENT_ERROR(context, "socket.stop error");
 		//}
 		context->socket->flush(100);
+		optimistic_yield(1000);
 		if (!context->socket->stop(100)) {
 			CLIENT_ERROR(context, "socket.stop error");
 		}
+		optimistic_yield(1000);
 		CLIENT_DEBUG(context, "The sockect is stoped");
 		delete context->socket;
 		context->socket = nullptr;
@@ -3675,6 +3673,7 @@ void homekit_server_process(homekit_server_t *server) {
 //			}
 //			delay(10);
 		homekit_client_process(context);
+		optimistic_yield(1000);
 		//		} while(homekit_client_need_process_data(context));
 
 		context = context->next;
@@ -4219,7 +4218,11 @@ void arduino_homekit_setup(homekit_server_config_t *config) {
 }
 
 void arduino_homekit_loop() {
-	MDNS.update();
+	if (homekit_mdns_started) {
+		MDNS.update();
+		optimistic_yield(1000);
+	}
+
 	if (running_server != nullptr) {
 		if (!running_server->paired) {
 			//If not paired or pairing was removed, preinit paring context.
