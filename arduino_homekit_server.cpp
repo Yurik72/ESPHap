@@ -723,11 +723,14 @@ void write_characteristic_json(json_stream *json, client_context_t *client,
 						json_string(json, "");
 					}
 					else {
+
 						byte *tlv_data = (byte*)malloc(tlv_size);
 						tlv_format(v.tlv_values, tlv_data, &tlv_size);
 
 						size_t encoded_tlv_size = base64_encoded_size(tlv_data, tlv_size);
+
 						byte *encoded_tlv_data = (byte*)malloc(encoded_tlv_size + 1);
+						CLIENT_INFO(client,"write tlv  json encoded_tlv_size:%d,tlv_size:%d", encoded_tlv_size, tlv_size);
 						//base64_encode_(tlv_data, tlv_size, encoded_tlv_data);
 						base64_encode(tlv_data, tlv_size, encoded_tlv_data);
 						encoded_tlv_data[encoded_tlv_size] = 0;
@@ -970,15 +973,18 @@ void client_send(client_context_t *context, byte *data, size_t data_size) {
 
 void client_send_chunk(byte *data, size_t size, void *arg) {
 	client_context_t *context = (client_context_t*)arg;
-
+	
 	size_t payload_size = size + 8;
-	byte *payload = (byte*)malloc(payload_size);
+	DECLARE_ALLOCATOR(1034)
+	byte *payload =(byte*) _MALLOC(payload_size);////(byte*)malloc(payload_size);
+	
 	if (!payload) {
 		ERROR("Error malloc payload!! payload_size->%d", payload_size);
 		return;
 	}
 
 	int offset = snprintf((char*)payload, payload_size, "%x\r\n", size);
+
 	//if(size > 0){
 	memcpy(payload + offset, data, size);
 	//}
@@ -987,7 +993,7 @@ void client_send_chunk(byte *data, size_t size, void *arg) {
 	//printf("size HEX is %x\n", size);
 	CLIENT_DEBUG(context, "client_send_chunk, size=%d, offset=%d", size, offset);
 	client_send(context, payload, offset + size + 2);
-	free(payload);
+	_FREE(payload);// free(payload);
 }
 
 void send_204_response(client_context_t *context) {
@@ -2791,10 +2797,10 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 
 		cJSON *j_ch = cJSON_GetArrayItem(characteristics, i);
 #ifdef HOMEKIT_DEBUG
-		char *s = cJSON_Print(j_ch);
-		CLIENT_DEBUG(context, "Processing element %s", s);
+		//char *s = cJSON_Print(j_ch);
+		//CLIENT_DEBUG(context, "Processing element %s", s);
 		//free(s);
-		cJSON_free(s);
+		//cJSON_free(s);
 #endif
 		statuses[i] = process_characteristics_update(j_ch, context);
 
