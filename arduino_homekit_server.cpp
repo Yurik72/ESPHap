@@ -47,6 +47,9 @@
 //See WiFiClient.h WIFICLIENT_MAX_FLUSH_WAIT_MS
 #define HOMEKIT_SOCKET_FLUSH_WAIT_MS 500 //milliseconds
 
+#define WIFI_CLIENT_SYNC true
+#define WIFI_CLIENT_NODELAY false   //in theory not neccessary to set false when sync true
+
 //#define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 //#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
 //#define TCP_DEFAULT_KEEPALIVE_COUNT             9    // fault after 9 failures
@@ -246,7 +249,18 @@ homekit_server_t* server_new() {
 	homekit_server_t *server = (homekit_server_t*)malloc(sizeof(homekit_server_t));
 	server->wifi_server = new WiFiServer(HOMEKIT_SERVER_PORT);
 	server->wifi_server->begin();
+
+#ifdef	WIFI_CLIENT_NODELAY
+	server->wifi_server->setNoDelay(WIFI_CLIENT_NODELAY);
+#else
 	server->wifi_server->setNoDelay(true);
+#endif
+#ifdef WIFI_CLIENT_SYNC
+	WiFiClient::setDefaultSync(WIFI_CLIENT_SYNC);
+#endif
+#ifdef WIFI_CLIENT_NODELAY
+	WiFiClient::setDefaultNoDelay(WIFI_CLIENT_NODELAY);
+#endif
 	http_parser_init(&server->parser, HTTP_REQUEST);
 	json_init(&server->json, server->output_buffer, sizeof(server->output_buffer),
 		client_send_chunk, NULL);
@@ -787,7 +801,7 @@ void write(client_context_t *context, byte *data, int data_size) {
 		isChunked = true;// TCP_MSS < 1460;
 	}
 	int write_size = 0;
-	
+	//CLIENT_INFO(context, "write   size:%d,available:%d, sync:%d,nodelay:%d", data_size, availableForWrite, context->socket->getSync(), context->socket->getNoDelay());
 	if (isChunked) {
 		int writed = 0;
 		int write_oustanding = data_size;
@@ -805,6 +819,7 @@ void write(client_context_t *context, byte *data, int data_size) {
 		write_size = context->socket->write(data, data_size);
 		context->socket->flush();
 	}
+	optimistic_yield(1000);
 //	availableForWrite = context->socket->availableForWrite();
 //	CLIENT_DEBUG(context, "socket.write, data_size=%d, write_size=%d, availableForWrite=%d, WriteError=%d",
 //		data_size, write_size, availableForWrite, context->socket->getWriteError());
@@ -3566,9 +3581,16 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 	wifiClient->keepAlive(HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC,
 		HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC, HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT);
 	//wifiClient->disableKeepAlive();
+
+
+
+#ifndef WIFI_CLIENT_NODELAY
 	wifiClient->setNoDelay(true);
+#endif
+#ifndef WIFI_CLIENT_SYNC
 	wifiClient->setSync(false);
-	//wifiClient在write数据的时候会用到timeout
+#endif
+
 	wifiClient->setTimeout(HOMEKIT_SOCKET_FLUSH_WAIT_MS);    //milliseconds (ms)
 
 	client_context_t *context = client_context_new(wifiClient);
@@ -4030,7 +4052,11 @@ void homekit_server_restart() {
 		INFO("Creating new WiFi server");
 		running_server->wifi_server = new WiFiServer(HOMEKIT_SERVER_PORT);
 		running_server->wifi_server->begin();
+#ifdef	WIFI_CLIENT_NODELAY
+		running_server->wifi_server->setNoDelay(WIFI_CLIENT_NODELAY);
+#else
 		running_server->wifi_server->setNoDelay(true);
+#endif
 		DEBUG("WiFiServer begin at port: %d\n", HOMEKIT_ARDUINO_SERVER_PORT);
 
 	}
