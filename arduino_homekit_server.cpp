@@ -48,7 +48,7 @@
 #define HOMEKIT_SOCKET_FLUSH_WAIT_MS 500 //milliseconds
 
 #define WIFI_CLIENT_SYNC true
-#define WIFI_CLIENT_NODELAY false   //in theory not neccessary to set false when sync true
+#define WIFI_CLIENT_NODELAY true   //in theory not neccessary to set false when sync true
 
 //#define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 //#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
@@ -56,7 +56,7 @@
 //const int idle = 180; /* 180 sec idle before start sending probes */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_SEC      120
 //const int interval = 30; /* 30 sec between probes */
-#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  10
+#define HOMEKIT_SOCKET_KEEPALIVE_INTERVAL_SEC  20
 //const int maxpkt = 4; /* Drop connection after 4 probes without response */
 #define HOMEKIT_SOCKET_KEEPALIVE_IDLE_COUNT     4
 // if 180 + 30 * 4 = 300 sec without socket response, disconected it.
@@ -797,7 +797,8 @@ void write(client_context_t *context, byte *data, int data_size) {
 	bool isChunked = false;
 	if (availableForWrite < data_size) {
 		CLIENT_INFO(context, "Socket not available to write size:%d,available:%d", data_size, availableForWrite);
-		context->socket->flush();  //???
+		if(availableForWrite)
+			context->socket->flush();  //???
 		isChunked = true;// TCP_MSS < 1460;
 	}
 	int write_size = 0;
@@ -827,7 +828,7 @@ void write(client_context_t *context, byte *data, int data_size) {
 	if (write_size != data_size) {
 	
 		context->error_write = true;
-		context->socket->keepAlive(1, 1, 1);		// fast disconnected internally in 1 second.
+		//context->socket->keepAlive(1, 1, 1);		// fast disconnected internally in 1 second.
 		CLIENT_ERROR(context, "socket.write, data_size=%d, write_size=%d", data_size, write_size);
 	}
 
@@ -1924,6 +1925,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		);
 
 		byte *encrypted_response_data = (byte*)malloc(encrypted_response_data_size);
+
 		r = crypto_chacha20poly1305_encrypt(
 			session_key, (byte *)"\x0\x0\x0\x0PV-Msg02", NULL, 0,
 			sub_response_data, sub_response_data_size,
@@ -1969,7 +1971,8 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		memcpy(context->verify_context->device_public_key,
 			tlv_device_public_key->value, tlv_device_public_key->size);
 		context->verify_context->device_public_key_size = tlv_device_public_key->size;
-
+		///YK
+		//context->disconnect = true;
 		break;
 	}
 	case 3: {
@@ -2891,14 +2894,14 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 
 	switch (tlv_get_integer_value(message, TLVType_Method, -1)) {
 	case TLVMethod_AddPairing: {
-		CLIENT_INFO(context, "Add Pairing");
+		CLIENT_INFO(context, "Add Pairing ");
 
 		if (!(context->permissions & pairing_permissions_admin)) {
 			CLIENT_ERROR(context, "Refusing to add pairing to non-admin controller");
 			send_tlv_error_response(context, 2, TLVError_Authentication);
 			break;
 		}
-
+		//INFO("Add Pairing 1/5" );
 		tlv_t *tlv_device_identifier = tlv_get_value(message, TLVType_Identifier);
 		if (!tlv_device_identifier) {
 			CLIENT_ERROR(context, "Invalid add pairing request: no device identifier");
@@ -2911,13 +2914,14 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
+		//INFO("Add Pairing 2/5" );
 		int device_permissions = tlv_get_integer_value(message, TLVType_Permissions, -1);
 		if (device_permissions == -1) {
 			CLIENT_ERROR(context, "Invalid add pairing request: no device permissions");
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
-
+		//INFO("Add Pairing 3 / 5" );
 		//ed25519_key device_key;
 		//crypto_ed25519_init(&device_key);
 		ed25519_key *device_key = crypto_ed25519_new();
@@ -2929,7 +2933,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 			send_tlv_error_response(context, 2, TLVError_Unknown);
 			break;
 		}
-
+		//INFO("Add Pairing 4 / 5" );
 		char *device_identifier = strndup((const char*)tlv_device_identifier->value,
 			tlv_device_identifier->size);
 
@@ -2963,7 +2967,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 			}
 
 			free(pairing_public_key);
-
+			//INFO("Add Pairing 5 / 5" );
 			r = homekit_storage_update_pairing(device_identifier, device_permissions);
 			if (r) {
 				CLIENT_ERROR(context, "Failed to add pairing: storage error (code %d)", r);
@@ -2972,7 +2976,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 				break;
 			}
 
-			INFO("Updated pairing with %s", device_identifier);
+			//INFO("Updated pairing with %s", device_identifier);
 		}
 		else {
 			if (!homekit_storage_can_add_pairing()) {
@@ -3494,8 +3498,8 @@ void homekit_server_close_client(homekit_server_t *server, client_context_t *con
 		//if(!stop_ok){
 		//CLIENT_ERROR(context, "socket.stop error");
 		//}
-		context->socket->flush(100);
-		optimistic_yield(1000);
+		//context->socket->flush(100);
+		//optimistic_yield(1000);
 		if (!context->socket->stop(100)) {
 			CLIENT_ERROR(context, "socket.stop error");
 		}
@@ -3571,8 +3575,12 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 			CLIENT_INFO(ct, "It's already pervious connection from %s", wifiClient->remoteIP().toString().c_str());
 			if (CLOSE_DUPLICATED_CONNECTION) {
 				ct->socket->flush();
-				ct->socket->keepAlive(1, 1, 1);
+				ct->disconnect = true;
 				CLIENT_INFO(ct, "Trying to close them");
+				homekit_server_close_clients(server);
+				optimistic_yield(1000);
+				//ct->socket->keepAlive(1, 1, 1);
+				
 			}
 		}
 	}
@@ -4248,13 +4256,14 @@ void arduino_homekit_setup(homekit_server_config_t *config) {
 		}
 	});
 }
-
+static size_t update_mdns_count = 0;   //experimental
 void arduino_homekit_loop() {
-	if (homekit_mdns_started) {
+	if (homekit_mdns_started && update_mdns_count==10) {
 		MDNS.update();
 		optimistic_yield(1000);
+		update_mdns_count = 0;
 	}
-
+	update_mdns_count++;
 	if (running_server != nullptr) {
 		if (!running_server->paired) {
 			//If not paired or pairing was removed, preinit paring context.

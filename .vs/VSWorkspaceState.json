@@ -1,9 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\hapweb",
-    "\\wolfssl"
+    ""
   ],
-  "SelectedNode": "\\debug.h",
+  "SelectedNode": "\\arduino_homekit_server.cpp",
   "PreviewInSolutionExplorer": false
 }

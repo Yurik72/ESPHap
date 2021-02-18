@@ -5,8 +5,10 @@
 #define PAIRVERIFY_USE_MEMORYBUFFER   
 #define USE_STACK_BUFFER               //instruct to use stack buffer on some operation, like sending responce etc
 #define USE_STATIC_HTTP_BODY           //instruct to use static buffer when HTTP parser parsing a body
-#define CLOSE_DUPLICATED_CONNECTION  0  //instruct that previous connection with the same ip should be closed
+#define CLOSE_DUPLICATED_CONNECTION  1  //instruct that previous connection with the same ip should be closed
 #define USE_STATIC_BUFFER_WRITE_JSON_CHARACHTERISTIC    //instruct use static buffer when base64 encoded for write charachteristik
+
+#define DEBUG_MEMORY
 #if defined(ARDUINO) && defined(ESP8266)
 #define ARDUINO8266_SERVER
 
