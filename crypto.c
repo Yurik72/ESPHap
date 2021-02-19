@@ -375,8 +375,11 @@ ed25519_key *crypto_ed25519_new() {
 }
 
 void crypto_ed25519_free(ed25519_key *key) {
-    if (key)
-        free(key);
+	if (key) {
+//YK
+		wc_ed25519_free(key);
+		free(key);
+	}
 }
 
 ed25519_key *crypto_ed25519_generate() {

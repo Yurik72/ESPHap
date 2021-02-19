@@ -47,6 +47,7 @@
 //See WiFiClient.h WIFICLIENT_MAX_FLUSH_WAIT_MS
 #define HOMEKIT_SOCKET_FLUSH_WAIT_MS 500 //milliseconds
 
+#define DISCONNECT_ALIVE_DELAY_S  4
 #define WIFI_CLIENT_SYNC true
 #define WIFI_CLIENT_NODELAY true   //in theory not neccessary to set false when sync true
 
@@ -145,7 +146,7 @@ extern "C" {
 		bool error_write; // WangBin added
 		bool is_static;
 		bool is_used;
-
+		long disconnect_ms;
 		struct _client_context_t *next;
 	};
 
@@ -328,23 +329,23 @@ pair_verify_context_t* pair_verify_context_new() {
 	context->device_public_key_size = 0;
 	context->accessory_public_key = NULL;
 	context->accessory_public_key_size = 0;
-
+	
 	return context;
 }
 
 void pair_verify_context_free(pair_verify_context_t *context) {
 	if (context->secret)
 		free(context->secret);
-
+	context->secret = NULL;
 	if (context->session_key)
 		free(context->session_key);
-
+	context->session_key = NULL;
 	if (context->device_public_key)
 		free(context->device_public_key);
-
+	context->device_public_key = NULL;
 	if (context->accessory_public_key)
 		free(context->accessory_public_key);
-
+	context->accessory_public_key = NULL;
 	free(context);
 }
 
@@ -376,7 +377,7 @@ void homekit_init_client_context(client_context_t *c, WiFiClient *wifiClient) {
 	c->count_reads = 0;
 	c->count_writes = 0;
 	c->disconnect = false;
-
+	c->disconnect_ms = 0;
 	
 	c->event_queue = (Queue_t*)malloc(sizeof(Queue_t));
 	q_init(c->event_queue, sizeof(characteristic_event_t*),
@@ -424,8 +425,8 @@ void client_context_free(client_context_t *c) {
 	c->step = HOMEKIT_CLIENT_STEP_NONE;
 	if (c->verify_context)
 		pair_verify_context_free(c->verify_context);
-	c->verify_context == nullptr;
-
+	c->verify_context = nullptr;
+	c->disconnect_ms = 0;
 
 	if (c->endpoint_params)
 		query_params_free(c->endpoint_params);
@@ -789,7 +790,11 @@ void write(client_context_t *context, byte *data, int data_size) {
 		CLIENT_ERROR(context, "The socket is null! (or is closed)");
 		return;
 	}
-	if (context->error_write) {
+	if (context->disconnect) {
+		context->error_write = true;
+		return;
+	}
+	if (context->error_write ) {
 		CLIENT_ERROR(context, "error_in_write_data is true, abort write data");
 		return;
 	}
@@ -1958,6 +1963,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			pair_verify_context_free(context->verify_context);
 
 		context->verify_context = pair_verify_context_new();
+
 		context->verify_context->secret = shared_secret;
 		context->verify_context->secret_size = shared_secret_size;
 
@@ -1971,8 +1977,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		memcpy(context->verify_context->device_public_key,
 			tlv_device_public_key->value, tlv_device_public_key->size);
 		context->verify_context->device_public_key_size = tlv_device_public_key->size;
-		///YK
-		//context->disconnect = true;
+
 		break;
 	}
 	case 3: {
@@ -1994,6 +1999,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			send_tlv_error_response(context, 4, TLVError_Authentication);
 			break;
 		}
+
 
 		CLIENT_DEBUG(context, "Decrypting payload");
 		size_t decrypted_data_size = 0;
@@ -2020,6 +2026,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			send_tlv_error_response(context, 4, TLVError_Authentication);
 			break;
 		}
+		//leak
 
 		tlv_values_t *decrypted_message = tlv_new();
 		r = tlv_parse(decrypted_data, decrypted_data_size, decrypted_message);
@@ -2105,6 +2112,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			pair_verify_context_free(context->verify_context);
 			context->verify_context = NULL;
 			send_tlv_error_response(context, 4, TLVError_Authentication);
+			homekit_storage_pairing_free(pairing);
 			break;
 		}
 
@@ -2119,6 +2127,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			pair_verify_context_free(context->verify_context);
 			context->verify_context = NULL;
 			send_tlv_error_response(context, 4, TLVError_Unknown);
+			homekit_storage_pairing_free(pairing);
 			break;
 		}
 
@@ -2135,6 +2144,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		if (r) {
 			CLIENT_ERROR(context, "Failed to derive write encryption key (code %d)", r);
 			send_tlv_error_response(context, 4, TLVError_Unknown);
+			homekit_storage_pairing_free(pairing);
 			break;
 		}
 
@@ -2145,7 +2155,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 		context->pairing_id = pairing_id;
 		context->permissions = permissions;
 		context->encrypted = true;
-
+		homekit_storage_pairing_free(pairing);
 		HOMEKIT_NOTIFY_EVENT(context->server, HOMEKIT_EVENT_CLIENT_VERIFIED);
 		CLIENT_INFO(context, "Verification successful, secure session established");
 		context->step = HOMEKIT_CLIENT_STEP_PAIR_VERIFY_2OF2;
@@ -2953,6 +2963,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 				free(device_identifier);
 				crypto_ed25519_free(device_key);
 				send_tlv_error_response(context, 2, TLVError_Unknown);
+				break;
 			}
 			pairing_free(pairing);
 			if (pairing_public_key_size != tlv_device_public_key->size
@@ -2964,6 +2975,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 				free(device_identifier);
 				crypto_ed25519_free(device_key);
 				send_tlv_error_response(context, 2, TLVError_Unknown);
+				break;
 			}
 
 			free(pairing_public_key);
@@ -2972,10 +2984,11 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 			if (r) {
 				CLIENT_ERROR(context, "Failed to add pairing: storage error (code %d)", r);
 				free(device_identifier);
+				crypto_ed25519_free(device_key);
 				send_tlv_error_response(context, 2, TLVError_Unknown);
 				break;
 			}
-
+			crypto_ed25519_free(device_key);
 			//INFO("Updated pairing with %s", device_identifier);
 		}
 		else {
@@ -2983,6 +2996,7 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 				CLIENT_ERROR(context, "Failed to add pairing: max peers");
 				free(device_identifier);
 				send_tlv_error_response(context, 2, TLVError_MaxPeers);
+				crypto_ed25519_free(device_key);
 				break;
 			}
 
@@ -2991,9 +3005,10 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 				CLIENT_ERROR(context, "Failed to add pairing: storage error (code %d)", r);
 				free(device_identifier);
 				send_tlv_error_response(context, 2, TLVError_Unknown);
+				crypto_ed25519_free(device_key);
 				break;
 			}
-
+			crypto_ed25519_free(device_key);
 			INFO("Added pairing with %s", device_identifier);
 
 			HOMEKIT_NOTIFY_EVENT(context->server, HOMEKIT_EVENT_PAIRING_ADDED);
@@ -3393,6 +3408,8 @@ void homekit_client_process(client_context_t *context) {
 		CLIENT_ERROR(context, "The socket is null");
 		return;
 	}
+	if (context->disconnect)
+		return;
 	context->server->parser.data = context;
 
 	size_t data_available = 0;
@@ -3484,13 +3501,23 @@ void homekit_server_close_clients(homekit_server_t *server) {
 	}
 }
 void homekit_server_close_client(homekit_server_t *server, client_context_t *context) {
+	if (context->socket && context->disconnect_ms==0) {
+
+		context->disconnect_ms = (DISCONNECT_ALIVE_DELAY_S +1)* 1000 + millis();
+		//context->socket->keepAlive(DISCONNECT_ALIVE_DELAY_S, DISCONNECT_ALIVE_DELAY_S, DISCONNECT_ALIVE_DELAY_S);
+		//context->socket->disableKeepAlive();
+		return;
+	}
+	if (context->socket && context->disconnect_ms > millis()) {
+		return;
+	}
 	CLIENT_INFO(context, "Closing client connection");
 	context->step = HOMEKIT_CLIENT_STEP_END;
 	//FD_CLR(context->socket, &server->fds);
 	// TODO: recalc server->max_fd ?
 	server->nfds--;
 	//close(context->socket);
-
+	
 	if (context->socket) {
 		//context->socket->disableKeepAlive();
 		// disableKeepAlive or FLUSH_WAIT_MS is small may cause crash
@@ -3499,10 +3526,12 @@ void homekit_server_close_client(homekit_server_t *server, client_context_t *con
 		//CLIENT_ERROR(context, "socket.stop error");
 		//}
 		//context->socket->flush(100);
-		//optimistic_yield(1000);
-		if (!context->socket->stop(100)) {
-			CLIENT_ERROR(context, "socket.stop error");
-		}
+
+		optimistic_yield(1000);
+		context->socket->stop();
+	//	if (!context->socket->stop(100)) {
+	//		CLIENT_ERROR(context, "socket.stop error");
+	//	}
 		optimistic_yield(1000);
 		CLIENT_DEBUG(context, "The sockect is stoped");
 		delete context->socket;

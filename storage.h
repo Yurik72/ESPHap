@@ -27,7 +27,7 @@ extern "C" {
 	int homekit_storage_update_pairing(const char *device_id, byte permissions);
 	int homekit_storage_remove_pairing(const char *device_id);
 	pairing_t *homekit_storage_find_pairing(const char *device_id);
-
+	void homekit_storage_pairing_free(pairing_t * pairing);
 	struct _pairing_iterator;
 	typedef struct _pairing_iterator pairing_iterator_t;
 
