@@ -33,7 +33,7 @@ extern "C"{
 #ifdef ESP8266
 #include "homekitintegrationcpp.h"
 #endif
-#include <hapfilestorage\hapfilestorage.hpp>
+#include <hapfilestorage/hapfilestorage.hpp>
 
 
 
