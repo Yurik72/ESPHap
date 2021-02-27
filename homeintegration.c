@@ -807,6 +807,39 @@ homekit_service_t* hap_new_fan_service(const char* szname, hap_callback cb, void
 	});
 }
 
+/**
+ * Add a custom accessory, customising the services for it.
+ * Example usage:
+ * <code>
+ *      String name = "My Accessory";
+ *      homekit_service_t *services[4];
+ *      services[0] = hap_new_homekit_accessory_service(name.c_str(), "0");
+ *      services[1] = hap_new_motion_service(name.c_str(), hapCallback, nullptr);
+ *      services[2] = hap_new_battery_service(name.c_str(), hapCallback, nullptr);
+ *      services[3] = NULL;
+ *      hap_add_accessory(homekit_accessory_category_security_system,
+ *                        services);
+ * </code>
+ * @param acctype Something from homekit_accessory_category_t
+ * @param services An array of homekit_service_t, with the last element as NULL
+ * @return
+ */
+homekit_accessory_t *hap_add_accessory(
+        int acctype, homekit_service_t *services[]) {
+
+    INFO("hap_add_accessory");
+    homekit_accessory_t *acc = NEW_HOMEKIT_ACCESSORY(
+            .category = (homekit_accessory_category_t)acctype,
+            .services = services
+    );
+    hap_accessories[hap_mainaccesories_current] = acc;
+
+    hap_mainaccesories_current++;
+    hap_accessories[hap_mainaccesories_current] = NULL;
+
+    return acc;
+}
+
 homekit_service_t* hap_add_fan_service(const char* szname, hap_callback cb, void* context) {
 
 	INFO("hap_add_fan_service");

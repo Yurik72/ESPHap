@@ -156,6 +156,9 @@ type name() { \
 
 	homekit_service_t* hap_add_service(homekit_service_t* service);
 
+    homekit_accessory_t *hap_add_accessory(
+            int acctype, homekit_service_t *services[]);
+
 	void hap_setbase_accessorytype(int val);
 
 	//initial value
