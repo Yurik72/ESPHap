@@ -2253,8 +2253,9 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
     CLIENT_INFO(context, "Update Characteristics");
 #ifdef CJSON_USE_PREALLOCATED_BUFFER
 	char al_buf[JSON_ALLOCATE_SIZE];
-	set_allocator_buffer(al_buf, JSON_ALLOCATE_SIZE)
+	set_allocator_buffer(al_buf, JSON_ALLOCATE_SIZE);
 #endif
+
     DEBUG_HEAP();
 
     char *data1 = strndup((char *)data, size);
