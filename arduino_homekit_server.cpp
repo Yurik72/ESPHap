@@ -2073,6 +2073,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
 			tlv_free(decrypted_message);
 			pair_verify_context_free(context->verify_context);
 			context->verify_context = NULL;
+
 			send_tlv_error_response(context, 4, TLVError_Authentication);
 			break;
 		}
