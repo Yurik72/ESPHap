@@ -33,7 +33,7 @@
 #include "storage.h"
 #include "storage_ex.h"
 
-#define MAX_SERVICES 20
+//#define MAX_SERVICES 20
 
 
 static callback_storagechanged callbackstorage_integration=NULL;

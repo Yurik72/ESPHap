@@ -1966,6 +1966,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
                 CLIENT_ERROR(context, "Failed to verify device signature (code %d)", r);
 
                 pair_verify_context_free(context->verify_context);
+				homekit_storage_pairing_free(pairing);
                 context->verify_context = NULL;
 
                 send_tlv_error_response(context, 4, TLVError_Authentication);
@@ -1991,7 +1992,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
                 
                 pair_verify_context_free(context->verify_context);
                 context->verify_context = NULL;
-
+				homekit_storage_pairing_free(pairing);
                 send_tlv_error_response(context, 4, TLVError_Unknown);
                 break;
             }
@@ -2012,7 +2013,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
             if (r) {
                 CLIENT_ERROR(context, "Failed to derive write encryption key (code %d)", r);
                 
-
+				homekit_storage_pairing_free(pairing);
                 send_tlv_error_response(context, 4, TLVError_Unknown);
                 break;
             }
@@ -2025,7 +2026,7 @@ void homekit_server_on_pair_verify(client_context_t *context, const byte *data, 
             context->pairing_id = pairing_id;
             context->permissions = permissions;
             context->encrypted = true;
-
+			homekit_storage_pairing_free(pairing);
             HOMEKIT_NOTIFY_EVENT(context->server, HOMEKIT_EVENT_CLIENT_VERIFIED);
 
             CLIENT_INFO(context, "Verification successful, secure session established");
