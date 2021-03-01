@@ -3417,7 +3417,8 @@ void homekit_client_process(client_context_t *context) {
 
 	do {
 		int data_len = 0;
-		int available_len = context->socket->available();  // optimistic_yield(100);
+		int available_len = context->socket->available();  
+		optimistic_yield(1000);
 		if (available_len > 0) {
 			int size = sizeof(context->server->data) - data_available;
 			if (size > available_len) {
