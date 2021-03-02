@@ -3625,7 +3625,7 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 	//String yourIP = "192.168.0.0";  IP Bridge
 	//if(wifiClient->remoteIP().toString() ==yourIP)  // this is a bridge
 	//{
-	//	CLIENT_INFO(ct, "Home bridge IGNORED");
+	//	INFO( "Home bridge IGNORED");
 	//	wifiClient->stop();
 	//	delete wifiClient;
 	//	return NULL;
