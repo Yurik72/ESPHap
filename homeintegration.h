@@ -82,13 +82,14 @@ type name() { \
 	homekit_service_t*  hap_add_rgbstrip_service_as_accessory_ex(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_rgbstrip_service_ex(const char* szname, hap_callback cb, void* context);
 	//Thermo
-	
+
+    homekit_service_t* hap_new_temperature_service(const char *szname);
 	homekit_service_t* hap_add_temperature_service(const char* szname);
 
 	homekit_service_t* hap_add_thermostat_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_thermostat_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback cb, void* context);
-
+	homekit_service_t* hap_new_humidity_service(const char *szname);
 	homekit_service_t* hap_add_humidity_service(const char* szname);
 	homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype, const char* szname, homekit_service_t** pp_temp, homekit_service_t** pp_hum);
 	homekit_service_t*  hap_add_hum_as_accessory(int acctype, const char* szname);

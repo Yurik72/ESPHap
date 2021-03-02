@@ -543,14 +543,17 @@ homekit_service_t*  hap_add_relaydim_service_as_accessory(int acctype,const char
  //   INFO("added light bulb as accessory , next accessory %d",hap_mainaccesories_current);
 return lbservice;
 }
-homekit_service_t* hap_add_temperature_service(const char* szname){
 
-	homekit_service_t*service=NEW_HOMEKIT_SERVICE(TEMPERATURE_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
-	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-	            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0),
-	            NULL
-	        });
-	return hap_add_service(service);
+homekit_service_t *hap_new_temperature_service(const char *szname) {
+    return NEW_HOMEKIT_SERVICE(
+            TEMPERATURE_SENSOR,
+            .characteristics=(homekit_characteristic_t*[]) { NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_TEMPERATURE, 0), NULL
+            });
+}
+
+homekit_service_t* hap_add_temperature_service(const char* szname){
+    return hap_add_service(hap_new_temperature_service(szname));
 }
 homekit_service_t* hap_add_thermostat_service(const char* szname, hap_callback cb, void* context) {
 
@@ -608,15 +611,19 @@ homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback c
 	});
 
 }
-homekit_service_t* hap_add_humidity_service(const char* szname){
 
-	homekit_service_t*service=NEW_HOMEKIT_SERVICE(HUMIDITY_SENSOR, .characteristics=(homekit_characteristic_t*[]) {
-	            NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
-	            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0),
-	            NULL
-	        });
-	return hap_add_service(service);
+homekit_service_t *hap_new_humidity_service(const char *szname) {
+    return NEW_HOMEKIT_SERVICE(
+            HUMIDITY_SENSOR,
+            .characteristics=(homekit_characteristic_t*[]) { NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+            NEW_HOMEKIT_CHARACTERISTIC(CURRENT_RELATIVE_HUMIDITY, 0), NULL
+            });
 }
+
+homekit_service_t *hap_add_humidity_service(const char *szname) {
+    return hap_add_service(hap_new_humidity_service(szname));
+}
+
 homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype,const char* szname,homekit_service_t** pp_temp,homekit_service_t** pp_hum){
 
 	homekit_service_t* baseservice=hap_new_homekit_accessory_service(szname,"0");
