@@ -137,7 +137,7 @@ extern "C" {
 		byte write_key[32];
 		int count_reads;
 		int count_writes;
-
+		bool is_wrong_endpoint = false;
 		//QueueHandle_t event_queue;
 		Queue_t *event_queue;
 		pair_verify_context_t *verify_context;
@@ -366,7 +366,7 @@ void server_static_init() {
 void homekit_init_client_context(client_context_t *c, WiFiClient *wifiClient) {
 	c->server = NULL;
 	c->endpoint_params = NULL;
-
+	c->is_wrong_endpoint = false;
 
 	c->body = NULL;
 	c->body_length = 0;
@@ -414,7 +414,7 @@ client_context_t* client_context_new(WiFiClient *wifiClient) {
 void client_context_free(client_context_t *c) {
 	CLIENT_INFO(c, "client content free");
 	c->body_length = 0;
-
+	c->is_wrong_endpoint = false;
 
 	c->pairing_id = -1;
 	c->encrypted = false;
@@ -800,11 +800,25 @@ void write(client_context_t *context, byte *data, int data_size) {
 	}
 	int availableForWrite = context->socket->availableForWrite();
 	bool isChunked = false;
+
 	if (availableForWrite < data_size) {
 		CLIENT_INFO(context, "Socket not available to write size:%d,available:%d", data_size, availableForWrite);
-		if(availableForWrite)
+		//if(availableForWrite)
 			context->socket->flush();  //???
 		isChunked = true;// TCP_MSS < 1460;
+	}
+	int attempts = 0;
+	while (!availableForWrite && attempts < 5) {
+		availableForWrite = context->socket->availableForWrite();
+		CLIENT_INFO(context, "Attempt :%d, available:%d", attempts, availableForWrite);
+		if (!availableForWrite) {
+			optimistic_yield(1000);
+		}
+		else {
+			isChunked = availableForWrite < data_size;
+			break;
+		}
+		attempts++;
 	}
 	int write_size = 0;
 	//CLIENT_INFO(context, "write   size:%d,available:%d, sync:%d,nodelay:%d", data_size, availableForWrite, context->socket->getSync(), context->socket->getNoDelay());
@@ -1024,7 +1038,9 @@ void send_204_response(client_context_t *context) {
 
 void send_404_response(client_context_t *context) {
 	static char response[] = "HTTP/1.1 404 Not Found\r\n\r\n";
+	//CLIENT_INFO(context, "start send 404");
 	client_send(context, (byte*)response, sizeof(response) - 1);
+	//CLIENT_INFO(context, "end send 404");
 }
 
 void send_client_events(client_context_t *context, client_event_t *events) {
@@ -3211,9 +3227,9 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 	//DEBUG("http_parser data_length = %d", length);
 //    String url = String(data);
 	//DEBUG("url -> %s", data);
-
+	
 	client_context_t *context = (client_context_t*)parser->data;
-
+	//CLIENT_INFO(context,"url -> %s", data);
 	context->endpoint = HOMEKIT_ENDPOINT_UNKNOWN;
 	if (parser->method == HTTP_GET) {
 		if (!strncmp(data, "/accessories", length)) {
@@ -3258,10 +3274,10 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 	}
 
 	if (context->endpoint == HOMEKIT_ENDPOINT_UNKNOWN) {
-		char *url = strndup(data, length);
+		//'char *url = strndup(data, length);
 		//TODO fix
 		//ERROR("Unknown endpoint: %s %s", http_method_str(parser->method), url);
-		free(url);
+		//free(url);
 	}
 
 	return 0;
@@ -3315,8 +3331,10 @@ int homekit_server_on_message_complete(http_parser *parser) {
 			break;
 		}
 		default: {
-			DEBUG("Unknown endpoint");
+			ERROR("Unknown endpoint");
 			send_404_response(context);
+			context->is_wrong_endpoint = true; //#64
+			context->disconnect = true;  //#64 
 			break;
 		}
 		}
@@ -3351,6 +3369,8 @@ int homekit_server_on_message_complete(http_parser *parser) {
 		default: {
 			DEBUG("Unknown endpoint");
 			send_404_response(context);
+			context->is_wrong_endpoint = true; //#64
+			context->disconnect = true;  //#64 
 			break;
 		}
 		}
@@ -3603,7 +3623,14 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 	for (int i = 0; i < CLIENT_CONTEXT_CACHE_SIZE; i++) {
 		client_context_t * ct = &(cache_client_contexts[i]);
 		if (ct->is_used && ct->socket && wifiClient->remoteIP()== ct->socket->remoteIP()) {
-			CLIENT_INFO(ct, "It's already pervious connection from %s", wifiClient->remoteIP().toString().c_str());
+			CLIENT_INFO(ct, "It's already previous connection from %s", wifiClient->remoteIP().toString().c_str());
+			//#64
+			if (ct->is_wrong_endpoint) {
+				CLIENT_INFO(ct, "Previous connection is wrong");
+				wifiClient->stop();
+				delete wifiClient;
+				return NULL;
+			}
 			if (CLOSE_DUPLICATED_CONNECTION) {
 				ct->socket->flush();
 				ct->disconnect = true;
