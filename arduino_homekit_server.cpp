@@ -3619,7 +3619,14 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 
 	//    const struct timeval rcvtimeout = { 10, 0 }; /* 10 second timeout */
 	//    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &rcvtimeout, sizeof(rcvtimeout));
-
+	//if(wifiClient->remoteIP()=xxxx)  // this is a bridge
+	//{
+	//	CLIENT_INFO(ct, "Home bridge IGNORED");
+	//	wifiClient->stop();
+	//	delete wifiClient;
+	//	return NULL;
+	//
+	//}
 	for (int i = 0; i < CLIENT_CONTEXT_CACHE_SIZE; i++) {
 		client_context_t * ct = &(cache_client_contexts[i]);
 		if (ct->is_used && ct->socket && wifiClient->remoteIP()== ct->socket->remoteIP()) {
