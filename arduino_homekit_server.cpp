@@ -162,6 +162,7 @@ bool arduino_homekit_preinit(homekit_server_t *server);
 
 static client_context_t cache_client_contexts[CLIENT_CONTEXT_CACHE_SIZE];
 static bool is_initialized = false;
+static bool mdns_announce=false;
 #ifdef USE_STATIC_HTTP_BODY
 byte static_http_body[512];
 #endif
@@ -3278,6 +3279,8 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 		//TODO fix
 		//ERROR("Unknown endpoint: %s %s", http_method_str(parser->method), url);
 		//free(url);
+		CLIENT_INFO(context, "onurl -> %s", data);
+		mdns_announce = true;
 	}
 
 	return 0;
@@ -3619,7 +3622,8 @@ client_context_t* homekit_server_accept_client(homekit_server_t *server) {
 
 	//    const struct timeval rcvtimeout = { 10, 0 }; /* 10 second timeout */
 	//    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &rcvtimeout, sizeof(rcvtimeout));
-	//if(wifiClient->remoteIP()=xxxx)  // this is a bridge
+	//String yourIP = "192.168.0.0";  IP Bridge
+	//if(wifiClient->remoteIP().toString() ==yourIP)  // this is a bridge
 	//{
 	//	CLIENT_INFO(ct, "Home bridge IGNORED");
 	//	wifiClient->stop();
@@ -4327,6 +4331,10 @@ void arduino_homekit_loop() {
 		MDNS.update();
 		optimistic_yield(1000);
 		update_mdns_count = 0;
+	}
+	if (mdns_announce && update_mdns_count == 5) {
+		MDNS.announce();
+		mdns_announce = false;
 	}
 	update_mdns_count++;
 	if (running_server != nullptr) {
