@@ -8,7 +8,7 @@
 #include <WiFiClient.h>
 #include <ESP8266mDNS.h>
 #include <LEAmDNS.h>
-
+#include "user_interface.h"
 //#include <wolfssl/wolfcrypt/settings.h>
 #include <homekit.h>
 #include <characteristics.h>
@@ -3850,6 +3850,9 @@ void homekit_mdns_init(homekit_server_t *server) {
 	char* hostname = unique_name;// name->value.string_value;
 	//homekit_mdns_configure_init(name->value.string_value, PORT);
 	WiFi.hostname(hostname);
+	INFO("Wifi Sleep type:%d", wifi_get_sleep_type());
+	wifi_set_sleep_type(NONE_SLEEP_T);
+	INFO("Set Wifi Sleep type :%d", wifi_get_sleep_type());
 	// Must specify the MDNS runs on the IP of STA
 	MDNS.begin(hostname, staIP);
 	//MDNS.begin(unique_name, staIP);
