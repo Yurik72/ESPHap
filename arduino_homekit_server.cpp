@@ -3504,7 +3504,16 @@ void homekit_client_process(client_context_t *context) {
 
 		current_client_context = context;
 		context->server->request_completed = false;
-
+		/*  Uncomment this block for trace
+		if (payload_size) {
+			char* strTrace = strndup((const char*)payload, payload_size);
+			CLIENT_INFO(context, "payload=<%s>", strTrace);
+			free(strTrace);
+		}
+		else {
+			CLIENT_INFO(context, "payload size=0");
+		}
+		*/
 		http_parser_execute(&context->server->parser, &homekit_http_parser_settings,
 			(char*)payload, payload_size);
 
