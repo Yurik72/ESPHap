@@ -36,6 +36,7 @@
 	};
 #endif
 
+
 #define HAP_IMPLEMENT_GETVAL(name,type,service,characteristic)\
 type name() { \
 	if (service) { \
@@ -60,6 +61,10 @@ type name() { \
 	void hap_set_device_password(char* szpwd);
 
 	void hap_set_device_setupId(char* szpwd);
+
+
+	bool hap_set_charachteristic_validrange(homekit_characteristic_t * ch, float min, float max);
+	bool hap_set_charachteristic_validrange_by_type(homekit_service_t *service,const char *type, float min, float max);
 
 	//esp controller usage
 	int hap_initbase_accessory_service(const char* szname_value, const char* szmanufacturer, const char* szserialnumber, const char* szmodels, const char* szfirmware);
@@ -88,6 +93,15 @@ type name() { \
 	homekit_service_t* hap_add_thermostat_service(const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_add_thermostat_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_thermostat_service(const char* szname, hap_callback cb, void* context);
+	// heater cooler
+#define HEATER_COOLER_STATE_AUTO 0
+#define HEATER_COOLER_STATE_HEAT 1
+#define HEATER_COOLER_STATE_COOL 2
+
+	homekit_service_t* hap_add_heater_service(const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_add_heater_service_as_accessory(int acctype, const char* szname, hap_callback cb, void* context);
+	homekit_service_t* hap_new_heater_service(const char* szname, hap_callback cb, void* context);
+
 
 	homekit_service_t* hap_add_humidity_service(const char* szname);
 	homekit_service_t*  hap_add_temp_hum_as_accessory(int acctype, const char* szname, homekit_service_t** pp_temp, homekit_service_t** pp_hum);
@@ -164,6 +178,8 @@ type name() { \
 	//initial value
 #define INIT_CHARACHTERISTIC_VAL(type,ch,val) \
 		hap_set_initial_characteristic_##type##_value(ch,val);
+#define INIT_CHARACHTERISTIC_VAL_BY_TYPE(type,service,ch,val) \
+		hap_setinitial_characteristic_##type##_value(service,ch,val);
 
 	void hap_setinitial_characteristic_int_value(homekit_service_t* s, const char *type, int val);
 	void hap_setinitial_characteristic_bool_value(homekit_service_t* s, const char *type, bool val);

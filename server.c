@@ -3012,9 +3012,10 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
     }
 
     if (context->endpoint == HOMEKIT_ENDPOINT_UNKNOWN) {
-        char *url = strndup(data, length);
-        ERROR("Unknown endpoint: %s %s", http_method_str(parser->method), url);
-        free(url);
+       // char *url = strndup(data, length);
+       // ERROR("Unknown endpoint: %s %s", http_method_str(parser->method), url);
+       // free(url);
+		CLIENT_INFO(context, "unknown endpoint url -> %s", data);
     }
 
     return 0;

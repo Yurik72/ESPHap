@@ -3338,6 +3338,7 @@ int homekit_server_on_message_complete(http_parser *parser) {
 			send_404_response(context);
 			context->is_wrong_endpoint = true; //#64
 			context->disconnect = true;  //#64 
+		
 			break;
 		}
 		}
