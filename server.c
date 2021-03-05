@@ -3171,6 +3171,12 @@ static void homekit_client_process(client_context_t *context) {
 		
 	} while (data_available && !context->server->request_completed);
 
+	if (!http_should_keep_alive(&context->server->parser)) {  //fix #64 , after connection close , parser is dead
+		//http_parser_init(&context->server->parser, HTTP_REQUEST);
+		CLIENT_INFO(context, "Connection: close received, client will be disconnected");
+		context->disconnect = true;
+	}
+	http_parser_init(&context->server->parser, HTTP_REQUEST);
     current_client_context = NULL;
 	context->server->parser.data = NULL;
 

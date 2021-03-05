@@ -3231,12 +3231,15 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 	
 	client_context_t *context = (client_context_t*)parser->data;
 	//CLIENT_INFO(context,"url -> %s", data);
+	
 	context->endpoint = HOMEKIT_ENDPOINT_UNKNOWN;
 	if (parser->method == HTTP_GET) {
 		if (!strncmp(data, "/accessories", length)) {
 			context->endpoint = HOMEKIT_ENDPOINT_GET_ACCESSORIES;
+			
 		}
 		else {
+			CLIENT_INFO(context,"Other");
 			static const char url[] = "/characteristics";
 			size_t url_len = sizeof(url) - 1;
 
@@ -3504,7 +3507,8 @@ void homekit_client_process(client_context_t *context) {
 
 		current_client_context = context;
 		context->server->request_completed = false;
-		/*  Uncomment this block for trace
+		 // Uncomment this block for trace
+		/*
 		if (payload_size) {
 			char* strTrace = strndup((const char*)payload, payload_size);
 			CLIENT_INFO(context, "payload=<%s>", strTrace);
@@ -3518,7 +3522,12 @@ void homekit_client_process(client_context_t *context) {
 			(char*)payload, payload_size);
 
 	} while (data_available && !context->server->request_completed);
-
+	if (!http_should_keep_alive(&context->server->parser)) {  //fix #64 , after connection close , parser is dead
+		//http_parser_init(&context->server->parser, HTTP_REQUEST);
+		CLIENT_INFO(context, "Connection: close received, client will be disconnected");
+		context->disconnect = true;
+	}
+	http_parser_init(&context->server->parser, HTTP_REQUEST);
 	context->server->parser.data = NULL;
 	current_client_context = NULL;
 
