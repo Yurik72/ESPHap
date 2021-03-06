@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\examples",
+    "\\examples\\ESPHAPCamera"
   ],
-  "SelectedNode": "\\arduino_homekit_server.cpp",
+  "SelectedNode": "\\examples\\ESPHAPCamera\\config.h",
   "PreviewInSolutionExplorer": false
 }
