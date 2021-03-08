@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\examples",
     "\\examples\\ESPHAPCamera"
   ],
-  "SelectedNode": "\\examples\\ESPHAPCamera\\config.h",
+  "SelectedNode": "\\esphap_cJSON.c",
   "PreviewInSolutionExplorer": false
 }
