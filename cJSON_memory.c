@@ -5,7 +5,7 @@
 
 #include <ctype.h>
 
-#include "cJSON.h"
+#include "esphap_cJSON.h"
 #include "cJSON_memory.h"
 
 //#define JSON_MEMORY_DEBUG
@@ -39,7 +39,7 @@ void set_allocator_buffer(void* b, size_t size) {
 	allocator.buffer_size = size;
 	allocator.buffer = b;
 	allocator.root = NULL;
-	cJSON_InitHooks(&allocator_hooks);
+	esphap_cJSON_InitHooks(&allocator_hooks);
 
 #endif
 }
@@ -112,7 +112,7 @@ void* create_from_allocator(const internal_hooks * const hooks) {
 void reset_allocator() {
 #ifdef CJSON_USE_PREALLOCATED_BUFFER
 	TRC("reset_allocator");
-	cJSON_InitHooks(NULL);
+	esphap_cJSON_InitHooks(NULL);
 
 	allocator.root = NULL;
 	allocator.offset = 0;

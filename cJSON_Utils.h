@@ -20,7 +20,7 @@
   THE SOFTWARE.
 */
 
-#include "cJSON.h"
+#include "esphap_cJSON.h"
 
 /* Implement RFC6901 (https://tools.ietf.org/html/rfc6901) JSON Pointer spec. */
 CJSON_PUBLIC(cJSON *) cJSONUtils_GetPointer(cJSON * const object, const char *pointer);
@@ -40,16 +40,16 @@ CJSON_PUBLIC(int) cJSONUtils_ApplyPatchesCaseSensitive(cJSON * const object, con
 // Note that ApplyPatches is NOT atomic on failure. To implement an atomic ApplyPatches, use:
 //int cJSONUtils_AtomicApplyPatches(cJSON **object, cJSON *patches)
 //{
-//    cJSON *modme = cJSON_Duplicate(*object, 1);
+//    cJSON *modme = esphap_cJSON_Duplicate(*object, 1);
 //    int error = cJSONUtils_ApplyPatches(modme, patches);
 //    if (!error)
 //    {
-//        cJSON_Delete(*object);
+//        esphap_cJSON_Delete(*object);
 //        *object = modme;
 //    }
 //    else
 //    {
-//        cJSON_Delete(modme);
+//        esphap_cJSON_Delete(modme);
 //    }
 //
 //    return error;
