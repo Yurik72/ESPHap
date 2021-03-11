@@ -194,25 +194,25 @@ void setup() {
 }
 
 void notifyHAP(){
-  Serial.print("Notify HAP - ");
+//  Serial.print("Notify HAP - ");
   if(hap_on && hap_on->value.bool_value!=DeviceData.IsOn){
-      Serial.print(" ON/OFF state: ");
-      Serial.println(DeviceData.IsOn);
+//      Serial.print(" ON/OFF state: ");
+//      Serial.println(DeviceData.IsOn);
       HAP_NOTIFY_CHANGES(int,hap_on,DeviceData.IsOn, 0)
     }
     if(hap_br && hap_br->value.int_value !=DeviceData.Brightness){
-      Serial.print(" Brightness: ");
-      Serial.println(DeviceData.Brightness);
+ //     Serial.print(" Brightness: ");
+ //     Serial.println(DeviceData.Brightness);
       HAP_NOTIFY_CHANGES(int,hap_br,DeviceData.Brightness, 0)
     }
     if(hap_hue && hap_hue->value.float_value !=DeviceData.Hue){ //note this code is not used at this time. Device will not change hue or saturation
-      Serial.print(" Hue: ");
-      Serial.println(DeviceData.Hue);
+//      Serial.print(" Hue: ");
+//      Serial.println(DeviceData.Hue);
       HAP_NOTIFY_CHANGES(int,hap_hue,DeviceData.Hue, 0)
     }
     if(hap_saturation && hap_saturation->value.float_value !=DeviceData.Saturation){
-      Serial.print(" Saturation: ");
-      Serial.println(DeviceData.Saturation);
+//      Serial.print(" Saturation: ");
+//      Serial.println(DeviceData.Saturation);
       HAP_NOTIFY_CHANGES(int,hap_saturation,DeviceData.Saturation, 0)
     }
 }
@@ -235,16 +235,16 @@ void handleSetVal(){
           DeviceData.IsOn=false;
           HSItoRGBW(DeviceData.Hue,DeviceData.Saturation,0, rgbw);
 		  }
-      Serial.print("Web SetOn: ");
-      Serial.println(DeviceData.IsOn);
+//      Serial.print("Web SetOn: ");
+//      Serial.println(DeviceData.IsOn);
       notifyHAP();
       set_strip(rgbw);
       isSucess=true;
     }
      else if(server.arg("var") == "br"){
-      Serial.print("Web Set Brightness: ");
+//      Serial.print("Web Set Brightness: ");
       DeviceData.Brightness = server.arg("val").toInt();
-      Serial.println(DeviceData.Brightness);
+//      Serial.println(DeviceData.Brightness);
       notifyHAP();
       HSItoRGBW(DeviceData.Hue,DeviceData.Saturation,DeviceData.Brightness, rgbw);
       set_strip(rgbw);
@@ -353,15 +353,15 @@ void set_strip(int RGBW[4]){
     analogWrite(GREENPIN, RGBW[1]);
     analogWrite(BLUEPIN, RGBW[2]);
     analogWrite(WHITEPIN, RGBW[3]);
-    Serial.print("Setting Strip: R=[");
-    Serial.print(RGBW[0]);
-    Serial.print("] - B=[");
-    Serial.print(RGBW[1]);
-    Serial.print("] - G=[");
-    Serial.print(RGBW[2]);
-    Serial.print("] - W=[");
-    Serial.print(RGBW[3]);
-    Serial.println("]");
+//    Serial.print("Setting Strip: R=[");
+//    Serial.print(RGBW[0]);
+//    Serial.print("] - G=[");
+//    Serial.print(RGBW[1]);
+//    Serial.print("] - B=[");
+//    Serial.print(RGBW[2]);
+//    Serial.print("] - W=[");
+//    Serial.print(RGBW[3]);
+//    Serial.println("]");
 }
 
 void HSItoRGBW(float H, float S, float I, int* rgbw) {//https://blog.saikoled.com/post/44677718712/how-to-convert-from-hsi-to-rgb-white
