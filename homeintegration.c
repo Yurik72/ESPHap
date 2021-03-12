@@ -456,10 +456,19 @@ homekit_service_t*  hap_add_rgbstrip_service_as_accessory_ex(int acctype, const 
 
 	homekit_service_t* baseservice = hap_new_homekit_accessory_service(szname, "0");
 	homekit_service_t* rgbservice = hap_new_rgbstrip_service_ex(szname, cb, context);
-	homekit_service_t* svc[3];
+	homekit_service_t* is1 = hap_new_inputsource_service(szname, "is1", 1, cb, context);
+	homekit_service_t* is2 = hap_new_inputsource_service(szname, "is2", 1, cb, context);
+	homekit_service_t* svc[5];
 	svc[0] = baseservice;//hap_new_homekit_accessory_service(szname,"0");
 	svc[1] = rgbservice;//hap_new_lightbulb_service(szname,cb,context);
-	svc[2] = NULL;
+	svc[2] = is1;
+	svc[3] = is2;
+	svc[4] = NULL;
+	homekit_service_t* linked[3];
+	linked[0] = is1;
+	linked[1] = is2;
+	linked[2] = NULL;
+	rgbservice->linked = linked;
 	hap_accessories[hap_mainaccesories_current] = NEW_HOMEKIT_ACCESSORY(
 		.category = (homekit_accessory_category_t)acctype,
 		.services = svc
@@ -472,6 +481,7 @@ homekit_service_t*  hap_add_rgbstrip_service_as_accessory_ex(int acctype, const 
 }
 homekit_service_t* hap_new_rgbstrip_service_ex(const char* szname, hap_callback cb, void* context) {
 	INFO("hap_new_rgbstrip_service_ex" );
+	
 	return NEW_HOMEKIT_SERVICE(TELEVISION, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
 		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 		NEW_HOMEKIT_CHARACTERISTIC(
@@ -500,18 +510,37 @@ homekit_service_t* hap_new_rgbstrip_service_ex(const char* szname, hap_callback 
 				)
 			),
 			NEW_HOMEKIT_CHARACTERISTIC(
+				REMOTE_KEY, .callback = HOMEKIT_CHARACTERISTIC_CALLBACK(cb, .context = context)
+			),
+			NEW_HOMEKIT_CHARACTERISTIC(
 				PICTURE_MODE, 0,
 
 				.callback = HOMEKIT_CHARACTERISTIC_CALLBACK(
 					cb, .context = context
 				)
 			),
-
+			NEW_HOMEKIT_CHARACTERISTIC(POWER_MODE_SELECTION),
 			NULL
 	});
 }
 
 // end rgb
+
+// input source service
+homekit_service_t* hap_new_inputsource_service(const char* szname,const char* szconfigname,int value, hap_callback cb, void* context) {
+	INFO("hap_new_inputsource_service");
+	return NEW_HOMEKIT_SERVICE(TELEVISION, .primary = true, .characteristics = (homekit_characteristic_t*[]) {
+		NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
+		NEW_HOMEKIT_CHARACTERISTIC(CONFIGURED_NAME, szconfigname),
+			NEW_HOMEKIT_CHARACTERISTIC(IDENTIFIER, value),
+			NEW_HOMEKIT_CHARACTERISTIC(INPUT_SOURCE_TYPE, value),
+			NEW_HOMEKIT_CHARACTERISTIC(IS_CONFIGURED, true),
+			NEW_HOMEKIT_CHARACTERISTIC(CURRENT_VISIBILITY_STATE, HOMEKIT_CURRENT_VISIBILITY_STATE_SHOWN),
+			NULL
+	});
+}
+//
+
 homekit_service_t* hap_add_relaydim_service(const char* szname,hap_callback cb,void* context){
 
 	homekit_service_t*service=NEW_HOMEKIT_SERVICE(LIGHTBULB, .characteristics=(homekit_characteristic_t*[]) {

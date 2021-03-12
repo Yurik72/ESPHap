@@ -2905,7 +2905,10 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 
 void homekit_server_on_pairings(client_context_t *context, const byte *data, size_t size) {
 	DEBUG("HomeKit Pairings"); DEBUG_HEAP();
-
+#ifdef TLV_USE_PREALLOCATED_BUFFER
+//	byte tlv_buff[2048];
+//	set_tlv_allocator_buffer(tlv_buff, sizeof(tlv_buff));
+#endif
 	//context->step = HOMEKIT_CLIENT_STEP_PAIRINGS;
 	tlv_values_t *message = tlv_new();
 	tlv_parse(data, size, message);
@@ -2929,8 +2932,9 @@ void homekit_server_on_pairings(client_context_t *context, const byte *data, siz
 			send_tlv_error_response(context, 2, TLVError_Authentication);
 			break;
 		}
-		//INFO("Add Pairing 1/5" );
+
 		tlv_t *tlv_device_identifier = tlv_get_value(message, TLVType_Identifier);
+
 		if (!tlv_device_identifier) {
 			CLIENT_ERROR(context, "Invalid add pairing request: no device identifier");
 			send_tlv_error_response(context, 2, TLVError_Unknown);
@@ -3239,7 +3243,7 @@ int homekit_server_on_url(http_parser *parser, const char *data, size_t length) 
 			
 		}
 		else {
-			CLIENT_INFO(context,"Other");
+			
 			static const char url[] = "/characteristics";
 			size_t url_len = sizeof(url) - 1;
 

@@ -86,6 +86,10 @@ type name() { \
 	homekit_service_t* hap_add_rgbstrip_service_ex(const char* szname, hap_callback cb, void* context);
 	homekit_service_t*  hap_add_rgbstrip_service_as_accessory_ex(int acctype, const char* szname, hap_callback cb, void* context);
 	homekit_service_t* hap_new_rgbstrip_service_ex(const char* szname, hap_callback cb, void* context);
+
+	//input source
+	homekit_service_t* hap_new_inputsource_service(const char* szname, const char* szconfigname, int value, hap_callback cb, void* context);
+
 	//Thermo
 	
 	homekit_service_t* hap_add_temperature_service(const char* szname);

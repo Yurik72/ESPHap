@@ -21,12 +21,14 @@ void set_tlv_allocator_buffer(void* b, size_t size) {
 	tlv_allocator.buffer_size = size;
 	tlv_allocator.buffer = b;
 	tlv_allocator.root = NULL;
+	tlv_allocator.offset = 0;
 #endif
 }
 void reset_tlv_allocator_buffer() {
 	tlv_allocator.buffer_size = 0;
 	tlv_allocator.buffer = NULL;
 	tlv_allocator.root = NULL;
+	tlv_allocator.offset = 0;
 
 }
 
