@@ -1,5 +1,5 @@
 /*******************************************************************
- * This sketch will allow homekit control of an ESP8266 or ESP32 
+ * This sketch will allow homekit control of an ESP8266/8285 
  * RGBW LED controller. This example is based on the ARILUX AL_LC06.
  * You will need to determin the proper pins for your controller and
  * set the pin definitions accordingly. 
@@ -15,15 +15,9 @@
 
 #include <Arduino.h>
 
-#ifdef ESP32
-#include <SPIFFS.h>
-#endif
-
-#ifdef ESP8266
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include "coredecls.h"
-#endif
 
 #ifdef ENABLE_OTA
 #include <ArduinoOTA.h>
@@ -31,19 +25,8 @@
 
 //Webserver
 
-#ifdef ESP8266
 #include <ESP8266WebServer.h>
 ESP8266WebServer server(80);
-#endif
-
-#ifdef ESP32
-#include <WebServer.h>
-WebServer server(80);
-#endif
-
-#if defined(ESP32) && defined(ENABLE_OTA)
-#include <Update.h>
-#endif
 
 #include "spiffs_webserver.h"
 bool isWebserver_started=false;
@@ -60,9 +43,8 @@ const char* password = "yourpassword";      //Enter your WiFi credentials if you
 extern "C"{
 #include "homeintegration.h"
 }
-#ifdef ESP8266
+
 #include "homekitintegrationcpp.h"
-#endif
 
 //This code is not used at this time as there is no on device color change ability
 ////color converters
@@ -93,22 +75,14 @@ String pair_file_name="/pair.dat"; //store pairing information in this file
 int rgbw[4];
 
 void setup() {
- #ifdef ESP8266 
-  disable_extra4k_at_link_time();
- #endif 
+    disable_extra4k_at_link_time();
+
     Serial.begin(115200);
     delay(10);
 
-#ifdef ESP32
-     if (!SPIFFS.begin(true)) {
-      // Serial.print("SPIFFS Mount failed");
-     }
-#endif
-#ifdef ESP8266
-     if (!SPIFFS.begin()) {
+    if (!SPIFFS.begin()) {
       //Serial.print("SPIFFS Mount failed");
      }
-#endif
  
     pinMode(REDPIN, OUTPUT);
     pinMode(GREENPIN, OUTPUT);
@@ -120,12 +94,9 @@ void setup() {
     WiFi.mode(WIFI_STA);
 #else
     //Serial.println(ssid);
-    #ifdef ESP8266
-        WiFi.mode(WIFI_STA);
-        WiFi.begin((char*)ssid, (char*)password);
-    #else
-        WiFi.begin(ssid, password);
-    #endif
+    WiFi.mode(WIFI_STA);
+    WiFi.begin((char*)ssid, (char*)password);
+
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         //Serial.print(".");
@@ -170,27 +141,22 @@ void setup() {
     hap_init_homekit_server();
 
   //Web server section
-#ifdef ESP8266
     if(hap_homekit_is_paired()){
-#endif
     //Serial.println(PSTR("Setting web server"));
-    SETUP_FILEHANDLES
-    server.on("/get", handleGetVal);
-    server.on("/set", handleSetVal);   
-    server.begin(); 
-    isWebserver_started=true;
-#ifdef ESP8266
-}else
-    //Serial.println(PSTR("Web server is NOT SET, waiting for pairing"));
-#endif
-
-    //On restart set LEDs to off
-    analogWrite(REDPIN, 0);
-    analogWrite(GREENPIN, 0);
-    analogWrite(BLUEPIN, 0);
-    analogWrite(WHITEPIN, 0);
-    //notify homekit of inital value LED is off
-    INIT_CHARACHTERISTIC_VAL(bool,hap_on,false);
+	SETUP_FILEHANDLES
+	server.on("/get", handleGetVal);
+	server.on("/set", handleSetVal);   
+	server.begin(); 
+	isWebserver_started=true;
+    }else
+	//Serial.println(PSTR("Web server is NOT SET, waiting for pairing"));
+	//On restart set LEDs to off
+	analogWrite(REDPIN, 0);
+	analogWrite(GREENPIN, 0);
+	analogWrite(BLUEPIN, 0);
+	analogWrite(WHITEPIN, 0);
+	//notify homekit of inital value LED is off
+	INIT_CHARACHTERISTIC_VAL(bool,hap_on,false);
 }
 
 void notifyHAP(){
@@ -463,10 +429,8 @@ void loop() { //main program loop
     ArduinoOTA.handle(); //check for OTA updates
 #endif
 
-#ifdef ESP8266
   hap_homekit_loop();
-#endif
   
-if(isWebserver_started)
+  if(isWebserver_started)
     server.handleClient();
 }
