@@ -1,5 +1,5 @@
 #include "port_x.h"
-#include "debug.h"
+#include "esphap_debug.h"
 #ifdef ARDUINO8266_SERVER_CPP
 extern "C" {
 #include "homeintegration.h"

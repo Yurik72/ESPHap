@@ -311,7 +311,7 @@ void ICACHE_FLASH_ATTR homekit_mdns_configure_finalize() {
 #include "types.h"
 #include "Arduino.h"
 #include "user_interface.h"
-#include "debug.h"
+#include "esphap_debug.h"
 
 #ifndef MDNS_TTL
 #define MDNS_TTL 4500

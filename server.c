@@ -38,7 +38,7 @@
 #include "storage.h"
 #include "query_params.h"
 #include "json.h"
-#include "debug.h"
+#include "esphap_debug.h"
 #include "port.h"
 
 #include "homekit.h"
@@ -2515,9 +2515,9 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
                         return HAPStatus_InvalidValue;
                     }
 
-                    size_t tlv_size = base64_decoded_size((unsigned char*)value, value_len);
+                    size_t tlv_size = esphap_base64_decoded_size((unsigned char*)value, value_len);
                     byte *tlv_data = malloc(tlv_size);
-                    if (base64_decode((byte*) value, value_len, tlv_data) < 0) {
+                    if (esphap_base64_decode((byte*) value, value_len, tlv_data) < 0) {
                         free(tlv_data);
                         CLIENT_ERROR(context, "Failed to update %d.%d: error Base64 decoding", aid, iid);
                         return HAPStatus_InvalidValue;
@@ -2567,7 +2567,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 						return HAPStatus_InvalidValue;
 					}
 
-					size_t data_size = base64_decoded_size((unsigned char*)value, value_len);
+					size_t data_size = esphap_base64_decoded_size((unsigned char*)value, value_len);
 					byte *data = malloc(data_size);
 					if (!data) {
 						CLIENT_ERROR(context,
@@ -2577,7 +2577,7 @@ void homekit_server_on_update_characteristics(client_context_t *context, const b
 						return HAPStatus_InvalidValue;
 					}
 
-					if (base64_decode((byte*)value, value_len, data) < 0) {
+					if (esphap_base64_decode((byte*)value, value_len, data) < 0) {
 						free(data);
 						CLIENT_ERROR(context, "Failed to update %d.%d: error Base64 decoding", aid, iid);
 						return HAPStatus_InvalidValue;

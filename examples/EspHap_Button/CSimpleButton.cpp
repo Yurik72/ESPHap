@@ -1,6 +1,6 @@
 
 #include "CSimpleButton.h"
-#include "debug.h"
+#include "esphap_debug.h"
 
 void IRAM_ATTR isr() {
 	Serial.println("isr");

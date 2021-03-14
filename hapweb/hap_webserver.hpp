@@ -44,7 +44,7 @@ WebServer server(80);
 //#include "file_index_html.h"
 #include "hap_file_setup.h"
 #include "../qr/hapqr.hpp"
-#include "../debug.h"
+#include "../esphap_debug.h"
 
 const char FILE_BROWSE_FILE[] PROGMEM = "/filebrowse.html";
 const char FILE_INDEX[] PROGMEM = "index.html";

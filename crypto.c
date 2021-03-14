@@ -15,7 +15,7 @@
 
 #include "port_x.h"
 #include "port.h"
-#include "debug.h"
+#include "esphap_debug.h"
 #define CACHE_CURVE25519_KEY_SIZE 2
 const curve25519_key cache_curve25519_key[CACHE_CURVE25519_KEY_SIZE];
 #ifndef ARDUINO8266_SERVER_X

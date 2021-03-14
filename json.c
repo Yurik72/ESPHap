@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "json.h"
-#include "debug.h"
+#include "esphap_debug.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 

@@ -1,6 +1,6 @@
 #include <string.h>
 #include <ctype.h>
-#include "debug.h"
+#include "esphap_debug.h"
 #include "crypto.h"
 #include "pairing.h"
 #include "port.h"

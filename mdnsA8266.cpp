@@ -5,7 +5,7 @@
 #include "mdnsA8266.h"
 
 
-#include "debug.h"
+#include "esphap_debug.h"
 
 //#include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>

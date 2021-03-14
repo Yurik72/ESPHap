@@ -27,7 +27,7 @@
 #include "esphap_cJSON.h"
 #include "cJSON_memory.h"
 #include "json.h"
-#include "debug.h"
+#include "esphap_debug.h"
 #include "port.h"
 #include "http_parser.h"
 #include "query_params.h"
@@ -2679,9 +2679,9 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 				return HAPStatus_InvalidValue;
 			}
 
-			size_t tlv_size = base64_decoded_size((unsigned char*)value, value_len);
+			size_t tlv_size = esphap_base64_decoded_size((unsigned char*)value, value_len);
 			byte *tlv_data = (byte*)malloc(tlv_size);
-			if (base64_decode((byte*)value, value_len, tlv_data) < 0) {
+			if (esphap_base64_decode((byte*)value, value_len, tlv_data) < 0) {
 				free(tlv_data);
 				CLIENT_ERROR(context, "Failed to update %d.%d: error Base64 decoding", aid, iid);
 				return HAPStatus_InvalidValue;
@@ -2732,9 +2732,9 @@ HAPStatus process_characteristics_update(const cJSON *j_ch, client_context_t *co
 				return HAPStatus_InvalidValue;
 			}
 
-			size_t data_size = base64_decoded_size((unsigned char*)value, value_len);
+			size_t data_size = esphap_base64_decoded_size((unsigned char*)value, value_len);
 			byte *data = (byte*)malloc(data_size);
-			if (base64_decode((byte*)value, value_len, data) < 0) {
+			if (esphap_base64_decode((byte*)value, value_len, data) < 0) {
 				free(data);
 				CLIENT_ERROR(context, "Failed to update %d.%d: error Base64 decoding", aid, iid);
 				return HAPStatus_InvalidValue;

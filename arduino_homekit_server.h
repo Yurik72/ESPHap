@@ -23,7 +23,7 @@ extern "C" {
 #include "storage.h"
 #include "query_params.h"
 #include "json.h"
-#include "debug.h"
+#include "esphap_debug.h"
 #include "port.h"
 #include "cQueue.h"
 #include "homekit.h"
