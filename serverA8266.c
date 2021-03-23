@@ -590,7 +590,7 @@ void write_characteristic_json(json_stream *json, client_context_t *client, cons
 
                             size_t encoded_tlv_size = base64_encoded_size(tlv_data, tlv_size);
                             byte *encoded_tlv_data = malloc(encoded_tlv_size + 1);
-                            base64_encode(tlv_data, tlv_size, encoded_tlv_data);
+							esphap_base64_encode(tlv_data, tlv_size, encoded_tlv_data);
                             encoded_tlv_data[encoded_tlv_size] = 0;
 
                             json_string(json, (char*) encoded_tlv_data);
@@ -3493,7 +3493,7 @@ void homekit_setup_mdns(homekit_server_t *server) {
         memset(encodedHash, 0, sizeof(encodedHash));
 
         word32 len = sizeof(encodedHash);
-		base64_encode((const unsigned char *)shaHash, 4, encodedHash);// , &len);
+		esphap_base64_encode((const unsigned char *)shaHash, 4, encodedHash);// , &len);
 
         homekit_mdns_add_txt("sh", "%s", encodedHash);
     }

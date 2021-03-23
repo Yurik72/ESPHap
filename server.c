@@ -634,7 +634,7 @@ void write_characteristic_json(json_stream *json, client_context_t *client, cons
 
                             size_t encoded_tlv_size = base64_encoded_size(tlv_data, tlv_size);
                             byte *encoded_tlv_data = malloc(encoded_tlv_size + 1);
-                            base64_encode(tlv_data, tlv_size, encoded_tlv_data);
+							esphap_base64_encode(tlv_data, tlv_size, encoded_tlv_data);
                             encoded_tlv_data[encoded_tlv_size] = 0;
 
                             json_string(json, (char*) encoded_tlv_data);
@@ -658,7 +658,7 @@ void write_characteristic_json(json_stream *json, client_context_t *client, cons
 							json_string(json, "");
 							break;
 						}
-						base64_encode(v.data_value, v.data_size, encoded_data);
+						esphap_base64_encode(v.data_value, v.data_size, encoded_data);
 						encoded_data[encoded_data_size] = 0;
 
 						json_string(json, (char*)encoded_data);

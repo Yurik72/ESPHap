@@ -36,7 +36,7 @@ size_t esphap_base64_decoded_size(const unsigned char *encoded_data, size_t enco
   return size;
 }
 
-int base64_encode(const unsigned char* data, size_t size, unsigned char *encoded_data) {
+int esphap_base64_encode(const unsigned char* data, size_t size, unsigned char *encoded_data) {
   size_t i=0, j=0, size1=size - size%3;
   for (; i<size1; i+=3, j+=4) {
     encoded_data[j+0] = base64_encode_char(data[i+0]>>2);

@@ -748,7 +748,7 @@ void write_characteristic_json(json_stream *json, client_context_t *client,
 						byte *encoded_tlv_data = (byte*)malloc(encoded_tlv_size + 1);
 						CLIENT_INFO(client,"write tlv  json encoded_tlv_size:%d,tlv_size:%d", encoded_tlv_size, tlv_size);
 						//base64_encode_(tlv_data, tlv_size, encoded_tlv_data);
-						base64_encode(tlv_data, tlv_size, encoded_tlv_data);
+						esphap_base64_encode(tlv_data, tlv_size, encoded_tlv_data);
 						encoded_tlv_data[encoded_tlv_size] = 0;
 
 						json_string(json, (char*)encoded_tlv_data);
@@ -3953,7 +3953,7 @@ void homekit_mdns_init(homekit_server_t *server) {
 		memset(encodedHash, 0, sizeof(encodedHash));
 		word32 len = sizeof(encodedHash);
 		//base64_encode_((const unsigned char*) shaHash, 4, encodedHash);
-		base64_encode((const unsigned char*)shaHash, 4, encodedHash);
+		esphap_base64_encode((const unsigned char*)shaHash, 4, encodedHash);
 		MDNS.addServiceTxt(mdns_service, "sh", (char*)encodedHash);
 	}
 
