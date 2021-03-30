@@ -68,6 +68,8 @@ bool handleFileRead(String path);
 void handleFileList();
 void handleFileUpload();
 
+static bool isspiffs_locked = false;   // to do... need better way to handle multiple access
+
 #define SETUP_FILEHANDLES   server.on("/list", HTTP_GET, handleFileList); \
   server.on("/edit", HTTP_GET, []() { \
     if (!handleFileRead("/edit.htm")) server.send(404, FPSTR(TEXT_PLAIN), "FileNotFound"); \
@@ -414,10 +416,16 @@ void handleFileList() {
 
 };
 void saveFile(const __FlashStringHelper* name, const __FlashStringHelper* content) {
-	String data = FPSTR(content);
+	//String data = FPSTR(content);
+	if (isspiffs_locked) {
+		ERROR("Save file failed , spiffs locked");
+		return;
+	}
+	isspiffs_locked = true;
+	String data = content;
 	String filename = name;
 	if (!filename.startsWith("/")) filename = "/" + filename;
-	//INFO("Save file %s", filename.c_str());
+	INFO("Save file %s", filename.c_str());
 	//INFO("Save file content %s", data.substring(1,90).c_str());
 	File fb = SPIFFS.open(filename, "w+");
 	if (fb)
@@ -426,10 +434,58 @@ void saveFile(const __FlashStringHelper* name, const __FlashStringHelper* conten
 		ERROR("Save file failed %s", filename.c_str());
 	if (fb)
 		fb.close();
+	isspiffs_locked = false;
+}
+void saveFileChunked(const __FlashStringHelper* name, const char* content) {
+	if (isspiffs_locked) {
+		ERROR("Save file failed , spiffs locked");
+			return;
+	}
+	isspiffs_locked = true;
+	size_t content_size = strlen_P(content);
+	const int CHUNKSIZE = 1024; // CHUNKSIZE *must* be an even number!!
+	char workingBuff[CHUNKSIZE + 1];
+	size_t idx = 0;
+	String filename = name;
+	
+	if (!filename.startsWith("/")) filename = "/" + filename;
+	INFO("Save saveFileChunked file %s", filename.c_str());
+	File fb = SPIFFS.open(filename, "w+");
+	if (!fb) {
+		bool exist=SPIFFS.exists(filename);
+		INFO("exist %d", exist);
+		//if (exist)
+		//	SPIFFS.remove(filename);
+		//fb = SPIFFS.open(filename, "w+");
+	}
+	if (fb) {
+		while (idx < content_size) {
+			size_t chunk;
+			if (idx + CHUNKSIZE > content_size) {
+				chunk = content_size - idx;
+			}
+			else {
+				chunk = CHUNKSIZE;
+			}
+			INFO("chunk %d", chunk);
+			memcpy_P(workingBuff, content + idx, chunk);
+			//workingBuff[chunk] = 0;
+			fb.write(workingBuff, chunk);
+			//fb.print(workingBuff);
+			idx += chunk;
+			yield();
+		}
+	}
+	else
+		ERROR("Save file failed %s", filename.c_str());
+	if (fb)
+		fb.close();
+	isspiffs_locked = false;
 }
 void saveFileBrowse() {
 	//INFO("Save file browse");
 	saveFile(FPSTR(FILE_BROWSE_FILE), FPSTR(FILE_BROWSE_HTML));
+	//saveFileChunked(FPSTR(FILE_BROWSE_FILE), FILE_BROWSE_HTML);
 	/*
 	  //DBG_OUTPUT_PORT.println("saveFileBrowse: " );
 	  String data=FPSTR(FILE_BROWSE_HTML);
@@ -442,11 +498,16 @@ void saveFileBrowse() {
 	 */
 };
 void saveSetup() {
-	saveFile(FPSTR(FILE_SETUP), FPSTR(SETUP_HTML));
+	//saveFile(FPSTR(FILE_SETUP), FPSTR(SETUP_HTML));
+
+	saveFileChunked(FPSTR(FILE_SETUP), SETUP_HTML);
 };
+
 void saveIndex() {
+
 	if(INDEX_HTML_INTERNAL)
-		saveFile(FPSTR(FILE_INDEX), FPSTR(INDEX_HTML_INTERNAL));
+		saveFileChunked(FPSTR(FILE_INDEX), reinterpret_cast<const char*>(INDEX_HTML_INTERNAL));
+		//saveFile(FPSTR(FILE_INDEX), FPSTR(INDEX_HTML_INTERNAL));
 
 	/*
 	  String data=FPSTR(INDEX_HTML);
@@ -456,7 +517,7 @@ void saveIndex() {
 	  if(fb)
 		fb.close();
 	 */
-};;
+};
 
 void handleFileBrowser()
 {
@@ -473,8 +534,9 @@ void handleFileBrowser()
 				handleFileDownload(server.arg("file").c_str());
 			}
 			else
-			{
-				SPIFFS.remove(FPSTR(FILE_BROWSE_FILE));
+			{   
+				INFO("Handle file browse");
+				//SPIFFS.remove(FPSTR(FILE_BROWSE_FILE));
 				if (!SPIFFS.exists(FPSTR(FILE_BROWSE_FILE))) {
 					saveFileBrowse();
 				}
