@@ -467,7 +467,7 @@ void saveFileChunked(const __FlashStringHelper* name, const char* content) {
 			else {
 				chunk = CHUNKSIZE;
 			}
-			INFO("chunk %d", chunk);
+			//INFO("chunk %d", chunk);
 			memcpy_P(workingBuff, content + idx, chunk);
 			//workingBuff[chunk] = 0;
 			fb.write(workingBuff, chunk);

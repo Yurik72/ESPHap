@@ -128,8 +128,8 @@ homekit_server_config_t config = {
 };
 */
 #ifdef ESP8266
-#define MAX_HAP_SERVICES 7
-#define MAX_HAP_ACCESSORIES 7
+#define MAX_HAP_SERVICES 8
+#define MAX_HAP_ACCESSORIES 8
 #else // ESP32.
 #define MAX_HAP_SERVICES 45
 #define MAX_HAP_ACCESSORIES 45
