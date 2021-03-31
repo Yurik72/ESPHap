@@ -127,9 +127,13 @@ homekit_server_config_t config = {
     .password = "111-11-111"
 };
 */
-
+#ifdef ESP8266
 #define MAX_HAP_SERVICES 7
 #define MAX_HAP_ACCESSORIES 7
+#else // ESP32.
+#define MAX_HAP_SERVICES 45
+#define MAX_HAP_ACCESSORIES 45
+#endif
 homekit_accessory_t *hap_accessories[MAX_HAP_ACCESSORIES + 1] = { 0 };
 homekit_service_t* hap_services[MAX_HAP_SERVICES + 1] = { 0 };
 homekit_server_config_t hap_config = {
