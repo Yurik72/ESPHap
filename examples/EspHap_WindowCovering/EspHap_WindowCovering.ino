@@ -61,7 +61,12 @@ homekit_characteristic_t * ch_hold=NULL;
 #ifdef ESP_TASK
 #include <task.h>
 TaskHandle_t updateStateTask;
+#elif defined ESP8266
+#include <Ticker.h>
+Ticker ticker;
+#define TICKER_PERIOD 0.5       // second
 #else
+  
 esp_timer_create_args_t _timerConfig;
 esp_timer_handle_t _timer=NULL;
 #endif
@@ -170,6 +175,8 @@ void create_update_task() {
 #ifdef ESP_TASK
     xTaskCreate(update_state, "UpdateState", 256, NULL, tskIDLE_PRIORITY, &updateStateTask);
     vTaskSuspend(updateStateTask);
+#elif defined ESP8266
+ //ticker.attach(0.3, flip);
 #else
   _timerConfig.arg = 0;
   _timerConfig.callback = update_window_state_arg;
@@ -181,7 +188,8 @@ void create_update_task() {
 
 void start_update_task(){
 #ifdef ESP_TASK
-  
+#elif defined ESP8266
+ ticker.attach(TICKER_PERIOD, update_window_state);  
 #else
   esp_timer_start_periodic(_timer,   10*500ULL);
 #endif
@@ -189,6 +197,8 @@ void start_update_task(){
 void suspend_update_task(){
 #ifdef ESP_TASK
    vTaskSuspend(updateStateTask);
+#elif defined ESP8266
+  ticker.detach();
 #else
   esp_timer_stop(_timer);
 #endif
@@ -198,6 +208,8 @@ void resume_update_task(){
 
 #ifdef ESP_TASK
     vTaskResume(updateStateTask);
+#elif defined ESP8266
+ ticker.attach(TICKER_PERIOD, update_window_state);
 #else 
   esp_timer_start_periodic(_timer,   10*500ULL);
 #endif

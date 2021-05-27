@@ -127,6 +127,7 @@ homekit_server_config_t config = {
     .password = "111-11-111"
 };
 */
+#define ESPHAP_VERSION "v1.1"
 #ifdef ESP8266
 #define MAX_HAP_SERVICES 8
 #define MAX_HAP_ACCESSORIES 8
@@ -205,6 +206,7 @@ static bool paired = false;
 #ifndef ARDUINO8266_SERVER_CPP
 void hap_init_homekit_server() {
 //	INFO("callbackstorage_integration 0x%x ", callbackstorage_integration);
+	INFO("hap_init_homekit_server library version %s", ESPHAP_VERSION);
 	set_wifi_max_power();
 	if(hap_mainservices_current>1){
 		set_callback_storage(on_storage_changed);
