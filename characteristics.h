@@ -2695,4 +2695,18 @@
     }, \
     ##__VA_ARGS__
 
+#define HOMEKIT_CHARACTERISTIC_COLORTEMPERATURE HOMEKIT_APPLE_UUID2("CE")
+#define HOMEKIT_DECLARE_CHARACTERISTIC_COLORTEMPERATURE(_value, ...) \
+    .type = HOMEKIT_CHARACTERISTIC_COLORTEMPERATURE, \
+    .description = "Color Themperathure", \
+    .format = homekit_format_uint8, \
+    .unit = homekit_unit_none, \
+    .permissions = homekit_permissions_paired_read \
+                 | homekit_permissions_paired_write \
+                 | homekit_permissions_notify, \
+    .min_value = (float[]) {140}, \
+    .max_value = (float[]) {500}, \
+    .min_step = (float[]) {1}, \
+    .value = HOMEKIT_INT_(_value), \
+    ##__VA_ARGS__
 #endif // __HOMEKIT_CHARACTERISTICS__
