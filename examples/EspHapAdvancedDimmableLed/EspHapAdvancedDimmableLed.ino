@@ -24,7 +24,6 @@ bool is_webserver_started = false;
 const int identity_led = 2;
 const int led_gpio = 4;
 int pwm_channel = 0; // for esp32, we will use channel 0 for PWM
-uint8_t led_level_stored = 0;
 
 #define DIM_MIN_VAL 0
 #define DIM_MAX_VAL 0xFF
@@ -191,11 +190,6 @@ void set_led(bool val) {
         hapservice, HOMEKIT_CHARACTERISTIC_ON);
     HAP_NOTIFY_CHANGES(bool, ch, val, 0)
   }
-  if (!val) {
-    set_led_level(0);
-  } else {
-    set_led_level(led_level_stored);
-  }
 }
 void set_led_level(uint8_t val) {
   Serial.println("set_led_level");
@@ -211,9 +205,6 @@ void set_led_level(uint8_t val) {
     homekit_characteristic_t *ch = homekit_service_characteristic_by_type(
         hapservice, HOMEKIT_CHARACTERISTIC_BRIGHTNESS);
     HAP_NOTIFY_CHANGES(int, ch, val, 0)
-    if (val > 0) {
-      led_level_stored = val;
-    }
   }
 }
 
