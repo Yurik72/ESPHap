@@ -396,7 +396,11 @@
 			fetch(query)
 				.then(response => response.text())
 				.then(val => {
-					el.value = val;
+					if(el.type === 'checkbox') {
+						el.checked = val === '1';
+					} else {
+						el.value = val;
+					}
 				});
 		});
 	};
