@@ -1251,7 +1251,7 @@ void hap_setinitial_characteristic_int_value(homekit_service_t* s, const char *t
 	hap_set_initial_characteristic_int_value(homekit_service_characteristic_by_type(s, type), val);
 }
 void hap_setinitial_characteristic_bool_value(homekit_service_t* s, const char *type, bool val) {
-	hap_set_initial_characteristic_int_value(homekit_service_characteristic_by_type(s, type), val);
+	hap_set_initial_characteristic_bool_value(homekit_service_characteristic_by_type(s, type), val);
 }
 
 void hap_set_initial_characteristic_int_value(homekit_characteristic_t* ch, int val) {
