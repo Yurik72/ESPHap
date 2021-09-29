@@ -46,6 +46,9 @@ To simplify installation, ESPHap comes with a pre-configured and slightly patche
 - ESP8266 board library version  between 2.6.3  and 2.7.4
 - Arduino version 1.8.12 and above
 
+! Note for ESP8266 boards select lwIP Variant :v2 High bandwidth.  Device behaviours is more stable especially in pairing process
+
+
 ### About the included webserver
 Some of the more advanced code examples below come with an integrated webserver which features a SPIFFS (Serial Peripheral Interface Flash File System) backend. The webserver is often used to display sensor data, control devices, configure device WiFi settings or to store data like Homekit binding credentials or historical sensor data. Once you've connected your device to your WLAN, it will be available under ``http://IPADDRESS/``. Your IP address is displayed within Arduino's serial monitor window during the boot sequence, so the IP is 172.16.0.169 in this case:
 
