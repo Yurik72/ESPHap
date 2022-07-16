@@ -310,7 +310,7 @@ void hap_set_device_setupId(char* szpwd) {
 }
 homekit_service_t* hap_new_homekit_accessory_service(const char *szname,const char * szserialnumber){
 	return NEW_HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]) {
-		        NEW_HOMEKIT_CHARACTERISTIC(NAME, sz_acc_name),
+		        NEW_HOMEKIT_CHARACTERISTIC(NAME, szname),
 		        NEW_HOMEKIT_CHARACTERISTIC(MANUFACTURER, sz_acc_manufacturer),
 		        NEW_HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, szserialnumber),
 		        NEW_HOMEKIT_CHARACTERISTIC(MODEL, sz_acc_models),
